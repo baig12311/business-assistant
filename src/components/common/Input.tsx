@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native"
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardTypeOptions} from "react-native"
 import Colors from "../../../src/constants/colors"
 import fonts, { fontSize } from "../../../src/constants/typography"
 import {
@@ -16,8 +16,10 @@ interface props {
     error?: string
     iconName:string
     iconType:string
+    keyboard?:KeyboardTypeOptions
 }
-const Input: React.FC<props> = ({ value, onChangeText, title, placeholder, error, iconName, iconType}) => {
+const Input: React.FC<props> = ({ value, onChangeText, title, placeholder, 
+    error, iconName, iconType, keyboard}) => {
     const [show, setShow] = useState(false)
     return (
         <View style={styles.container}>
@@ -33,6 +35,7 @@ const Input: React.FC<props> = ({ value, onChangeText, title, placeholder, error
                     value={value}
                     onChangeText={onChangeText}
                     placeholder={placeholder}
+                    keyboardType={keyboard}
                     placeholderTextColor={Colors.textSecondary}
                     style={styles.input}
                     secureTextEntry={(title === 'Password' || title === 'Confirm Password') && !show}

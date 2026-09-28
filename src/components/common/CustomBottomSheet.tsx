@@ -12,12 +12,11 @@ import Button from './Button';
 interface Props {
     bottomSheetRef: React.RefObject<BottomSheet | null>;
     options:string[]
-    value:string
     title:string
     onSelect: (value: string) => void;
 }
 
-const CustomBottomSheet: React.FC<Props> = ({ bottomSheetRef, options, title, value, onSelect}) => {
+const CustomBottomSheet: React.FC<Props> = ({ bottomSheetRef, options, title, onSelect}) => {
     const insets = useSafeAreaInsets()
 
 

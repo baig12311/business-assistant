@@ -10,7 +10,20 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.background,
         padding: wp(3),
     },
-    
+    scrollContainer:{
+        paddingBottom: hp(6),
+        flexGrow:1,
+        justifyContent: 'center',
+    },
+    button:{
+        marginTop: hp(4)
+    },
+    heading:{
+        fontFamily:fonts.extraBold,
+        fontSize:fontSize.largeHeading,
+        color:Colors.text,
+        marginBottom:hp(4)
+    },
 
 })
 export default styles

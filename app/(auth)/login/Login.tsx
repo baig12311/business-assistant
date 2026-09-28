@@ -4,6 +4,8 @@ import styles from './LoginStyle';
 import { router } from 'expo-router';
 import { supabase } from '../../../src/lib/supabase';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { getBusiness } from '../../../src/services/business';
+import { useBusiness } from '../../../src/hooks/useBusiness';
 import Input from '../../../src/components/common/Input';
 import { loginSchema } from '../../../src/services/schema/loginSchema';
 import Button from '../../../src/components/common/Button';
@@ -39,16 +41,7 @@ const Login = () => {
             return;
         }
         console.log('Sign In Success:', data);
-        const { data: business, error: businessError } = await supabase
-            .from('businesses')
-            .select('id')
-            .eq('owner_id', data.user.id)
-            .maybeSingle();
-
-        if (businessError) {
-            console.log(businessError.message);
-            return;
-        }
+        const business=await getBusiness(data.user.id)
 
         if (!business) {
             router.replace('/businessSetup/BusinessSetup');
@@ -71,6 +64,7 @@ const Login = () => {
                 error={errors.email}
                 iconName='mail-outline'
                 iconType='Ionicons'
+                keyboard='email-address'
             />
             <Input
                 title='Password'

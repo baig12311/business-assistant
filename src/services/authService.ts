@@ -8,3 +8,14 @@ export const logout = async () => {
     }
     router.replace('/OnBoard')
 };
+
+export const getCurrentUser = async () => {
+    const {
+        data: { user },
+        error
+    } = await supabase.auth.getUser()
+    if (error) {
+        throw new Error(error.message)
+    }
+    return user
+}

@@ -9,13 +9,14 @@ import {
 import Icon from "./Icon"
 interface props {
     value?: string
-    //onChangeText?: any
     title: string
     placeholder: string
     error?: string
     onPress?:()=>void
+    iconName:string
+    iconType:string
 }
-const SelectInput: React.FC<props> = ({ value,title, placeholder, error, onPress}) => {
+const SelectInput: React.FC<props> = ({ value,title, placeholder, error, onPress, iconName, iconType}) => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>{title}</Text>
@@ -24,7 +25,15 @@ const SelectInput: React.FC<props> = ({ value,title, placeholder, error, onPress
             activeOpacity={0.7}
             onPress={onPress}
             >
-                <Text style={styles.input}>
+                <Icon
+                name={iconName}
+                type={iconType}
+                color={Colors.textSecondary}
+                size={wp(5)}
+                />
+                <Text style={[styles.input,
+                    {color: value ? Colors.text : Colors.textSecondary}
+                ]}>
                     {value ? value : placeholder}
                 </Text>
                 <Icon
@@ -61,7 +70,8 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: fontSize.text,
         fontFamily: fonts.medium,
-        color: Colors.textSecondary,
+        //color: Colors.textSecondary,
+        marginLeft:wp(1)
     },
     title: {
         fontFamily: fonts.semiBold,

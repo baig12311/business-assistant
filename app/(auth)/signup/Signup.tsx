@@ -11,6 +11,7 @@ const Signup = () => {
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [loading, setLoading] = useState(false)
     const [confirmPassword, setConfirmPassword] = useState('')
     const [errors, setErrors] = useState<{
         name?: string;
@@ -20,6 +21,7 @@ const Signup = () => {
     }>({});
     // SignUp
     const handleSignup = async () => {
+        setLoading(true)
         const result = signupSchema.safeParse({
             name,
             email,
@@ -52,6 +54,7 @@ const Signup = () => {
             return;
         }
         router.push('/businessSetup/BusinessSetup')
+        setLoading(false)
         console.log('Sign Up Success:', data);
     }
     return (
@@ -84,6 +87,7 @@ const Signup = () => {
                         error={errors.email}
                         iconName='mail-outline'
                         iconType='Ionicons'
+                        keyboard='email-address'
                     />
                     <Input
                         title='Password'
@@ -108,6 +112,7 @@ const Signup = () => {
                         <Button
                             title='Sign Up'
                             onPress={handleSignup}
+                            isLoading={loading}
                         />
                     </View>
 

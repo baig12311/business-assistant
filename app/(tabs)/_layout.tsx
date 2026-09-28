@@ -56,7 +56,7 @@ const TabLayout = () => {
                     return (
                         <Icon 
                             name={iconName} 
-                            color={Colors.primary} 
+                            color={color} 
                             size={size} 
                             type={type} 
                         />
