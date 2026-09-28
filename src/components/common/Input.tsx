@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardTypeOptions} from "react-native"
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardTypeOptions } from "react-native"
 import Colors from "../../../src/constants/colors"
 import fonts, { fontSize } from "../../../src/constants/typography"
 import {
@@ -10,27 +10,35 @@ import Icon from "./Icon"
 interface props {
     value?: string
     onChangeText?: any
-    title: string
+    title?: string
     placeholder: string
     secure?: boolean
     error?: string
-    iconName:string
-    iconType:string
-    keyboard?:KeyboardTypeOptions
+    iconName?: string
+    iconType?: string
+    keyboard?: KeyboardTypeOptions
 }
-const Input: React.FC<props> = ({ value, onChangeText, title, placeholder, 
-    error, iconName, iconType, keyboard}) => {
+const Input: React.FC<props> = ({ value, onChangeText, title, placeholder,
+    error, iconName, iconType, keyboard }) => {
     const [show, setShow] = useState(false)
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>{title}</Text>
+            {
+                title && (<Text style={styles.title}>{title}</Text>
+                )
+            }
             <View style={styles.inputContainer}>
-                <Icon
-                name={iconName}
-                type={iconType}
-                color={Colors.textSecondary}
-                size={wp(5)}
-                />
+                {
+                    iconName && iconType && (
+                        <Icon
+                            name={iconName}
+                            type={iconType}
+                            color={Colors.textSecondary}
+                            size={wp(5)}
+                        />
+                    )
+                }
+
                 <TextInput
                     value={value}
                     onChangeText={onChangeText}
@@ -84,12 +92,12 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         fontSize: fontSize.text,
-        fontFamily: fonts.medium,
+        fontFamily: fonts.regular,
         color: Colors.text,
-        marginLeft:wp(1)
+        marginLeft: wp(1)
     },
     title: {
-        fontFamily: fonts.semiBold,
+        fontFamily: fonts.medium,
         fontSize: fontSize.text,
         marginBottom: hp(0.5),
         color: Colors.textSecondary

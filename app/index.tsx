@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '../src/lib/supabase';
-
+import AnimatedLoader from '../src/components/common/AnimatedLoader';
 const Index = () => {
 
     useEffect(() => {
@@ -53,7 +53,8 @@ const Index = () => {
                 alignItems: 'center',
             }}
         >
-            <ActivityIndicator />
+            {/* <ActivityIndicator /> */}
+            <AnimatedLoader/>
         </View>
     );
 };

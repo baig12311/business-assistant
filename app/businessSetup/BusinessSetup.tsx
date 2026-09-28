@@ -13,7 +13,7 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import { currencies } from '../../src/services/data/currencies';
 import { businessCategories } from '../../src/services/data/categories';
 const BusinessSetup = () => {
-    const {data:user, isLoading, error} = useUser()
+    const { data: user, isLoading, error } = useUser()
     const [loading, setLoading] = useState(false)
     const [category, setCategory] = useState('')
     const [currency, setCurrency] = useState('')
@@ -78,90 +78,94 @@ const BusinessSetup = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            >
-                <ScrollView
-                    contentContainerStyle={styles.scrollContainer}
-                    keyboardShouldPersistTaps="handled"
-                    showsVerticalScrollIndicator={false}
+        <View style={{ flex: 1 }}>
+            <SafeAreaView style={styles.container}>
+                <KeyboardAvoidingView
+                    style={{ flex: 1 }}
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 >
-                    <Text style={styles.heading}>Business Information</Text>
+                    <ScrollView
+                        contentContainerStyle={styles.scrollContainer}
+                        keyboardShouldPersistTaps="handled"
+                        showsVerticalScrollIndicator={false}
+                    >
+                        <Text style={styles.heading}>Business Information</Text>
 
-                    <Input
-                        title='Business Name'
-                        placeholder='John Traders'
-                        iconName='storefront-outline'
-                        iconType='Ionicons'
-                        value={businessName}
-                        onChangeText={setBusinessName}
-                    />
-                    <SelectInput
-                        title='Category'
-                        placeholder='Select Category'
-                        value={category}
-                        iconName='apps-outline'
-                        iconType='Ionicons'
-                        onPress={() => {
-                            setShowSheet(true)
-                            openSheet(
-                                'Select Category',
-                                businessCategories,
-                                category
-
-                            )
-                        }}
-                    />
-                    <Input
-                        title='Whatsapp number'
-                        placeholder='+92 XXXXXXXXXX'
-                        iconName='call-outline'
-                        iconType='Ionicons'
-                        keyboard='phone-pad'
-                        value={number}
-                        onChangeText={setNumber}
-                    />
-                    <SelectInput
-                        title='Currency'
-                        placeholder='Select Currency'
-                        iconName='currency-usd'
-                        iconType='MaterialDesignIcons'
-                        value={currency}
-                        onPress={() => {
-                            setShowSheet(true)
-                            openSheet(
-                                'Select Currency',
-                                currencies,
-                                currency
-
-                            )
-                        }}
-                    />
-                    <View style={styles.button}>
-                        <Button
-                            title='Create Business'
-                            onPress={createBusiness}
-                            isLoading={loading}
+                        <Input
+                            title='Business Name'
+                            placeholder='John Traders'
+                            iconName='storefront-outline'
+                            iconType='Ionicons'
+                            value={businessName}
+                            onChangeText={setBusinessName}
                         />
-                    </View>
+                        <SelectInput
+                            title='Category'
+                            placeholder='Select Category'
+                            value={category}
+                            iconName='apps-outline'
+                            iconType='Ionicons'
+                            onPress={() => {
+                                setShowSheet(true)
+                                openSheet(
+                                    'Select Category',
+                                    businessCategories,
+                                    category
 
+                                )
+                            }}
+                        />
+                        <Input
+                            title='Whatsapp number'
+                            placeholder='+92 XXXXXXXXXX'
+                            iconName='call-outline'
+                            iconType='Ionicons'
+                            keyboard='phone-pad'
+                            value={number}
+                            onChangeText={setNumber}
+                        />
+                        <SelectInput
+                            title='Currency'
+                            placeholder='Select Currency'
+                            iconName='currency-usd'
+                            iconType='MaterialDesignIcons'
+                            value={currency}
+                            onPress={() => {
+                                setShowSheet(true)
+                                openSheet(
+                                    'Select Currency',
+                                    currencies,
+                                    currency
 
-                    {
-                        showSheet && (
-                            <CustomBottomSheet
-                                bottomSheetRef={sheetRef}
-                                options={sheetOptions}
-                                title={sheetTitle}
-                                onSelect={handleSelect}
-                            //value=
+                                )
+                            }}
+                        />
+                        <View style={styles.button}>
+                            <Button
+                                title='Create Business'
+                                onPress={createBusiness}
+                                isLoading={loading}
                             />
-                        )
-                    }
-                </ScrollView>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+                        </View>
+
+
+
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            </SafeAreaView>
+            {
+                showSheet && (
+                    <CustomBottomSheet
+                        bottomSheetRef={sheetRef}
+                        options={sheetOptions}
+                        title={sheetTitle}
+                        onSelect={handleSelect}
+                    //value=
+                    />
+                )
+            }
+        </View>
+
     );
 };
 

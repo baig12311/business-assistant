@@ -42,15 +42,17 @@ const TabLayout = () => {
                     } else if (route.name === 'Orders') {
                         iconName = focused ? 'cart' : 'cart-outline';
                         type = 'Ionicons';
+                    }
+                    else if (route.name === 'Products') {
+                        iconName = focused ? 'cube' : 'cube-outline';
+                        type = 'Ionicons';
                     } 
-                    // else if (route.name === 'categories') {
-                    //     iconName = focused ? 'grid' : 'grid-outline';
-                    //     type = 'Ionicons';
-                    // } 
                     else if (route.name === 'Profile') {
                         iconName = focused ? 'account' : 'account-outline';
                         type = 'MaterialCommunityIcons';
                     }
+                    
+                    
 
 
                     return (

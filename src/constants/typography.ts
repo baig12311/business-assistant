@@ -17,7 +17,8 @@ export const fontSize = {
   heading:wp(6),
   subHeading:wp(5),
   text:wp(4),
-  smallText:wp(3.5)
+  smallText:wp(3.5),
+  extraSmallText:wp(3)
 }
 
 export default fonts
