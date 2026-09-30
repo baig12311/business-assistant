@@ -9,7 +9,9 @@ import { useBusiness } from '../../../src/hooks/useBusiness';
 import Input from '../../../src/components/common/Input';
 import { loginSchema } from '../../../src/services/schema/loginSchema';
 import Button from '../../../src/components/common/Button';
+import { tr } from 'zod/v4/locales';
 const Login = () => {
+    const[loading, setLoading] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [errors, setErrors] = useState<{
@@ -18,6 +20,7 @@ const Login = () => {
     }>({});
     // Login
     const handleSignin = async () => {
+        setLoading(true)
         const result = loginSchema.safeParse({
             email,
             password,
@@ -29,7 +32,7 @@ const Login = () => {
                 email: fieldErrors.email?.[0],
                 password: fieldErrors.password?.[0],
             })
-            console.log(fieldErrors);
+            setLoading(false)
             return;
         }
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -38,16 +41,16 @@ const Login = () => {
         });
         if (error) {
             console.log('Sign In Error:', error.message);
+            setLoading(false)
             return;
         }
-        console.log('Sign In Success:', data);
         const business=await getBusiness(data.user.id)
 
         if (!business) {
             router.replace('/businessSetup/BusinessSetup');
             return;
         }
-
+        setLoading(false)
         router.replace('/(tabs)/Home');
 
     }
@@ -57,20 +60,32 @@ const Login = () => {
             <Text style={styles.heading}>Welcome Back</Text>
             <Text style={styles.subHeading}>Login to your Business Assistant account</Text>
             <Input
-                title='Email'
+                title='Email*'
                 placeholder='someone@gmail.com'
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={(text:string)=>{
+                    setEmail(text),
+                    setErrors({
+                        ...errors,
+                        email:undefined
+                    })
+                }}
                 error={errors.email}
                 iconName='mail-outline'
                 iconType='Ionicons'
                 keyboard='email-address'
             />
             <Input
-                title='Password'
+                title='Password*'
                 placeholder='********'
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(text:string)=>{
+                    setPassword(text),
+                    setErrors({
+                        ...errors,
+                        password:undefined
+                    })
+                }}
                 error={errors.password}
                 iconName='lock'
                 iconType='SimpleLineIcons'
@@ -79,9 +94,12 @@ const Login = () => {
             <Button
                 title='Log in'
                 onPress={handleSignin}
+                isLoading={loading}
             />
             <Text style={styles.newText}>Don't have an account?{'  '}
-                <Text style={styles.sign} onPress={() => router.push('/signup/Signup')}>Signup</Text>
+                <Text style={styles.sign} onPress={() => router.push('/signup/Signup')}>
+                    Create Account
+                    </Text>
             </Text>
         </SafeAreaView>
     );

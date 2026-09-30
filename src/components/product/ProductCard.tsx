@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Colors from '../../constants/colors';
 import { Image } from 'expo-image';
 import fonts, { fontSize } from '../../constants/typography';
@@ -6,44 +7,98 @@ import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
+import Icon from '../common/Icon';
 interface props {
     name?: string
     stock?: number
     price?: number
     lowStock?: number
     currency?: string
-    imageurl?:string
+    imageurl?: string,
+    menuOpen?: boolean
+    onMenuPress?: () => void
+    onPressEdit?:()=>void
+    onPressDelete?:()=>void
 }
-const ProductCard: React.FC<props> = ({ name, stock, price, lowStock, currency,imageurl}) => {
+const ProductCard: React.FC<props> = ({ name, stock, price, lowStock, currency, 
+    imageurl, onMenuPress, menuOpen, onPressDelete, onPressEdit}) => {
     const stockValue = Number(stock)
     const lowStockValue = Number(lowStock)
     const isStockLow = stockValue <= lowStockValue
     const isStockOut = stockValue <= 0
+    const [showView, setShowView] = useState(false)
     return (
-        <View style={styles.container}>
-            
-            <Image 
-            style={styles.image}
-            source={{uri:imageurl}}
-            contentFit='cover'
-            onError={(error) => {
-        console.log('IMAGE LOAD ERROR:', error);
-    }}
+        <View style={[styles.container, menuOpen && { zIndex: 1000 },]}>
+
+            <Image
+                style={styles.image}
+                source={{ uri: imageurl }}
+                contentFit='cover'
             />
             <View style={styles.content}>
-                <Text style={[styles.name, { color: Colors.text }]}>{name}</Text>
+                <View style={styles.option}>
+                    <Text style={[styles.name, { color: Colors.text }]}>{name}</Text>
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        style={{ paddingLeft: wp(2) }}
+                        onPress={onMenuPress}
+                    >
+                        <Icon
+                            name='dots-three-vertical'
+                            type='Entypo'
+                            size={wp(5)}
+                            color={Colors.textSecondary}
+                        />
+                    </TouchableOpacity>
+
+                </View>
+
                 <Text style={[styles.name, { marginBottom: hp(0.5), color: Colors.text }]}>
                     {currency} {price?.toLocaleString()}
                 </Text>
                 <View style={styles.bottom}>
                     <Text style={[styles.name, { color: Colors.textSecondary, fontFamily: fonts.regular }]}>
-                        stock: {stock}</Text>
+                        stock: {Number(stock) <= 999 ? stock : '999+'}</Text>
                     <Text style={[styles.badge,
                     isStockOut ? styles.outStock : isStockLow ? styles.lowBadge : styles.stockBadge
                     ]}>{isStockOut ? 'Out of Stock' : isStockLow ? 'Low Stock' : 'In Stock'}</Text>
                 </View>
             </View>
+            {
+                menuOpen && (
+                    <View style={styles.menu}>
+                        <TouchableOpacity
+                            style={styles.row}
+                            activeOpacity={0.7}
+                            onPress={onPressEdit}
+                        >
+                            <Icon
+                                name='edit'
+                                type='Feather'
+                                size={wp(5)}
+                                color={Colors.success}
+                            />
+                            <Text style={[styles.rowText, { color: Colors.success }]}>Edit</Text>
 
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.row}
+                            activeOpacity={0.7}
+                            onPress={onPressDelete}
+                        >
+                            <Icon
+                                name='trash-outline'
+                                type='Ionicons'
+                                size={wp(5)}
+                                color={Colors.error}
+                            />
+                            <Text style={[styles.rowText, { color: Colors.error }]}>Delete</Text>
+
+                        </TouchableOpacity>
+
+                    </View>
+                )
+            }
         </View>
     );
 };
@@ -57,7 +112,8 @@ const styles = StyleSheet.create({
         borderRadius: wp(3),
         alignItems: 'center',
         marginBottom: hp(2),
-        elevation: 1
+        elevation: 1,
+        position: 'relative',
     },
     image: {
         borderWidth: 0.3,
@@ -93,9 +149,33 @@ const styles = StyleSheet.create({
         color: Colors.success,
         backgroundColor: Colors.successLight
     },
-    outStock:{
-        color:Colors.error,
-        backgroundColor:Colors.errorLight
+    outStock: {
+        color: Colors.error,
+        backgroundColor: Colors.errorLight
+    },
+    option: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    },
+    menu: {
+        position: 'absolute',
+        right: 5,
+        top: 35,
+        backgroundColor: Colors.background,
+        padding: wp(3),
+        elevation: 3,
+        borderRadius: wp(2),
+        zIndex: 999
+    },
+    row: {
+        flexDirection: 'row',
+        marginVertical: hp(0.5)
+    },
+    rowText: {
+        fontFamily: fonts.regular,
+        fontSize: fontSize.smallText,
+        marginLeft: wp(2)
     }
 });
 

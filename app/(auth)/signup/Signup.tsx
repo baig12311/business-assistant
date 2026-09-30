@@ -37,7 +37,7 @@ const Signup = () => {
                 password: fieldErrors.password?.[0],
                 confirmPassword: fieldErrors.confirmPassword?.[0]
             })
-            console.log(fieldErrors);
+            setLoading(false)
             return;
         }
         const { data, error } = await supabase.auth.signUp({
@@ -51,11 +51,16 @@ const Signup = () => {
         });
         if (error) {
             console.log('Sign Up Error:', error.message);
+            setLoading(false)
             return;
         }
-        router.push('/businessSetup/BusinessSetup')
+        router.push({
+            pathname: '/businessSetup/BusinessSetup',
+            params: {
+                userId: data.user?.id,
+            },
+        });
         setLoading(false)
-        console.log('Sign Up Success:', data);
     }
     return (
         <SafeAreaView style={styles.container}>
@@ -71,39 +76,63 @@ const Signup = () => {
                     <Text style={styles.heading}>Create your account</Text>
                     <Text style={styles.subHeading}>Join business assistant and grow your business</Text>
                     <Input
-                        title='Full Name'
+                        title='Full Name*'
                         placeholder='John Doe'
                         value={name}
-                        onChangeText={setName}
+                        onChangeText={(text:string)=>{
+                            setName(text),
+                            setErrors({
+                                ...errors,
+                                name:undefined
+                            })
+                        }}
                         error={errors.name}
                         iconName='person-outline'
                         iconType='Ionicons'
                     />
                     <Input
-                        title='Email'
+                        title='Email*'
                         placeholder='someone@gmail.com'
                         value={email}
-                        onChangeText={setEmail}
+                        onChangeText={(text:string)=>{
+                            setEmail(text),
+                            setErrors({
+                                ...errors,
+                                email:undefined
+                            })
+                        }}
                         error={errors.email}
                         iconName='mail-outline'
                         iconType='Ionicons'
                         keyboard='email-address'
                     />
                     <Input
-                        title='Password'
+                        title='Password*'
                         placeholder='********'
                         value={password}
-                        onChangeText={setPassword}
+                        onChangeText={(text:string)=>{
+                            setPassword(text),
+                            setErrors({
+                                ...errors,
+                                password:undefined
+                            })
+                        }}
                         error={errors.password}
                         iconName='lock'
                         iconType='SimpleLineIcons'
 
                     />
                     <Input
-                        title='Confirm Password'
+                        title='Confirm Password*'
                         placeholder='********'
                         value={confirmPassword}
-                        onChangeText={setConfirmPassword}
+                        onChangeText={(text:string)=>{
+                            setConfirmPassword(text),
+                            setErrors({
+                                ...errors,
+                                confirmPassword:undefined
+                            })
+                        }}
                         error={errors.confirmPassword}
                         iconName='lock'
                         iconType='SimpleLineIcons'

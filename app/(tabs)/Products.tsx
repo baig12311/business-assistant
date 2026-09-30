@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Touchable, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Pressable, FlatList } from 'react-native';
 import Colors from '../../src/constants/colors';
 
 import { useUser } from '../../src/hooks/useUser';
@@ -8,8 +8,11 @@ import {
 } from 'react-native-responsive-screen';
 import { router } from 'expo-router';
 import fonts, { fontSize } from '../../src/constants/typography';
+import ConfirmationDialog from '../../src/components/common/ConfirmationDialog';
 import Header from '../../src/components/common/Header';
+import CustomEmptyComponent from '../../src/components/common/CustomEmptyComponent';
 import { useBusiness } from '../../src/hooks/useBusiness';
+import { useDeleteProduct } from '../../src/hooks/useDeleteProduct';
 import Icon from '../../src/components/common/Icon';
 import { quickActions } from '../../src/services/data/quickActions';
 import Input from '../../src/components/common/Input';
@@ -25,13 +28,33 @@ const Products = () => {
     const { data: business } = useBusiness(userId)
     const { data: products } = useProducts(business?.id)
     const [searchText, setSearchText] = useState('')
+    const [menuIndex, setMenuIndex] = useState<number | null>(null)
+    const [showDialog, setShowDialog] = useState(false)
+    const [deleteId, setDeleteId] = useState('')
+    const { mutate: deleteProduct, isPending } = useDeleteProduct(
+    business?.id
+);
+
     // search products
     const filterProducts = products?.filter(item =>
         item.name.toLowerCase().
             includes(searchText.trim().toLocaleLowerCase())
     )
+
+    // handleEdit
+    const handlePressEdit=(productId:string)=>{
+        setMenuIndex(null);
+
+        router.push({
+            pathname: '/addProduct/AddProduct',
+            params:{
+                productId:productId
+            }
+        })
+    }
+
     // render product
-    const renderProduct = ({ item }: any) => {
+    const renderProduct = ({ item, index}: any) => {
         return (
             <ProductCard
                 name={item.name}
@@ -40,12 +63,44 @@ const Products = () => {
                 lowStock={item.low_stock_threshold}
                 currency={business?.currency}
                 imageurl={item.image_url}
+                menuOpen={menuIndex===index}
+                onMenuPress={()=>{
+                    setMenuIndex(menuIndex===index ? null : index)
+                }}
+                onPressEdit={()=>handlePressEdit(item.id)}
+                onPressDelete={()=>{
+                    setShowDialog(true),
+                    setMenuIndex(null),
+                    setDeleteId(item.id)
+                    
+                }}
             />
         )
     }
 
+    
+
     return (
         <SafeAreaView style={styles.container}>
+            <ConfirmationDialog
+            modalVisible={showDialog}
+            title='Delete Product?'
+            msg='Are you sure you want to delete this product?'
+            txtButton='Delete'
+            onPressCancel={()=>setShowDialog(false)}
+            onPressDelete={()=>{deleteProduct(deleteId),
+                setShowDialog(false)
+            }}
+            />
+            {menuIndex !== null && (
+        <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => {setMenuIndex(null),
+                console.log('overlay pressed');
+                
+            }}
+        />
+    )}
             <Header title='Products' onPress={() => router.back()} />
             <Input
                 placeholder='Search products...'
@@ -62,13 +117,15 @@ const Products = () => {
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={
                     searchText.trim() !== '' ? (
-                        <View>
-                            <Text>Nothing found matching {searchText}</Text>
-                        </View>
+                        <CustomEmptyComponent
+                        mainText={`No product found matching ${searchText}`}
+                        subText='Try another keyword.'
+                        />
                     ) : (
-                        <View>
-                            <Text>No products added yet</Text>
-                        </View>
+                        <CustomEmptyComponent
+                        mainText='No Product In Stock'
+                        subText='Start adding your inventory items with prices and stock levels to begin managing your sales.'
+                        />
                     )
                 }
             />

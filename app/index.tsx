@@ -1,5 +1,8 @@
 import { useEffect } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View, Text} from 'react-native';
+import Colors from '../src/constants/colors';
+import fonts, {fontSize} from '../src/constants/typography';
+import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { router } from 'expo-router';
 import { supabase } from '../src/lib/supabase';
 import AnimatedLoader from '../src/components/common/AnimatedLoader';
@@ -53,7 +56,15 @@ const Index = () => {
                 alignItems: 'center',
             }}
         >
-            {/* <ActivityIndicator /> */}
+            <Text style={{
+                fontFamily:fonts.bold,
+                fontSize: fontSize.heading,
+                color:Colors.primary,
+                marginTop:hp(2)
+
+            }}>
+                Business Assistant
+                </Text>
             <AnimatedLoader/>
         </View>
     );

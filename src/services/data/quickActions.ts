@@ -22,6 +22,6 @@ export const quickActions=[
         title:'Inventory',
         name:'file-tray-full-outline',
         type:'Ionicons',
-        onPress:null
+        onPress:()=>router.push('/inventory/Inventory')
     }
 ]

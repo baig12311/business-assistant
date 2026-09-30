@@ -27,7 +27,7 @@ const TabLayout = () => {
                 tabBarLabelStyle: {
                     fontSize: wp(3.5),
                     fontWeight: '400',
-                    fontFamily: 'Poppins_500Medium'
+                    fontFamily: 'Manrope_500Medium'
                     //fontFamily:  'Poppins_600SemiBold'
                     //paddingBottom: hp(1)
                 },
@@ -37,19 +37,24 @@ const TabLayout = () => {
                     let iconName = '', type = '';
 
                     if (route.name === 'Home') {
-                        iconName = focused ? 'home-sharp' : 'home-outline';
-                        type = 'Ionicons';
+                        iconName = focused ? 'home-fill' : 'home';
+                        type = 'Octicons';
                     } else if (route.name === 'Orders') {
-                        iconName = focused ? 'cart' : 'cart-outline';
+                        iconName = focused ? 'receipt' : 'receipt-outline';
                         type = 'Ionicons';
                     }
                     else if (route.name === 'Products') {
                         iconName = focused ? 'cube' : 'cube-outline';
                         type = 'Ionicons';
                     } 
+                    else if(route.name === 'Customers')
+                    {
+                        iconName = focused ? 'people' : 'people-outline';
+                        type = 'Ionicons';
+                    }
                     else if (route.name === 'Profile') {
-                        iconName = focused ? 'account' : 'account-outline';
-                        type = 'MaterialCommunityIcons';
+                        iconName = focused ? 'person' : 'person-outline';
+                        type = 'Ionicons';
                     }
                     
                     
@@ -82,11 +87,15 @@ const TabLayout = () => {
                 options={{ tabBarLabel: 'Wishlist' }} 
             /> */}
             <Tabs.Screen
-                name="cat"
-                options={{ tabBarLabel: 'Categories' }}
+                name="Products"
+                options={{ tabBarLabel: 'Products' }}
             />
             <Tabs.Screen
-                name="profile"
+                name="Customers"
+                options={{ tabBarLabel: 'Customers' }}
+            />
+            <Tabs.Screen
+                name="Profile"
                 options={{ tabBarLabel: 'Profile' }}
             />
         </Tabs>

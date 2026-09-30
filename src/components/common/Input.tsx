@@ -46,10 +46,10 @@ const Input: React.FC<props> = ({ value, onChangeText, title, placeholder,
                     keyboardType={keyboard}
                     placeholderTextColor={Colors.textSecondary}
                     style={styles.input}
-                    secureTextEntry={(title === 'Password' || title === 'Confirm Password') && !show}
+                    secureTextEntry={(title === 'Password*' || title === 'Confirm Password*') && !show}
                 />
                 {
-                    (title === 'Password' || title === 'Confirm Password') && (
+                    (title === 'Password*' || title === 'Confirm Password*') && (
                         <TouchableOpacity
                             activeOpacity={0.7}
                             onPress={() => setShow(!show)}
@@ -82,12 +82,14 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
         flexDirection: 'row',
-        borderWidth: 0.5,
+        borderWidth: 0.1,
         borderRadius: wp(2),
         borderColor: Colors.textMuted,
         height: hp(5.5),
         paddingHorizontal: wp(2),
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: Colors.surface,
+        elevation:1,
     },
     input: {
         flex: 1,

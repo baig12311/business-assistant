@@ -9,6 +9,7 @@ import {
 import fonts, { fontSize } from '../../src/constants/typography';
 import Header from '../../src/components/home/Header';
 import { useBusiness } from '../../src/hooks/useBusiness';
+import { useCustomers } from '../../src/hooks/useCustomer';
 import Icon from '../../src/components/common/Icon';
 import { quickActions } from '../../src/services/data/quickActions';
 import { useProducts } from '../../src/hooks/useProducts';
@@ -19,14 +20,16 @@ const Home = () => {
     const {data, error, isLoading} =useUser()
     const userId=data?.id
     const {data:business, error:bError, isLoading:bLoading} =useBusiness(userId)
-    console.log(business)
     const userName=data?.user_metadata?.name
-    const productData = useProducts(business?.id)
-    console.log('Products: ', productData);
-    
+    const {data:products} = useProducts(business?.id)
+    const {data:customers} = useCustomers(business?.id)
     return (
         <SafeAreaView style={styles.container}>
-            <Header userName={userName} business={business?.name}/>
+            <Header 
+            userName={userName} 
+            business={business?.name}
+            imageurl={business?.logo_url}
+            />
             <TouchableOpacity 
             activeOpacity={0.7}
             style={styles.timeSelector}
@@ -48,20 +51,41 @@ const Home = () => {
             </TouchableOpacity>
             <View style={styles.infoContainer}>
                 <DashboardCard
+                title="Products"
+                info={products?.length}
+                iconName='cube'
+                iconType='Ionicons'
+                bgColor='#EFF6FF'
+                iconColor='#2563EB'
+                iconBg='#DBEAFE'
+                />
+                <DashboardCard
+                title="Customers"
+                info={customers?.length}
+                iconName='people'
+                iconType='Ionicons'
+                bgColor='#FAF5FF'
+                iconColor='#9333EA'
+                iconBg='#F3E8FF'
+                />
+                <DashboardCard
+                title="Orders"
+                info={2}
+                iconName='receipt'
+                iconType='Ionicons'
+                bgColor='#FFF7ED'
+                iconColor='#D97706'
+                iconBg='#FEF3C7'
+                />
+                <DashboardCard
                 title="Today's Sales"
-                info='PKR 12,870'
-                />
-                <DashboardCard
-                title="Total's Ordes"
-                info='7'
-                />
-                <DashboardCard
-                title="Pending"
-                info='2'
-                />
-                <DashboardCard
-                title="Delivered"
-                info='5'
+                info={2}
+                iconName='cash'
+                iconType='Ionicons'
+                bgColor='#F0FDF4'
+                iconColor='#16A34A'
+                iconBg='#DCFCE7'
+                currency={business?.currency}
                 />
             </View>
             <View style={styles.section}>

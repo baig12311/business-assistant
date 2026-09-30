@@ -1,5 +1,6 @@
 
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
 import fonts, { fontSize } from '../../constants/typography';
 import Colors from '../../constants/colors';
 import {
@@ -10,13 +11,23 @@ import Icon from '../common/Icon';
 interface props {
     userName?: string
     business?: string
+    imageurl?:string
 }
-const Header: React.FC<props> = ({ userName, business }) => {
+const Header: React.FC<props> = ({ userName, business, imageurl}) => {
     return (
         <View style={styles.container}>
+            {
+                imageurl && (
+                    <Image
+            style={styles.logo}
+            source={{uri:imageurl}}
+            />
+                )
+            }
+            
             <View style={styles.textContainer}>
                 <Text style={styles.text} numberOfLines={1}>Good Afternoon, {userName}</Text>
-                <Text>{business}</Text>
+                <Text style={styles.text}>{business}</Text>
             </View>
             <TouchableOpacity
                 activeOpacity={0.7}
@@ -44,7 +55,8 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         flex: 1,
-        paddingRight: wp(5)
+        paddingRight: wp(5),
+        marginLeft: wp(3)
     },
     icon: {
         padding: wp(2),
@@ -56,6 +68,11 @@ const styles = StyleSheet.create({
         fontFamily: fonts.medium,
         fontSize: fontSize.text,
         color: Colors.text
+    },
+    logo:{
+        width: wp(14),
+        height: wp(14),
+        borderRadius:wp(7)
     }
 });
 

@@ -1,3 +1,5 @@
+import { success } from "zod";
+
 const Colors = {
   primary: '#0F766E',
   primaryDark: '#115E59',
@@ -7,19 +9,22 @@ const Colors = {
   surface: '#FFFFFF',
 
   text: '#0F172A',
-  textSecondary: '#64748B',
-  textMuted: '#94A3B8',
+  //textSecondary: '#64748B',
+  textSecondary: '#777777',
+  textMuted: '#E5E7EB',
 
   border: '#E2E8F0',
   divider: '#F1F5F9',
 
   success: '#16A34A',
-  successLight: '#DCFCE7',
+  //successLight: '#DCFCE7',
+  successLight: '#E8F0EA',
 
   warning: '#D97706',
-  warningLight: '#FEF3C7',
+  warningLight: '#FFF5E6',
+  //warningLight: '#FEF3C7',
 
-  error: '#DC2626',
+  error: '#C84037',
   errorLight: '#FEE2E2',
 
   info: '#2563EB',

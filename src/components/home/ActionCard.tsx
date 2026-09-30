@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
         paddingHorizontal:wp(1)
     },
     text:{
-        fontFamily:fonts.medium,
+        fontFamily:fonts.semiBold,
         fontSize: fontSize.smallText,
         color: Colors.text,
         marginTop: hp(0.5),

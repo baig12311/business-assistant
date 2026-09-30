@@ -1,9 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { View, Text, KeyboardAvoidingView, ScrollView, Platform, Alert, TouchableOpacity } from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as ImagePicker from 'expo-image-picker';
-import { File } from 'expo-file-system';
+import { takePhoto, pickFromLibrary } from '../../src/services/imagePicker';
 import ImageSheet from '../../src/components/uploadImage/ImageSheet';
 import { router } from 'expo-router';
 import Colors from '../../src/constants/colors';
@@ -13,22 +12,46 @@ import Button from '../../src/components/common/Button';
 import { useUser } from '../../src/hooks/useUser';
 import { useBusiness } from '../../src/hooks/useBusiness';
 import { supabase } from '../../src/lib/supabase';
+import { useLocalSearchParams } from 'expo-router';
 import Header from '../../src/components/common/Header';
+import { useAddProduct } from '../../src/hooks/useAddProduct';
+import { useProducts } from '../../src/hooks/useProducts';
+import { useUpdateProduct } from '../../src/hooks/useUpdateProduct';
 import { Image } from 'expo-image';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { productSchema } from '../../src/services/schema/productSchema';
 import styles from './AddProductStyle';
+import { uploadImage } from '../../src/services/convertImage';
 import { readonly } from 'zod';
 import BottomSheet from '@gorhom/bottom-sheet';
 const AddProduct = () => {
-    const queryClient = useQueryClient()
+    const { productId } = useLocalSearchParams<{
+    productId: string;
+}>();
+    console.log('Selected Product', productId);
     const [image, setImage] = useState<string | null>(null)
+    const [existingImage, setExistingImage] = useState<string | null>(null);
     const [showSheet, setShowSheet] = useState(false)
+    const [sheetEdit, setSheetEdit] = useState(false)
     const sheetRef = useRef<BottomSheet>(null)
     const [Loading, setLoading] = useState(false)
     const { data: user } = useUser()
     const { data: business } = useBusiness(user?.id)
     const businessId = business.id
+    
+    const {
+        mutateAsync: addProductMutation,
+        isPending,
+    } = useAddProduct(businessId);
+    const {
+        mutateAsync: updateProductMutation,
+        isPending: pending,
+    } = useUpdateProduct(businessId);
+    const isLoading = isPending || pending
+    const { data: productData } = useProducts(businessId)
+    const selectedProduct = productData?.find(
+        (item: any) => item.id === productId
+    )
 
     const [product, setProduct] = useState({
         productName: '',
@@ -46,99 +69,57 @@ const AddProduct = () => {
         stock?: string
         lowStock?: string
     }>({})
-    //taking photo from camera
-    const takePhoto = async () => {
-        const permissionResult = await ImagePicker.requestCameraPermissionsAsync()
 
-        if (!permissionResult.granted) {
-            Alert.alert('Permission Required', 'Permission to access camera is required')
-            return;
-        }
+    //chekcing existing info
+    const setSelectedProduct = () => {
+        if (selectedProduct) {
+            setProduct({
+                productName: selectedProduct.name ?? '',
+                description: selectedProduct.description ?? '',
+                price: selectedProduct.price.toString() ?? '',
+                costPrice: selectedProduct.cost_price.toString() ?? '',
+                stockQuantity: selectedProduct.stock_quantity.toString() ?? '',
+                lowStockThreshold: selectedProduct.low_stock_threshold.toString() ?? '',
 
-        let result = await ImagePicker.launchCameraAsync({
-            allowsEditing: true,
-            aspect: [1, 1],
-            quality: 1,
-        });
+            })
+            if (selectedProduct.image_url) {
+                setImage(selectedProduct.image_url ?? '')
 
-        if (!result.canceled) {
-            const imageUri = result.assets[0].uri;
-
+                setSheetEdit(true)
+                setExistingImage(selectedProduct.image_url);
+            }
 
 
-            setImage(imageUri);
+
+
+
         }
     }
-
-    // choosing photo from gallery
-    const pickFromLibrary = async () => {
-        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
-
-        if (!permissionResult.granted) {
-            Alert.alert('Permission Required', 'Permission to access media library is required')
-            return;
-        }
-
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ['images'],
-            allowsEditing: true,
-            aspect: [1, 1],
-            quality: 1,
-        });
-
-        if (!result.canceled) {
-            const imageUri = result.assets[0].uri;
-
-            console.log('SELECTED IMAGE:', imageUri);
-
-            setImage(imageUri);
-        }
-
-    }
+    useEffect(() => {
+        setSelectedProduct()
+    }, [selectedProduct])
 
     // image action
     const handleImageAction = async (action: 'camera' | 'gallery' | 'remove') => {
         sheetRef.current?.close()
         if (action === 'camera') {
-            await takePhoto()
+            const imageUri = await takePhoto()
+            if (imageUri) {
+                setImage(imageUri);
+            }
         }
         else if (action === 'gallery') {
-            await pickFromLibrary()
+            const imageUri = await pickFromLibrary()
+            if (imageUri) {
+                setImage(imageUri);
+            }
         }
         // else if (action === 'remove') {
         //     await removeImage()
         // }
     }
-    // imageURL extract
-    const uploadImage = async (imageUri: string) => {
-        const file = new File(imageUri);
-
-        const arrayBuffer = await file.arrayBuffer();
-
-        const fileName = `${Date.now()}.jpg`;
-        const filePath = `${businessId}/${fileName}`;
-
-        const { error } = await supabase.storage
-            .from('product-images')
-            .upload(filePath, arrayBuffer, {
-                contentType: 'image/jpeg',
-                upsert: false,
-            });
-
-        if (error) {
-            throw new Error(error.message);
-        }
-
-        const { data } = supabase.storage
-            .from('product-images')
-            .getPublicUrl(filePath);
-
-        return data.publicUrl;
-    };
-    // add product
-    const AddProduct = async () => {
-        setLoading(true)
-
+    // update product 
+    const updateProducts = async () => {
         const result = productSchema.safeParse(product)
         if (!result.success) {
             const fieldErrors = result.error.flatten().fieldErrors;
@@ -150,34 +131,27 @@ const AddProduct = () => {
                 stock: fieldErrors.stockQuantity?.[0],
                 lowStock: fieldErrors.lowStockThreshold?.[0]
             })
+            return
         }
-        let imageUrl = null;
+        let imageUrl = existingImage;
 
-        if (image) {
-            imageUrl = await uploadImage(image);
-        }
-        const { data, error } = await supabase
-            .from('products')
-            .insert({
-                business_id: businessId,
-                name: product.productName,
-                description: product.description,
-                price: Number(product.price),
-                cost_price: Number(product.costPrice),
-                stock_quantity: Number(product.stockQuantity),
-                low_stock_threshold: Number(product.lowStockThreshold),
-                image_url: imageUrl
-            });
-
-        if (error) {
-            console.log('Product Error:', error.message);
-            setLoading(false);
-            return;
-        }
-        await queryClient.invalidateQueries({
-            queryKey: ['products', business.id],
+if (image && image !== existingImage) {
+    imageUrl = await uploadImage(
+        image,
+        'product-images',
+        businessId
+    );
+}
+        await updateProductMutation({
+            productId,
+            name: product.productName,
+            description: product.description,
+            price: Number(product.price),
+            costPrice: Number(product.costPrice),
+            stockQuantity: Number(product.stockQuantity),
+            lowStockThreshold: Number(product.lowStockThreshold),
+            imageUrl,
         });
-        setLoading(false)
         router.back()
         setProduct({
             productName: '',
@@ -188,10 +162,62 @@ const AddProduct = () => {
             lowStockThreshold: ''
         })
     }
+    // add product
+    const AddProduct = async () => {
+        if (productId) {
+            await updateProducts()
+        }
+        else {
+
+            const result = productSchema.safeParse(product)
+            if (!result.success) {
+                const fieldErrors = result.error.flatten().fieldErrors;
+                setErrors({
+                    name: fieldErrors.productName?.[0],
+                    desc: fieldErrors.description?.[0],
+                    costPrice: fieldErrors.costPrice?.[0],
+                    price: fieldErrors.price?.[0],
+                    stock: fieldErrors.stockQuantity?.[0],
+                    lowStock: fieldErrors.lowStockThreshold?.[0]
+                })
+
+                return
+            }
+            let imageUrl = null;
+
+            if (image) {
+                imageUrl = await uploadImage(image,
+                    'product-images',
+                    businessId);
+            }
+            await addProductMutation({
+                businessId,
+                name: product.productName,
+                description: product.description,
+                price: Number(product.price),
+                costPrice: Number(product.costPrice),
+                stockQuantity: Number(product.stockQuantity),
+                lowStockThreshold: Number(product.lowStockThreshold),
+                imageUrl,
+            });
+            router.back()
+            setProduct({
+                productName: '',
+                description: '',
+                costPrice: '',
+                price: '',
+                stockQuantity: '',
+                lowStockThreshold: ''
+            })
+        }
+
+    }
     return (
         <View style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>
-                <Header title='Add Product' onPress={() => router.back()} />
+                <Header title={productId ? 'Edit Product' : 'Add Product'}
+                    onPress={() => router.back()}
+                />
                 <KeyboardAvoidingView
                     style={{ flex: 1 }}
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -203,44 +229,82 @@ const AddProduct = () => {
                     >
                         {/* <Text style={styles.heading}>Add new product</Text> */}
                         <View style={styles.imageContainer}>
-                            <TouchableOpacity
-                                style={styles.selectImage}
-                                activeOpacity={0.7}
-                                onPress={() => {
-                                    setShowSheet(true),
-                                        sheetRef.current?.snapToIndex(0)
-                                }}
-                            >
-                                {
-                                    image ? (
-                                        <Image
-                                            source={{ uri: image }}
-                                            style={styles.image}
-                                        />
-                                    ) : (
+                            {
+                                image ? (
+                                    <Image
+                                        source={{ uri: image }}
+                                        style={styles.image}
+                                    />
+                                ) : (
+                                    <TouchableOpacity
+                                        style={styles.selectImage}
+                                        activeOpacity={0.7}
+                                        onPress={() => {
+                                            setShowSheet(true),
+                                                sheetRef.current?.snapToIndex(0)
+                                        }}
+                                    >
+
                                         <Icon
-                                            name='cloud-upload-outline'
-                                            type='Ionicons'
-                                            size={wp(13)}
+                                            name='upload-file'
+                                            type='MaterialIcons'
+                                            size={wp(10)}
                                             color={Colors.primaryDark}
                                         />
-                                    )
-                                }
 
-                            </TouchableOpacity>
-                            <Text style={styles.text}>{image ? 'selected image' : 'upload product image'}</Text>
+
+
+                                    </TouchableOpacity>
+                                )
+                            }
+                            {
+                                (!productId && !image) && (
+                                    <Text style={styles.text}>Upload product image</Text>
+
+                                )
+                            }
+                            {
+                                (productId || image) && (
+                                    <TouchableOpacity
+                                        style={styles.row}
+                                        activeOpacity={0.7}
+                                        onPress={() => {
+                                            setShowSheet(true),
+                                                sheetRef.current?.snapToIndex(0)
+                                        }}
+                                    >
+                                        <Icon
+                                            name='edit'
+                                            type='Feather'
+                                            size={wp(5)}
+                                            color={Colors.success}
+                                        />
+
+                                        <Text style={[styles.rowText, { color: Colors.success }]}>Change product image</Text>
+
+                                    </TouchableOpacity>
+                                )
+                            }
+
                         </View>
                         <Input
                             title='Product Name*'
                             placeholder='Product'
                             value={product.productName}
+
                             onChangeText={(text: string) => {
                                 setProduct({
                                     ...product,
-                                    productName: text
-                                })
+                                    productName: text,
+                                });
+
+                                setErrors({
+                                    ...errors,
+                                    name: undefined,
+                                });
                             }}
                             error={errors.name}
+
                         // iconName='person-outline'
                         // iconType='Ionicons'
                         />
@@ -253,11 +317,13 @@ const AddProduct = () => {
                                     ...product,
                                     description: text
                                 })
+                                setErrors({
+                                    ...errors,
+                                    desc: undefined
+                                })
                             }}
                             error={errors.desc}
-                        // iconName='mail-outline'
-                        // iconType='Ionicons'
-                        // keyboard='email-address'
+
                         />
                         <Input
                             title='Selling Price*'
@@ -268,6 +334,10 @@ const AddProduct = () => {
                                 setProduct({
                                     ...product,
                                     price: text
+                                })
+                                setErrors({
+                                    ...errors,
+                                    price: undefined
                                 })
                             }}
                             error={errors.price}
@@ -285,6 +355,10 @@ const AddProduct = () => {
                                     ...product,
                                     costPrice: text
                                 })
+                                setErrors({
+                                    ...errors,
+                                    costPrice: undefined
+                                })
                             }}
                             error={errors.costPrice}
                         // iconName='lock'
@@ -300,11 +374,15 @@ const AddProduct = () => {
                                     ...product,
                                     stockQuantity: text
                                 })
+                                setErrors({
+                                    ...errors,
+                                    stock: undefined
+                                })
                             }}
                             error={errors.stock}
                         />
                         <Input
-                            title='Low Stock Threshold (optional)'
+                            title='Low Stock Threshold*'
                             placeholder='0'
                             keyboard='numeric'
                             value={product.lowStockThreshold}
@@ -313,15 +391,19 @@ const AddProduct = () => {
                                     ...product,
                                     lowStockThreshold: text
                                 })
+                                setErrors({
+                                    ...errors,
+                                    lowStock: undefined
+                                })
                             }}
                             error={errors.lowStock}
 
                         />
                         <View style={styles.button}>
                             <Button
-                                title='Add Product'
+                                title={productId ? 'Edit Product' : 'Add Product'}
                                 onPress={AddProduct}
-                                isLoading={Loading}
+                                isLoading={isLoading}
                             />
                         </View>
                     </ScrollView>
@@ -332,7 +414,7 @@ const AddProduct = () => {
                 showSheet && (
                     <ImageSheet
                         bottomSheetRef={sheetRef}
-
+                        isEdit={sheetEdit}
                         onAction={handleImageAction}
                     />
                 )

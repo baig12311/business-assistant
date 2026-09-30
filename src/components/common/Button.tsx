@@ -34,7 +34,8 @@ const styles = StyleSheet.create({
         height: hp(5.5),
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: Colors.primary
+        backgroundColor: Colors.primary,
+        elevation:2
     },
     text: {
         fontFamily: fonts.semiBold,

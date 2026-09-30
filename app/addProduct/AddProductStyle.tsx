@@ -35,10 +35,11 @@ const styles = StyleSheet.create({
         marginBottom: hp(2)
     },
     selectImage:{
-        width: wp(25),
-        height: wp(25),
-        borderRadius: wp(15),
-        borderWidth: 0.5,
+        width: wp(20),
+        height: wp(20),
+        borderRadius: wp(10),
+        borderWidth: 1,
+        borderStyle: 'dashed',
         borderColor: Colors.textSecondary,
         marginBottom:hp(0.5),
         justifyContent: 'center',
@@ -52,8 +53,20 @@ const styles = StyleSheet.create({
         color:Colors.textSecondary
     },
     image:{
-        width: '100%',
-        height: '100%'
+        width:wp(20),
+        height: wp(20),
+        borderRadius: wp(10),
+        //alignSelf: 'center',
+        
+    },
+    row: {
+        flexDirection: 'row',
+        marginVertical: hp(0.5)
+    },
+    rowText: {
+        fontFamily: fonts.regular,
+        fontSize: fontSize.smallText,
+        marginLeft: wp(2)
     }
 });
 export default styles

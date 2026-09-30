@@ -14,11 +14,11 @@ import {
 import SheetElement from './SheetElement';
 interface Props {
     bottomSheetRef: React.RefObject<BottomSheet | null>
-    //isEdit?: boolean
+    isEdit?: boolean
     onAction:(action: 'camera' | 'gallery' | 'remove')=>void
 }
 
-const ImageSheet: React.FC<Props> = ({ bottomSheetRef,onAction}) => {
+const ImageSheet: React.FC<Props> = ({ bottomSheetRef,onAction, isEdit}) => {
     const inset = useSafeAreaInsets()
     return (
         <BottomSheet
@@ -46,7 +46,7 @@ const ImageSheet: React.FC<Props> = ({ bottomSheetRef,onAction}) => {
                 <SheetElement
                     iconName='camera-outline'
                     iconType='Ionicons'
-                    title='Take Photo'
+                    title={isEdit ? 'Change Photo' : 'Take Photo'}
                     Color={Colors.primaryDark}
                     bgColor={Colors.successLight}
                     onPress={()=>onAction('camera')}
