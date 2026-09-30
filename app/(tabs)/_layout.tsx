@@ -16,26 +16,19 @@ const TabLayout = () => {
 
                 // Style the native tab bar container
                 tabBarStyle: {
-                    height: hp(7) + insets.bottom,
-                    // paddingBottom: insets.bottom > 0 ? insets.bottom : hp(1),
-                    // paddingTop: hp(1),
-                    //borderColor: Colors.secondaryColor,
-                    //paddingBottom: hp(1),
+                    height: hp(7.5) + insets.bottom,
                 },
 
                 // Style the native label directly
                 tabBarLabelStyle: {
-                    fontSize: wp(3.5),
-                    fontWeight: '400',
-                    fontFamily: 'Manrope_500Medium'
-                    //fontFamily:  'Poppins_600SemiBold'
-                    //paddingBottom: hp(1)
+                    fontSize: wp(3.2),
+                    fontFamily:fonts.medium,
+                    //fontSize:fontSize.extraSmallText
                 },
 
                 // Render custom icon per route
                 tabBarIcon: ({ focused, color, size }) => {
                     let iconName = '', type = '';
-
                     if (route.name === 'Home') {
                         iconName = focused ? 'home-fill' : 'home';
                         type = 'Octicons';
@@ -64,7 +57,7 @@ const TabLayout = () => {
                         <Icon 
                             name={iconName} 
                             color={color} 
-                            size={size} 
+                            size={wp(6)} 
                             type={type} 
                         />
                     );

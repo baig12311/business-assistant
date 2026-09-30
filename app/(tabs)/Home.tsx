@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet, Touchable, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import Colors from '../../src/constants/colors';
 import { useUser } from '../../src/hooks/useUser';
+import { LineChart } from 'react-native-gifted-charts'
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
@@ -17,93 +18,145 @@ import ActionCard from '../../src/components/home/ActionCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DashboardCard from '../../src/components/home/DashboardCard';
 const Home = () => {
-    const {data, error, isLoading} =useUser()
-    const userId=data?.id
-    const {data:business, error:bError, isLoading:bLoading} =useBusiness(userId)
-    const userName=data?.user_metadata?.name
-    const {data:products} = useProducts(business?.id)
-    const {data:customers} = useCustomers(business?.id)
+    const { data, error, isLoading } = useUser()
+    const userId = data?.id
+    const { data: business, error: bError, isLoading: bLoading } = useBusiness(userId)
+    const userName = data?.user_metadata?.name
+    const { data: products } = useProducts(business?.id)
+    const { data: customers } = useCustomers(business?.id)
+    const salesData = [
+        { value: 4500, label: 'Mon' },
+        { value: 7200, label: 'Tue' },
+        { value: 5800, label: 'Wed' },
+        { value: 9100, label: 'Thu' },
+        { value: 12500, label: 'Fri' },
+        { value: 8300, label: 'Sat' },
+        { value: 15550, label: 'Sun' },
+    ];
+
     return (
         <SafeAreaView style={styles.container}>
-            <Header 
-            userName={userName} 
-            business={business?.name}
-            imageurl={business?.logo_url}
+            <Header
+                userName={userName}
+                business={business?.name}
+                imageurl={business?.logo_url}
             />
-            <TouchableOpacity 
-            activeOpacity={0.7}
-            style={styles.timeSelector}
+            <ScrollView
+                contentContainerStyle={styles.scrollContainer}
+                showsVerticalScrollIndicator={false}
             >
-                
-                <Icon
-                name='calendar-outline'
-                type='Ionicons'
-                size={wp(4)}
-                color={Colors.textSecondary}
-            />
-                <Text style={styles.timeText}>This week</Text>
-                <Icon
-                name='chevron-small-down'
-                type='Entypo'
-                size={wp(5)}
-                color={Colors.textSecondary}
-            />
-            </TouchableOpacity>
-            <View style={styles.infoContainer}>
-                <DashboardCard
-                title="Products"
-                info={products?.length}
-                iconName='cube'
-                iconType='Ionicons'
-                bgColor='#EFF6FF'
-                iconColor='#2563EB'
-                iconBg='#DBEAFE'
-                />
-                <DashboardCard
-                title="Customers"
-                info={customers?.length}
-                iconName='people'
-                iconType='Ionicons'
-                bgColor='#FAF5FF'
-                iconColor='#9333EA'
-                iconBg='#F3E8FF'
-                />
-                <DashboardCard
-                title="Orders"
-                info={2}
-                iconName='receipt'
-                iconType='Ionicons'
-                bgColor='#FFF7ED'
-                iconColor='#D97706'
-                iconBg='#FEF3C7'
-                />
-                <DashboardCard
-                title="Today's Sales"
-                info={2}
-                iconName='cash'
-                iconType='Ionicons'
-                bgColor='#F0FDF4'
-                iconColor='#16A34A'
-                iconBg='#DCFCE7'
-                currency={business?.currency}
-                />
-            </View>
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Quick Actions</Text>
-                <View style={styles.actionRow}>
-                    {
-                        quickActions.map((action, index) => (
-                            <ActionCard
-                                key={index}
-                                iconName={action.name}
-                                iconType={action.type}
-                                title={action.title}
-                                onPress={action.onPress}
-                            />
-                        ))
-                    }
+                <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={styles.timeSelector}
+                >
+
+                    <Icon
+                        name='calendar-outline'
+                        type='Ionicons'
+                        size={wp(4)}
+                        color={Colors.textSecondary}
+                    />
+                    <Text style={styles.timeText}>This week</Text>
+                    <Icon
+                        name='chevron-small-down'
+                        type='Entypo'
+                        size={wp(5)}
+                        color={Colors.textSecondary}
+                    />
+                </TouchableOpacity>
+                <View style={styles.infoContainer}>
+                    <DashboardCard
+                        title="Products"
+                        info={products?.length}
+                        iconName='cube'
+                        iconType='Ionicons'
+                        bgColor='#EFF6FF'
+                        iconColor='#2563EB'
+                        iconBg='#DBEAFE'
+                    />
+                    <DashboardCard
+                        title="Customers"
+                        info={customers?.length}
+                        iconName='people'
+                        iconType='Ionicons'
+                        bgColor='#FAF5FF'
+                        iconColor='#9333EA'
+                        iconBg='#F3E8FF'
+                    />
+                    <DashboardCard
+                        title="Orders"
+                        info={2}
+                        iconName='receipt'
+                        iconType='Ionicons'
+                        bgColor='#FFF7ED'
+                        iconColor='#D97706'
+                        iconBg='#FEF3C7'
+                    />
+                    <DashboardCard
+                        title="Today's Sales"
+                        info={2}
+                        iconName='cash'
+                        iconType='Ionicons'
+                        bgColor='#F0FDF4'
+                        iconColor='#16A34A'
+                        iconBg='#DCFCE7'
+                        currency={business?.currency}
+                    />
                 </View>
-            </View>
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Quick Actions</Text>
+                    <View style={styles.actionRow}>
+                        {
+                            quickActions.map((action, index) => (
+                                <ActionCard
+                                    key={index}
+                                    iconName={action.name}
+                                    iconType={action.type}
+                                    title={action.title}
+                                    onPress={action.onPress}
+                                />
+                            ))
+                        }
+                    </View>
+                </View>
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>
+                        Sales Overview{' '}
+                        <Text style={styles.currency}>
+                            ({business?.currency})
+                        </Text>
+                    </Text>
+                    <View style={styles.chartContainer}>
+                        <LineChart
+                            data={salesData}
+                            height={hp(22)}
+                            thickness={1.5}
+                            hideDataPoints={false}
+                            curved
+                            color={Colors.primary}
+                            xAxisColor={Colors.border}
+                            yAxisColor={Colors.border}
+                            startFillColor1={Colors.primary}
+                            endFillColor1={Colors.primaryLight}
+                            dataPointsColor={Colors.primaryDark}
+                            startOpacity={0.5}
+                            endOpacity={0.1}
+                            hideRules
+                            isAnimated={true}
+                            noOfSections={4}
+                            spacing={wp(10)}
+                            areaChart
+                            yAxisLabelWidth={wp(12)}
+                            xAxisLabelTextStyle={styles.axisLabelText}
+                            yAxisTextStyle={styles.axisLabelText}
+                        />
+
+                    </View>
+
+                </View>
+            </ScrollView>
+
+
 
         </SafeAreaView>
     );
@@ -113,7 +166,7 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: Colors.background,
         padding: wp(3),
-        flex:1
+        flex: 1
     },
     actionRow: {
         flexDirection: 'row',
@@ -125,10 +178,10 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontFamily: fonts.bold,
         fontSize: fontSize.subHeading,
-        marginBottom: hp(0.5),
+        marginBottom: hp(1),
         color: Colors.text
     },
-    infoContainer:{
+    infoContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
@@ -136,24 +189,45 @@ const styles = StyleSheet.create({
         marginBottom: hp(2)
 
     },
-    timeSelector:{
-        borderWidth:0.5,
+    timeSelector: {
+        borderWidth: 0.5,
         borderRadius: wp(2),
         alignSelf: 'flex-end',
-        padding:wp(2),
+        padding: wp(2),
         borderColor: Colors.textMuted,
-        alignItems:'center',
+        alignItems: 'center',
         flexDirection: 'row',
         backgroundColor: Colors.surface,
-        elevation:1,
+        elevation: 1,
         marginBottom: hp(2)
 
     },
-    timeText:{
+    timeText: {
         fontFamily: fonts.regular,
-        fontSize:fontSize.smallText,
-        color:Colors.textSecondary,
+        fontSize: fontSize.smallText,
+        color: Colors.textSecondary,
         marginHorizontal: wp(2),
+    },
+    scrollContainer: {
+        paddingBottom: hp(4),
+        paddingTop:hp(0.5),
+        flexGrow: 1
+    },
+    axisLabelText: {
+        fontFamily: fonts.medium,
+        fontSize: fontSize.smallText,
+        color: Colors.textSecondary
+    },
+    currency:{
+        fontSize: fontSize.smallText,
+        fontFamily: fonts.medium,
+        color:Colors.textSecondary
+    },
+    chartContainer:{
+        backgroundColor:Colors.surface,
+        elevation:1,
+        borderRadius:wp(2),
+        paddingVertical:hp(2)
     }
 });
 

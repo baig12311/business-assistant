@@ -227,6 +227,10 @@ if (image && image !== existingImage) {
                         keyboardShouldPersistTaps="handled"
                         showsVerticalScrollIndicator={false}
                     >
+                        {
+                            !productId && (<Text style={styles.subHeading}>Add product details to keep your inventory organized..</Text>
+)
+                        }
                         {/* <Text style={styles.heading}>Add new product</Text> */}
                         <View style={styles.imageContainer}>
                             {

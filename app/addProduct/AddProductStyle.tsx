@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
     },
     scrollContainer:{
         paddingBottom: hp(6),
+        paddingTop:hp(0.5),
         flexGrow:1,
         //justifyContent: 'center',
     },
@@ -67,6 +68,12 @@ const styles = StyleSheet.create({
         fontFamily: fonts.regular,
         fontSize: fontSize.smallText,
         marginLeft: wp(2)
+    },
+    subHeading:{
+        fontFamily:fonts.medium,
+        fontSize: fontSize.text,
+        color:Colors.text,
+        marginBottom:hp(4)
     }
 });
 export default styles

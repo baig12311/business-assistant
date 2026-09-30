@@ -11,5 +11,19 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.background,
         padding: wp(3)
     },
+    subHeading:{
+        fontFamily:fonts.medium,
+        fontSize: fontSize.text,
+        color:Colors.text,
+        marginBottom:hp(4)
+    },
+    button:{
+        marginTop: hp(4)
+    },
+    scrollContainer:{
+        paddingBottom: hp(6),
+        paddingTop:hp(0.5),
+        flexGrow:1,
+    },
 });
 export default styles

@@ -51,6 +51,8 @@ const styles = StyleSheet.create({
         marginBottom: hp(2),
         flexDirection: 'row',
         alignItems: 'center',
+        borderBottomWidth:0.5,
+        borderColor:Colors.border
         //justifyContent: ''
     },
     textContainer: {
