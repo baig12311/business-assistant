@@ -15,7 +15,7 @@ import { supabase } from '../../src/lib/supabase';
 import { useLocalSearchParams } from 'expo-router';
 import Header from '../../src/components/common/Header';
 import { useAddProduct } from '../../src/hooks/useAddProduct';
-import { useProducts } from '../../src/hooks/useProducts';
+import { useProducts, useProductById} from '../../src/hooks/useProducts';
 import { useUpdateProduct } from '../../src/hooks/useUpdateProduct';
 import { Image } from 'expo-image';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
@@ -28,17 +28,15 @@ const AddProduct = () => {
     const { productId } = useLocalSearchParams<{
     productId: string;
 }>();
-    console.log('Selected Product', productId);
     const [image, setImage] = useState<string | null>(null)
     const [existingImage, setExistingImage] = useState<string | null>(null);
     const [showSheet, setShowSheet] = useState(false)
     const [sheetEdit, setSheetEdit] = useState(false)
     const sheetRef = useRef<BottomSheet>(null)
-    const [Loading, setLoading] = useState(false)
     const { data: user } = useUser()
     const { data: business } = useBusiness(user?.id)
     const businessId = business.id
-    
+    const {data: selectedProduct, isLoading:loadingProduct, error} = useProductById(productId)
     const {
         mutateAsync: addProductMutation,
         isPending,
@@ -49,9 +47,9 @@ const AddProduct = () => {
     } = useUpdateProduct(businessId);
     const isLoading = isPending || pending
     const { data: productData } = useProducts(businessId)
-    const selectedProduct = productData?.find(
-        (item: any) => item.id === productId
-    )
+    // const selectedProduct = productData?.find(
+    //     (item: any) => item.id === productId
+    // )
 
     const [product, setProduct] = useState({
         productName: '',

@@ -15,6 +15,22 @@ export const getProducts =async(businessId:string)=>{
     return data
 }
 
+// get product by id
+
+export const getProductById = async (productId: string) => {
+    const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', productId)
+        .single();
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return data;
+};
+
 
 // delete product
 export const deleteProduct = async (productId: string) => {

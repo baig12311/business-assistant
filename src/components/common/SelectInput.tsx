@@ -64,14 +64,16 @@ const styles = StyleSheet.create({
         borderColor: Colors.textMuted,
         height: hp(5.5),
         paddingHorizontal: wp(2),
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: Colors.surface,
+        elevation:1,
     },
     input: {
         flex: 1,
         fontSize: fontSize.text,
         fontFamily: fonts.medium,
         //color: Colors.textSecondary,
-        marginLeft:wp(1)
+        marginLeft:wp(2)
     },
     title: {
         fontFamily: fonts.semiBold,

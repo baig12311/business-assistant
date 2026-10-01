@@ -93,8 +93,8 @@ const styles = StyleSheet.create({
     },
     input: {
         flex: 1,
-        fontSize: fontSize.smallText,
-        fontFamily: fonts.regular,
+        fontSize: fontSize.text,
+        fontFamily: fonts.medium,
         color: Colors.text,
         marginLeft: wp(1)
     },

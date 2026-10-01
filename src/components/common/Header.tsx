@@ -6,27 +6,46 @@ import {
     heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
 import Icon from '../common/Icon';
-interface props{
-    title:string
-    onPress?:()=>void
+interface props {
+    title: string
+    onPress?: () => void
+    isMenu?: boolean
+    onPressMenu?: () => void
 }
-const Header:React.FC<props> = ({title, onPress}) => {
+const Header: React.FC<props> = ({ title, onPress, onPressMenu, isMenu }) => {
     return (
         <View style={styles.container}>
             <TouchableOpacity
-            activeOpacity={0.7} 
-            style={styles.icon}
-            onPress={onPress}
+                activeOpacity={0.7}
+                style={styles.icon}
+                onPress={onPress}
             >
-                <Icon 
-                name='arrow-back'
-                type='MaterialIcons'
-                size={wp(7)}
-                color={Colors.text}
+                <Icon
+                    name='arrow-back'
+                    type='MaterialIcons'
+                    size={wp(7)}
+                    color={Colors.text}
                 />
             </TouchableOpacity>
             <Text style={styles.title}>{title}</Text>
-            </View>
+            {
+                isMenu && (
+                    <TouchableOpacity
+                activeOpacity={0.7}
+                style={styles.menu}
+                onPress={onPressMenu}
+            >
+            <Icon
+                name='dots-three-vertical'
+                type='Entypo'
+                size={wp(5)}
+                color={Colors.text}
+            />
+            </TouchableOpacity>
+                )
+            }
+            
+        </View>
     );
 };
 const styles = StyleSheet.create({
@@ -40,10 +59,14 @@ const styles = StyleSheet.create({
         paddingRight: wp(2),
         marginRight: wp(5)
     },
-    title:{
+    title: {
         fontFamily: fonts.bold,
         fontSize: fontSize.subHeading,
-        color:Colors.text
+        color: Colors.text,
+        flex:1
+    },
+    menu:{
+        paddingLeft:wp(2)
     }
 });
 

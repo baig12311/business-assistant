@@ -10,4 +10,35 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.background,
         padding: wp(3)
     },
+    scrollContainer: {
+        paddingBottom: hp(4),
+        paddingTop:hp(0.5),
+        flexGrow: 1
+    },
+    slectCustomer:{
+        borderRadius: wp(2),
+        elevation: 1,
+        padding: wp(2),
+        backgroundColor: Colors.surface,
+        marginBottom:hp(2)
+    },
+    customerText:{
+        fontFamily: fonts.medium,
+        fontSize: fontSize.text,
+        color: Colors.text,
+        marginBottom: hp(1)
+    },
+    addButton:{
+        height: hp(5),
+        justifyContent:'center',
+        alignItems: 'center',
+        flexDirection: 'row'
+    },
+    textButton:{
+        color:Colors.primary,
+        fontSize: fontSize.text,
+        fontFamily: fonts.medium,
+        marginLeft: wp(2)
+    }
 });
+export default styles

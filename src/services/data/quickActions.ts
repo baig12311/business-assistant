@@ -1,7 +1,7 @@
 import { router } from "expo-router"
 export const quickActions=[
     {
-        title:'New Order',
+        title:'Create Order',
         name:'receipt-outline',
         type:'Ionicons',
         onPress: ()=>router.push('/newOrder/NewOrder')
@@ -19,7 +19,7 @@ export const quickActions=[
         onPress:()=>router.push('/addCustomer/AddCustomer')
     },
     {
-        title:'Inventory',
+        title:'Track Inventory',
         name:'file-tray-full-outline',
         type:'Ionicons',
         onPress:()=>router.push('/inventory/Inventory')

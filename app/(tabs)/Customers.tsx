@@ -1,22 +1,88 @@
-
-import { View, Text, StyleSheet } from 'react-native';
-
-
+import { useState } from 'react';
+import { View, Text, StyleSheet, FlatList} from 'react-native';
+import { SafeAreaView} from 'react-native-safe-area-context';
+import { router } from 'expo-router';
+import Colors from '../../src/constants/colors';
+import fonts,{fontSize} from '../../src/constants/typography';
+import CustomerCard from '../../src/components/customers/CustomerCard';
+import CustomEmptyComponent from '../../src/components/common/CustomEmptyComponent';
+import { useUser } from '../../src/hooks/useUser';
+import { useBusiness } from '../../src/hooks/useBusiness';
+import { useCustomers } from '../../src/hooks/useCustomer';
+import Header from '../../src/components/common/Header';
+import Input from '../../src/components/common/Input';
+import { widthPercentageToDP as wp,
+    heightPercentageToDP as hp
+ } from 'react-native-responsive-screen';
+import { json } from 'zod';
 const Customers = () => {
+    const [searchText, setSearchText] = useState('')
+    const { data } = useUser()
+    const userId = data?.id
+    const { data: business } = useBusiness(userId)
+    const { data: customers } = useCustomers(business?.id)
+
+    // search customer
+    const filterCustomers = customers?.filter(item =>
+        item.name.toLowerCase().
+            includes(searchText.trim().toLocaleLowerCase())
+    )
+
+    // render customer
+    const renderCustomer = ({item}:any) =>{
+        return(
+            <CustomerCard
+            name={item.name}
+            phone={item.phone}
+            onPress={()=>router.push({
+                pathname:'/customerDetail/[Customer]',
+                params:{
+                    customerId: item.id
+                }
+            })}
+            />
+        )
+    }
     return (
-        <View style={styles.container}>
-            <Text>Customers</Text>
-        </View>
+        <SafeAreaView style={styles.container}>
+            <Header title='Customers' onPress={()=>router.back()}/>
+            <Input
+                placeholder='Search customers...'
+                value={searchText}
+                onChangeText={setSearchText}
+                iconName='search-outline'
+                iconType='Ionicons'
+            />
+            <FlatList
+                contentContainerStyle={{ flexGrow: 1, marginBottom: hp(6) }}
+                data={filterCustomers ?? []}
+                renderItem={renderCustomer}
+                keyExtractor={(item:any) => item.id}
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={
+                    searchText.trim() !== '' ? (
+                        <CustomEmptyComponent
+                        mainText='No customer found'
+                        subText='Try searching with a different name.'
+                        />
+                    ) : (
+                        <CustomEmptyComponent
+                        mainText='No customers yet'
+                        subText='Add your first customer to start managing their details and orders.'
+                        />
+                    )
+                }
+            />
+        </SafeAreaView>
     );
 };
 
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#2c3e50',
+        padding:wp(3),
+        backgroundColor:Colors.background,
+        flex:1
     },
 });
 
