@@ -21,7 +21,7 @@ const AnimatedLoader = () => {
     useEffect(() => {
         translateX.value = withRepeat(
 
-            withTiming(200, { duration: 1400 })
+            withTiming(150, { duration: 1400 })
 
 
             , -1, false)

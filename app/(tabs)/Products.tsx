@@ -18,15 +18,16 @@ import { quickActions } from '../../src/services/data/quickActions';
 import Input from '../../src/components/common/Input';
 import { useProducts } from '../../src/hooks/useProducts';
 import ProductCard from '../../src/components/product/ProductCard';
+import ProductSkeleton from '../../src/components/skeleton/ProductSkeleton';
 import ActionCard from '../../src/components/home/ActionCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DashboardCard from '../../src/components/home/DashboardCard';
 import { useState } from 'react';
 const Products = () => {
-    const { data } = useUser()
+    const { data, isLoading:userLoading, error:userError} = useUser()
     const userId = data?.id
-    const { data: business } = useBusiness(userId)
-    const { data: products } = useProducts(business?.id)
+    const { data: business, isLoading:businessLoading, error:businessError } = useBusiness(userId)
+    const { data: products, isLoading:productsLoading, error:productsError } = useProducts(business?.id)
     const [searchText, setSearchText] = useState('')
     const [menuIndex, setMenuIndex] = useState<number | null>(null)
     const [showDialog, setShowDialog] = useState(false)
@@ -34,7 +35,7 @@ const Products = () => {
     const { mutate: deleteProduct, isPending } = useDeleteProduct(
     business?.id
 );
-
+const isLoading = userLoading || businessLoading || productsLoading
     // search products
     const filterProducts = products?.filter(item =>
         item.name.toLowerCase().
@@ -42,6 +43,7 @@ const Products = () => {
     )
 
     // handleEdit
+    
     const handlePressEdit=(productId:string)=>{
         setMenuIndex(null);
 
@@ -109,6 +111,9 @@ const Products = () => {
                 iconName='search-outline'
                 iconType='Ionicons'
             />
+            {
+                isLoading && <ProductSkeleton />
+            }
             <FlatList
                 contentContainerStyle={{ flexGrow: 1, marginBottom: hp(6) }}
                 data={filterProducts ?? []}

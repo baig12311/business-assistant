@@ -4,6 +4,7 @@ import { SafeAreaView} from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import Colors from '../../src/constants/colors';
 import fonts,{fontSize} from '../../src/constants/typography';
+import CustomerSkeleton from '../../src/components/skeleton/CustomerSkeleton';
 import CustomerCard from '../../src/components/customers/CustomerCard';
 import CustomEmptyComponent from '../../src/components/common/CustomEmptyComponent';
 import { useUser } from '../../src/hooks/useUser';
@@ -15,13 +16,14 @@ import { widthPercentageToDP as wp,
     heightPercentageToDP as hp
  } from 'react-native-responsive-screen';
 import { json } from 'zod';
+import { is } from 'zod/v4/locales';
 const Customers = () => {
     const [searchText, setSearchText] = useState('')
-    const { data } = useUser()
+    const { data, isLoading: userLoading, error:userError} = useUser()
     const userId = data?.id
-    const { data: business } = useBusiness(userId)
-    const { data: customers } = useCustomers(business?.id)
-
+    const { data: business, isLoading: businessLoading } = useBusiness(userId)
+    const { data: customers, isLoading: customersLoading } = useCustomers(business?.id)
+    const isLoading = userLoading || businessLoading || customersLoading
     // search customer
     const filterCustomers = customers?.filter(item =>
         item.name.toLowerCase().
@@ -53,6 +55,9 @@ const Customers = () => {
                 iconName='search-outline'
                 iconType='Ionicons'
             />
+            {
+                isLoading && <CustomerSkeleton />
+            }
             <FlatList
                 contentContainerStyle={{ flexGrow: 1, marginBottom: hp(6) }}
                 data={filterCustomers ?? []}

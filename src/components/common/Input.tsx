@@ -17,12 +17,13 @@ interface props {
     iconName?: string
     iconType?: string
     keyboard?: KeyboardTypeOptions
+    isOrderInput?: boolean
 }
-const Input: React.FC<props> = ({ value, onChangeText, title, placeholder,
+const Input: React.FC<props> = ({ isOrderInput,value, onChangeText, title, placeholder,
     error, iconName, iconType, keyboard }) => {
     const [show, setShow] = useState(false)
     return (
-        <View style={styles.container}>
+        <View style={!isOrderInput && {marginBottom: hp(2)}}>
             {
                 title && (<Text style={styles.title}>{title}</Text>
                 )
@@ -78,7 +79,7 @@ const Input: React.FC<props> = ({ value, onChangeText, title, placeholder,
 
 const styles = StyleSheet.create({
     container: {
-        marginBottom: hp(2)
+        
     },
     inputContainer: {
         flexDirection: 'row',

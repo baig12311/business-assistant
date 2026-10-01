@@ -15,16 +15,18 @@ interface props {
     lowStock?: number
     currency?: string
     imageurl?: string,
-    //menuOpen?: boolean
-    // onMenuPress?: () => void
-    // onPressEdit?:()=>void
-    // onPressDelete?:()=>void
+    onIcrease?: () => void,
+    onDecrease?: () => void
+    quantity?: number
+    isLast?:boolean
 }
-const ItemCard: React.FC<props> = ({ name, stock, price, currency,
+const ItemCard: React.FC<props> = ({ isLast, onIcrease, onDecrease, quantity, name, stock, price, currency,
     imageurl, }) => {
-    const [quantity, setQuantity] = useState(1)
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, 
+        !isLast && { borderBottomWidth: 0.3 }
+    ]}
+        >
 
             <Image
                 style={styles.image}
@@ -46,7 +48,7 @@ const ItemCard: React.FC<props> = ({ name, stock, price, currency,
                 <TouchableOpacity
                     activeOpacity={0.7}
                     style={styles.button}
-                    onPress={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                    onPress={onDecrease}
                 >
                     <Icon
                         name="minus"
@@ -65,7 +67,7 @@ const ItemCard: React.FC<props> = ({ name, stock, price, currency,
                 <TouchableOpacity
                     activeOpacity={0.7}
                     style={styles.button}
-                    onPress={() => setQuantity((prev) => Math.min(stock, prev + 1))}
+                    onPress={onIcrease}
                 >
 
                     <Icon
@@ -85,13 +87,11 @@ const ItemCard: React.FC<props> = ({ name, stock, price, currency,
 const styles = StyleSheet.create({
     container: {
         backgroundColor: Colors.surface,
+        paddingVertical: hp(2),
         flexDirection: 'row',
-        padding: wp(3),
-        borderRadius: wp(3),
         alignItems: 'center',
         marginBottom: hp(2),
-        elevation: 1,
-        position: 'relative',
+        borderColor: Colors.textSecondary,
     },
     image: {
         borderWidth: 0.3,
