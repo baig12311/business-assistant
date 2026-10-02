@@ -35,7 +35,7 @@ const Products = () => {
     const { mutate: deleteProduct, isPending } = useDeleteProduct(
     business?.id
 );
-const isLoading = userLoading || businessLoading || productsLoading
+const isLoading = userLoading || businessLoading || productsLoading || isPending
     // search products
     const filterProducts = products?.filter(item =>
         item.name.toLowerCase().

@@ -22,7 +22,8 @@ const styles = StyleSheet.create({
         marginBottom: hp(1)
     },
     infoContainer:{
-        flexDirection: 'row'
+        flexDirection: 'row',
+        marginBottom: hp(2)
     },
     avatar:{
         width: wp(14),
@@ -62,6 +63,11 @@ const styles = StyleSheet.create({
         fontFamily: fonts.regular,
         fontSize: fontSize.smallText,
         marginLeft: wp(2)
+    },
+    dashboard:{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom:hp(2)
     }
 });
 export default styles

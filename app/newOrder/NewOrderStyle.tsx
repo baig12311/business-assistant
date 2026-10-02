@@ -96,6 +96,15 @@ const styles = StyleSheet.create({
         fontSize: fontSize.text,
         color: Colors.text,
         marginBottom: hp(0.5)
-    }
+    },
+    titleTextCurrency:{
+        fontFamily: fonts.medium,
+        fontSize: fontSize.extraSmallText,
+        color: Colors.textSecondary,
+    },
+    button:{
+        marginTop: hp(4),
+        marginBottom: hp(2)
+    },
 });
 export default styles

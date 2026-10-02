@@ -44,7 +44,7 @@ const BusinessSetup = () => {
         currency?: string;
         category?: string
     }>({})
-
+    const isDisabled = !businessName || !category || !currency || !number
     // Open Sheet
     const openSheet = (
         title: string,
@@ -237,8 +237,8 @@ const BusinessSetup = () => {
                             error={errors.number}
                         />
                         <SelectInput
-                            title='Currency'
-                            placeholder='Select Currency*'
+                            title='Currency*'
+                            placeholder='Select Currency'
                             iconName='currency-usd'
                             iconType='MaterialDesignIcons'
                             value={currency}
@@ -258,6 +258,7 @@ const BusinessSetup = () => {
                                 title='Create Business'
                                 onPress={createBusiness}
                                 isLoading={loading}
+                                disabled={isDisabled}
                             />
                         </View>
 

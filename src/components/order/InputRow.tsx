@@ -18,7 +18,7 @@ interface props {
 const InputRow: React.FC<props> = ({ value, onChangeText, title, currency, borderWidth}) => {
     return (
         <View style={[styles.summaryRow, { borderBottomWidth: borderWidth }]}>
-            <Text style={styles.summaryText}>{title} ({currency})</Text>
+            <Text style={styles.summaryText}>{title}</Text>
             <View style={{ flex: 1 }}>
                 <TextInput
                     placeholder='0'
@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
     },
     input:{
         borderWidth:0.3,
+        height:hp(5),
         borderColor: Colors.textSecondary,
         paddingHorizontal: wp(2),
         borderRadius: wp(2),

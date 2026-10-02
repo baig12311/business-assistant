@@ -67,7 +67,7 @@ const AddProduct = () => {
         stock?: string
         lowStock?: string
     }>({})
-
+    const isDisabled = !product.productName || !product.price || !product.costPrice || !product.stockQuantity || !product.lowStockThreshold
     //chekcing existing info
     const setSelectedProduct = () => {
         if (selectedProduct) {
@@ -406,6 +406,7 @@ if (image && image !== existingImage) {
                                 title={productId ? 'Edit Product' : 'Add Product'}
                                 onPress={AddProduct}
                                 isLoading={isLoading}
+                                disabled={isDisabled}
                             />
                         </View>
                     </ScrollView>

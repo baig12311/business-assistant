@@ -44,7 +44,7 @@ const AddCustomer = () => {
         address?: string
         city?: string
     }>({})
-
+    const isDiabled = !customer.name || !customer.phone
     // // check if customer exists
     // const selectedCustomer = customers?.find(
     //     (item: any) => item.id === customerId
@@ -262,6 +262,7 @@ const AddCustomer = () => {
                             title={customerId ? 'Edit Customer' : 'Add Customer'}
                             onPress={handleCustomer}
                             isLoading={isLoading}
+                            disabled={isDiabled}
                         />
                     </View>
                 </ScrollView>

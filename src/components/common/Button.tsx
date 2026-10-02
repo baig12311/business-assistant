@@ -9,18 +9,24 @@ interface props {
     title: string
     onPress?: () => void
     isLoading?: boolean
+    disabled?: boolean
 }
-const Button: React.FC<props> = ({ title, onPress, isLoading }) => {
+const Button: React.FC<props> = ({ title, onPress, isLoading, disabled }) => {
     return (
         <TouchableOpacity
-            style={[styles.container, isLoading&&{backgroundColor: Colors.textMuted}]}
+            style={[styles.container,
+            isLoading && { backgroundColor: Colors.textMuted },
+            disabled && { backgroundColor: Colors.textMuted }
+            ]}
             activeOpacity={0.7}
             onPress={onPress}
-            disabled={isLoading}
+            disabled={isLoading || disabled}
         >
             {
                 isLoading ? (<ActivityIndicator size='small' color={Colors.primary} />) : (
-                    <Text style={styles.text}>{title}</Text>
+                    <Text style={[styles.text,
+                    disabled && { color: Colors.textSecondary }
+                    ]}>{title}</Text>
 
                 )
             }
@@ -35,7 +41,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: Colors.primary,
-        elevation:2
+        elevation: 2
     },
     text: {
         fontFamily: fonts.semiBold,

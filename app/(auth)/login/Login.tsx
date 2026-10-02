@@ -95,6 +95,7 @@ const Login = () => {
                 title='Log in'
                 onPress={handleSignin}
                 isLoading={loading}
+                disabled={!email || !password}
             />
             <Text style={styles.newText}>Don't have an account?{'  '}
                 <Text style={styles.sign} onPress={() => router.push('/signup/Signup')}>

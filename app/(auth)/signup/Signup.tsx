@@ -19,6 +19,7 @@ const Signup = () => {
         password?: string;
         confirmPassword?: string
     }>({});
+    const isDisabled = !name || !email || !password || !confirmPassword
     // SignUp
     const handleSignup = async () => {
         setLoading(true)
@@ -142,6 +143,7 @@ const Signup = () => {
                             title='Sign Up'
                             onPress={handleSignup}
                             isLoading={loading}
+                            disabled={isDisabled}
                         />
                     </View>
 

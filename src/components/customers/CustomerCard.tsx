@@ -10,8 +10,9 @@ interface props {
     name: string
     phone: string
     onPress?:()=>void
+    order?:number
 }
-const CustomerCard: React.FC<props> = ({ name, phone,onPress}) => {
+const CustomerCard: React.FC<props> = ({ name, phone,onPress, order}) => {
     const initials = name
         .trim()
         .split(' ')
@@ -36,7 +37,11 @@ const CustomerCard: React.FC<props> = ({ name, phone,onPress}) => {
             </View>
             <View style={styles.textContainer}>
                 <Text style={styles.textName}>{name}</Text>
-                <Text style={styles.textPhone}>{phone}</Text>
+                <Text style={[styles.textPhone, {marginBottom: hp(0.8)}]}>{phone}</Text>
+                {
+                    order && order>0 && <Text style={styles.textPhone}>{order} {order>1?'Orders':'Order'}</Text>
+                }
+                
             </View>
             <View style={{ alignSelf: 'center' }}>
                 <Icon
@@ -84,12 +89,13 @@ const styles = StyleSheet.create({
         fontFamily: fonts.medium,
         fontSize: fontSize.text,
         color: Colors.text,
-        marginBottom: hp(0.3)
+        marginBottom: hp(0)
     },
     textPhone: {
         fontFamily: fonts.medium,
         fontSize: fontSize.smallText,
-        color: Colors.textSecondary
+        color: Colors.textSecondary,
+        
     }
 });
 

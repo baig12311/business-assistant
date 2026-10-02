@@ -13,9 +13,11 @@ import { useUser } from '../../src/hooks/useUser';
 import { useBusiness } from '../../src/hooks/useBusiness';
 import { useCustomers } from '../../src/hooks/useCustomer';
 import { useProducts } from '../../src/hooks/useProducts';
+import { useCreateOrder } from '../../src/hooks/useCreateOrder';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import CustomBottomSheet from '../../src/components/common/CustomBottomSheet';
+import Button from '../../src/components/common/Button';
 import ItemCard from '../../src/components/order/ItemCard';
 import BottomSheet from '@gorhom/bottom-sheet';
 
@@ -24,12 +26,17 @@ const NewOrder = () => {
     const { data: business } = useBusiness(user?.id)
     const { data: customers } = useCustomers(business?.id)
     const { data: products } = useProducts(business?.id)
+    const {
+        mutateAsync: createOrderMutation,
+        isPending,
+    } = useCreateOrder(business?.id);
     const sheetRef = useRef<BottomSheet>(null)
     const [orderItems, setOrderItems] = useState<any>([])
     const [discount, setDiscount] = useState('')
     const [amountPaid, setAmountPaid] = useState('')
     const [remainingAmount, setRemainingAmount] = useState('')
     const [selectedCustomer, setSelectedCustomer] = useState('')
+    const [selectedCustomerData, setSelectedCustomerData] = useState<any>(null)
     const [selectedProduct, setSelectedProduct] = useState('')
     const [showSheet, setShowSheet] = useState(false);
     const [sheetTitle, setSheetTitle] = useState('');
@@ -39,6 +46,8 @@ const NewOrder = () => {
         (sum: any, item: any) => sum + item.price * item.quantity,
         0
     );
+    const totalAmount = subtotal - Number(discount);
+    const remaining = totalAmount - Number(amountPaid);
     const customerNames = customers?.map(
         (item: any) => item.name
     ) ?? []
@@ -46,6 +55,15 @@ const NewOrder = () => {
         (item: any) => item.name
     ) ?? []
 
+    // handle customer select
+    const handleCustomerSelect = (selectedCustomer: string) => {
+        const selectedCustomerData = customers?.find(
+            item => item.name === selectedCustomer
+        )
+        if (!selectedCustomerData) return;
+        setSelectedCustomerData(selectedCustomerData)
+
+    }
     // handle product select
     const handleProductSelect = (selectedName: string) => {
         const selectedProductData = products?.find(
@@ -55,14 +73,27 @@ const NewOrder = () => {
         if (!selectedProductData) return;
 
         const alreadyExist = orderItems?.find(
-            (item: any) => item.id === selectedProductData?.id
+            (item: any) => item.product_id === selectedProductData?.id
         )
         if (!alreadyExist) {
             setOrderItems([
                 ...orderItems,
                 {
-                    ...selectedProductData,
-                    quantity: 1
+                    // ...selectedProductData,
+                    // quantity: 1
+
+                    // Supabase ke liye
+                    product_id: selectedProductData.id,
+                    quantity: 1,
+                    unit_price: selectedProductData.price,
+                    subtotal: selectedProductData.price,
+
+                    // UI ke liye
+                    name: selectedProductData.name,
+                    price: selectedProductData.price,
+
+                    image_url: selectedProductData.image_url,
+                    stock_quantity: selectedProductData.stock_quantity,
                 }
 
             ])
@@ -87,6 +118,7 @@ const NewOrder = () => {
     const handleSelect = (value: string) => {
         if (sheetTitle === 'Select Customer') {
             setSelectedCustomer(value);
+            handleCustomerSelect(value)
         }
         if (sheetTitle === 'Select Product') {
             setSelectedProduct(value);
@@ -96,10 +128,10 @@ const NewOrder = () => {
         setShowSheet(false);
     };
 
-    const increaseQuantity = (id: string) => {
+    const increaseQuantity = (productId: string) => {
         setOrderItems((prev: any) =>
             prev.map((item: any) => {
-                if (item.id !== id) return item;
+                if (item.product_id !== productId) return item;
 
                 return {
                     ...item,
@@ -112,10 +144,10 @@ const NewOrder = () => {
         );
     };
 
-    const decreaseQuantity = (id: string) => {
+    const decreaseQuantity = (productId: string) => {
         setOrderItems((prev: any) =>
             prev.map((item: any) => {
-                if (item.id !== id) return item;
+                if (item.product_id !== productId) return item;
 
                 return {
                     ...item,
@@ -125,6 +157,24 @@ const NewOrder = () => {
         );
     };
 
+    // Creat order
+
+    const createOrder = async () => {
+        const notes = 'Deliver on time'
+        try {
+            await createOrderMutation({
+                businessId: business.id,
+                customerId: selectedCustomerData?.id ?? null,
+                totalAmount,
+                notes: notes?.trim() || null,
+                items: orderItems,
+            });
+            router.push('/receipt/Receipt')
+        }
+        catch (error: any) {
+            console.log(error?.message)
+        }
+    }
     return (
         <View style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>
@@ -192,7 +242,7 @@ const NewOrder = () => {
                     {
                         orderItems.length > 0 && (
                             <View>
-                                <Text style={styles.titleText}>Price Summary</Text>
+                                <Text style={styles.titleText}>Order Items</Text>
                                 <View style={styles.summaryContainer}>
                                     {
                                         orderItems.map((item: any, index: number) => (
@@ -204,8 +254,8 @@ const NewOrder = () => {
                                                 imageurl={item.image_url}
                                                 stock={item.stock_quantity}
                                                 quantity={item.quantity}
-                                                onIcrease={() => increaseQuantity(item.id)}
-                                                onDecrease={() => decreaseQuantity(item.id)}
+                                                onIcrease={() => increaseQuantity(item.product_id)}
+                                                onDecrease={() => decreaseQuantity(item.product_id)}
                                                 isLast={index === orderItems.length - 1}
                                             />
                                         ))
@@ -221,17 +271,19 @@ const NewOrder = () => {
                     {
                         orderItems.length > 0 && (
                             <View>
-                                <Text style={styles.titleText}>Price Summary</Text>
+                                <Text style={styles.titleText}>Price Summary
+                                    <Text style={styles.titleTextCurrency}> ({business?.currency})</Text>
+                                </Text>
                                 <View style={styles.summaryContainer}>
                                     <View style={styles.summaryRow}>
                                         <Text style={styles.summaryText}>Subtotal</Text>
-                                        <Text style={styles.summaryText}>PKR {subtotal}</Text>
+                                        <Text style={styles.summaryText}>{subtotal.toLocaleString()}</Text>
                                     </View>
                                     <InputRow
                                         title='Discount'
                                         value={discount}
                                         borderWidth={0.3}
-                                        currency={business?.currency}
+                                        //currency={business?.currency}
                                         onChangeText={(text: string) => {
                                             const value = Number(text);
 
@@ -242,14 +294,54 @@ const NewOrder = () => {
                                     />
                                     <View style={styles.summaryRow}>
                                         <Text style={styles.totalText}>Total</Text>
-                                        <Text style={styles.totalText}>PKR {subtotal - Number(discount)}</Text>
+                                        <Text style={styles.totalText}>{totalAmount.toLocaleString()}</Text>
                                     </View>
+
+                                </View>
+                            </View>
+
+                        )
+
+                    }
+
+                    {
+                        orderItems.length > 0 && (
+                            <View>
+                                <Text style={styles.titleText}>Amount Summary
+                                    <Text style={styles.titleTextCurrency}> ({business?.currency})</Text>
+                                </Text>
+                                <View style={styles.summaryContainer}>
+
                                     <InputRow
                                         title='Amount Paid'
                                         value={amountPaid}
                                         //currency={business?.currency}
-                                        onChangeText={(text:string)=>setAmountPaid(text)}
+                                        onChangeText={(text: string) => setAmountPaid(text)}
                                     />
+                                    {
+                                        (amountPaid !== '' && Number(amountPaid) > Number(totalAmount)) && (
+                                            <View style={styles.summaryRow}>
+                                                <Text style={styles.totalText}>Change to return</Text>
+                                                <Text style={styles.totalText}>{remaining.toLocaleString()}</Text>
+                                            </View>
+                                        )
+
+
+
+                                    }
+                                    {
+                                        (amountPaid !== '' && Number(amountPaid) < Number(totalAmount)) && (
+                                            <View style={styles.summaryRow}>
+                                                <Text style={styles.totalText}>Remaining Credit (udhar)</Text>
+                                                <Text style={styles.totalText}>{remaining.toLocaleString()}</Text>
+                                            </View>
+                                        )
+
+
+
+                                    }
+
+
                                 </View>
                             </View>
 
@@ -258,6 +350,14 @@ const NewOrder = () => {
                     }
 
                 </ScrollView>
+                <View style={styles.button}>
+                    <Button
+                        title='Create order & continue'
+                        onPress={createOrder}
+                        isLoading={isPending}
+                        disabled={orderItems.length === 0 || !selectedCustomer || !totalAmount}
+                    />
+                </View>
             </SafeAreaView>
             {
                 showSheet && (
