@@ -199,7 +199,10 @@ const NewOrder = () => {
                                 )
                             }}
                         />
-                        <AddRow text='Add Customer' />
+                        <AddRow 
+                        text='Add Customer' 
+                        onPress={()=>router.push('/addCustomer/AddCustomer')}
+                        />
                     </View>
                     {/* <View style={styles.slectCustomer}> */}
                     <View style={styles.searchRow}>
@@ -377,9 +380,13 @@ const NewOrder = () => {
 };
 
 
-const AddRow = ({ text }: { text: string }) => {
+const AddRow = ({ text , onPress}: { text: string, onPress:()=>void}) => {
     return (
-        <TouchableOpacity activeOpacity={0.7} style={styles.addButton}>
+        <TouchableOpacity 
+        activeOpacity={0.7} 
+        style={styles.addButton}
+        onPress={onPress}
+        >
             <Icon
                 name='plus'
                 type='Entypo'

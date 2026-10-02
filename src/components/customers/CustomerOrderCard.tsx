@@ -11,7 +11,7 @@ import {
 interface props{
     date?:any
     orderNumber?:string
-    amount?:string
+    amount:any
 }
 const CustomerOrderCard:React.FC<props> = ({date, orderNumber, amount}) => {
     const formatDate = new Date(date).toLocaleDateString('en-GB', {

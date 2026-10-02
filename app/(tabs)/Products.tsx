@@ -32,9 +32,14 @@ const Products = () => {
     const [menuIndex, setMenuIndex] = useState<number | null>(null)
     const [showDialog, setShowDialog] = useState(false)
     const [deleteId, setDeleteId] = useState('')
-    const { mutate: deleteProduct, isPending } = useDeleteProduct(
+    const { mutate: deleteProduct, isPending, error} = useDeleteProduct(
     business?.id
 );
+if(error)
+{
+    console.log('Delete Error', error.message);
+    
+}
 const isLoading = userLoading || businessLoading || productsLoading || isPending
     // search products
     const filterProducts = products?.filter(item =>
@@ -112,9 +117,8 @@ const isLoading = userLoading || businessLoading || productsLoading || isPending
                 iconType='Ionicons'
             />
             {
-                isLoading && <ProductSkeleton />
-            }
-            <FlatList
+                isLoading ? <ProductSkeleton /> : (
+                    <FlatList
                 contentContainerStyle={{ flexGrow: 1, marginBottom: hp(6) }}
                 data={filterProducts ?? []}
                 renderItem={renderProduct}
@@ -134,6 +138,9 @@ const isLoading = userLoading || businessLoading || productsLoading || isPending
                     )
                 }
             />
+                )
+            }
+            
         </SafeAreaView>
     );
 };

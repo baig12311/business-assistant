@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: wp(5),
         paddingVertical:wp(3),
         borderRadius: wp(2),
-        top:hp(7),
+        top:hp(4),
         zIndex:99
     },
     row: {

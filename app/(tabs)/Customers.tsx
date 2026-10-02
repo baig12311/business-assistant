@@ -21,11 +21,12 @@ import { json } from 'zod';
 import { is } from 'zod/v4/locales';
 const Customers = () => {
     const [searchText, setSearchText] = useState('')
+    const [orderLoading, setOrderLoading] = useState(false)
     const { data, isLoading: userLoading, error: userError } = useUser()
     const userId = data?.id
     const { data: business, isLoading: businessLoading } = useBusiness(userId)
     const { data: customers, isLoading: customersLoading } = useCustomers(business?.id)
-    const isLoading = userLoading || businessLoading || customersLoading
+    
     // search customer
     const filterCustomers = customers?.filter(item =>
         item.name.toLowerCase().
@@ -34,8 +35,8 @@ const Customers = () => {
 
     // render customer
     const CustomerItem = ({ item }: any) => {
-        const { data: customerOrder } = useCustomerOrders(business?.id, item?.id);
-
+        const { data: customerOrder, isLoading} = useCustomerOrders(business?.id, item?.id);
+        setOrderLoading(isLoading)
         return (
             <CustomerCard
                 name={item.name}
@@ -52,6 +53,8 @@ const Customers = () => {
             />
         );
     };
+    const isLoading = userLoading || businessLoading || customersLoading
+    || orderLoading
     const renderCustomer = ({ item }: any) => {
         return <CustomerItem item={item} />;
     };
@@ -66,9 +69,8 @@ const Customers = () => {
                 iconType='Ionicons'
             />
             {
-                isLoading && <CustomerSkeleton />
-            }
-            <FlatList
+                isLoading ? <CustomerSkeleton /> :(
+                    <FlatList
                 contentContainerStyle={{ flexGrow: 1, marginBottom: hp(6) }}
                 data={filterCustomers ?? []}
                 renderItem={renderCustomer}
@@ -88,6 +90,9 @@ const Customers = () => {
                     )
                 }
             />
+                )
+            }
+            
         </SafeAreaView>
     );
 };

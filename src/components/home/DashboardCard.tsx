@@ -9,7 +9,7 @@ import {
 
 interface props {
     title: string
-    info?: number
+    info?: string | number
     iconName: string
     iconType: string
     iconColor: string

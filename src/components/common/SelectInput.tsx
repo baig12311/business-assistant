@@ -12,36 +12,40 @@ interface props {
     title: string
     placeholder: string
     error?: string
-    onPress?:()=>void
-    iconName:string
-    iconType:string
+    onPress?: () => void
+    iconName: string
+    iconType: string
 }
-const SelectInput: React.FC<props> = ({ value,title, placeholder, error, onPress, iconName, iconType}) => {
+const SelectInput: React.FC<props> = ({ value, title, placeholder, error, onPress, iconName, iconType }) => {
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>{title}</Text>
-            <TouchableOpacity 
-            style={styles.inputContainer} 
-            activeOpacity={0.7}
-            onPress={onPress}
+            {
+                title && (<Text style={styles.title}>{title}</Text>
+                )
+            }
+
+            <TouchableOpacity
+                style={styles.inputContainer}
+                activeOpacity={0.7}
+                onPress={onPress}
             >
                 <Icon
-                name={iconName}
-                type={iconType}
-                color={Colors.textSecondary}
-                size={wp(5)}
+                    name={iconName}
+                    type={iconType}
+                    color={Colors.textSecondary}
+                    size={wp(5)}
                 />
                 <Text style={[styles.input,
-                    {color: value ? Colors.text : Colors.textSecondary}
+                { color: value ? Colors.text : Colors.textSecondary }
                 ]}>
                     {value ? value : placeholder}
                 </Text>
                 <Icon
-                name='chevron-small-down'
-                type='Entypo'
-                size={wp(7)}
-                color={Colors.text}
-            />
+                    name='chevron-small-down'
+                    type='Entypo'
+                    size={wp(7)}
+                    color={Colors.text}
+                />
             </TouchableOpacity>
             {
                 error && (
@@ -66,14 +70,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: wp(2),
         alignItems: 'center',
         backgroundColor: Colors.surface,
-        elevation:1,
+        elevation: 1,
     },
     input: {
         flex: 1,
         fontSize: fontSize.text,
         fontFamily: fonts.medium,
         //color: Colors.textSecondary,
-        marginLeft:wp(2)
+        marginLeft: wp(2)
     },
     title: {
         fontFamily: fonts.semiBold,

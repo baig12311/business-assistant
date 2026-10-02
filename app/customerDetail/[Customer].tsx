@@ -55,33 +55,38 @@ const CustomerDetail = () => {
     }
     return (
         <SafeAreaView style={styles.container}>
-            <Header title='Customer Detail'
-                isMenu={true}
-                onPressMenu={() => setShowMenu(!showMenu)}
-                onPress={() => router.back()} />
-            {
-                showMenu && (
-                    <View style={styles.menu}>
-                        <TouchableOpacity
-                            style={styles.row}
-                            activeOpacity={0.7}
-                            onPress={handlePressEdit}
-                        >
-                            <Icon
-                                name='edit'
-                                type='Feather'
-                                size={wp(5)}
-                                color={Colors.success}
-                            />
-                            <Text style={[styles.rowText, { color: Colors.success }]}>Edit Customer</Text>
+            <View>
+                <Header title='Customer Detail'
+                    isMenu={true}
+                    onPressMenu={() => setShowMenu(!showMenu)}
+                    onPress={() => router.back()} />
+                {
+                    showMenu && (
+                        <View style={styles.menu}>
+                            <TouchableOpacity
+                                style={styles.row}
+                                activeOpacity={0.7}
+                                onPress={handlePressEdit}
+                            >
+                                <Icon
+                                    name='edit'
+                                    type='Feather'
+                                    size={wp(5)}
+                                    color={Colors.success}
+                                />
+                                <Text style={[styles.rowText, { color: Colors.success }]}>Edit Customer</Text>
 
-                        </TouchableOpacity>
+                            </TouchableOpacity>
 
-                    </View>
-                )
-            }
+                        </View>
+                    )
+                }
+            </View>
+
+
 
             <ScrollView contentContainerStyle={styles.scrollContainer}>
+
                 <View style={styles.infoContainer}>
                     <View style={styles.avatar}>
                         <Text style={styles.initials}>{initials}</Text>
@@ -139,7 +144,7 @@ const CustomerDetail = () => {
                                 />
                                 <DashboardCard
                                     title='Total Spent'
-                                    info={totalOrdersAmount}
+                                    info={totalOrdersAmount.toLocaleString()}
                                     bgColor={Colors.surface}
                                     iconName='cash-outline'
                                     iconType='Ionicons'
@@ -151,10 +156,10 @@ const CustomerDetail = () => {
                             {
                                 customerOrder?.map((order, index) => (
                                     <CustomerOrderCard
-                                    key={index}
-                                    orderNumber={order.order_number}
-                                    amount={`${businessData.currency} ${order.total_amount}`}
-                                    date={order.created_at}
+                                        key={index}
+                                        orderNumber={order.order_number}
+                                        amount={`${businessData.currency} ${order.total_amount.toLocaleString()}`}
+                                        date={order.created_at}
                                     />
                                 ))
                             }

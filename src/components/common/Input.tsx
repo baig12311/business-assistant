@@ -7,6 +7,7 @@ import {
     heightPercentageToDP as hp
 } from "react-native-responsive-screen"
 import Icon from "./Icon"
+import { maxLength } from "zod"
 interface props {
     value?: string
     onChangeText?: any
@@ -14,12 +15,13 @@ interface props {
     placeholder: string
     secure?: boolean
     error?: string
+    max?:number
     iconName?: string
     iconType?: string
     keyboard?: KeyboardTypeOptions
     isOrderInput?: boolean
 }
-const Input: React.FC<props> = ({ isOrderInput,value, onChangeText, title, placeholder,
+const Input: React.FC<props> = ({ isOrderInput,max, value, onChangeText, title, placeholder,
     error, iconName, iconType, keyboard }) => {
     const [show, setShow] = useState(false)
     return (
@@ -45,6 +47,7 @@ const Input: React.FC<props> = ({ isOrderInput,value, onChangeText, title, place
                     onChangeText={onChangeText}
                     placeholder={placeholder}
                     keyboardType={keyboard}
+                    maxLength={max}
                     placeholderTextColor={Colors.textSecondary}
                     style={styles.input}
                     secureTextEntry={(title === 'Password*' || title === 'Confirm Password*') && !show}
