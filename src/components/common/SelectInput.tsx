@@ -9,14 +9,16 @@ import {
 import Icon from "./Icon"
 interface props {
     value?: string
-    title: string
-    placeholder: string
+    title?: string
+    placeholder?: string
     error?: string
     onPress?: () => void
-    iconName: string
-    iconType: string
+    iconName?: string
+    iconType?: string
+    flag?: string
 }
-const SelectInput: React.FC<props> = ({ value, title, placeholder, error, onPress, iconName, iconType }) => {
+const SelectInput: React.FC<props> = ({ flag, value, title, placeholder, error, onPress, iconName, iconType }) => {
+    const newValue = flag ? flag + '  ' + value : value
     return (
         <View style={styles.container}>
             {
@@ -29,16 +31,21 @@ const SelectInput: React.FC<props> = ({ value, title, placeholder, error, onPres
                 activeOpacity={0.7}
                 onPress={onPress}
             >
-                <Icon
-                    name={iconName}
-                    type={iconType}
-                    color={Colors.textSecondary}
-                    size={wp(5)}
-                />
+                {
+                    iconName && iconType && (
+                        <Icon
+                            name={iconName}
+                            type={iconType}
+                            color={Colors.textSecondary}
+                            size={wp(5)}
+                        />
+                    )
+                }
+
                 <Text style={[styles.input,
                 { color: value ? Colors.text : Colors.textSecondary }
                 ]}>
-                    {value ? value : placeholder}
+                    {value ? newValue : placeholder}
                 </Text>
                 <Icon
                     name='chevron-small-down'

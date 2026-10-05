@@ -1,11 +1,12 @@
+import { CountryCode } from "libphonenumber-js";
 export type Country = {
-    code: string;
+    code: CountryCode;
     name: string;
     dialCode: string;
     flag: string;
 };
 
-export const countries: Country[] = [
+export const countries:Country[]= [
     { code: 'AF', name: 'Afghanistan', dialCode: '+93', flag: '🇦🇫' },
     { code: 'AL', name: 'Albania', dialCode: '+355', flag: '🇦🇱' },
     { code: 'DZ', name: 'Algeria', dialCode: '+213', flag: '🇩🇿' },

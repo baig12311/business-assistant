@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, KeyboardAvoidingView, ScrollView, Platform } fr
 import { supabase } from '../../../src/lib/supabase';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from './SignupStyle';
+import CustomToast from '../../../src/components/common/CustomToast';
 import { router } from 'expo-router';
 import { signupSchema } from '../../../src/services/schema/signupSchema';
 import Input from '../../../src/components/common/Input';
@@ -13,6 +14,9 @@ const Signup = () => {
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const [confirmPassword, setConfirmPassword] = useState('')
+    const [toastMessage, setToastMessage] = useState('')
+    const [showToast, setShowToast] = useState(false)
+    const [toastType, setToastType] = useState<'success' | 'error'>('error')
     const [errors, setErrors] = useState<{
         name?: string;
         email?: string;
@@ -51,7 +55,9 @@ const Signup = () => {
             }
         });
         if (error) {
-            console.log('Sign Up Error:', error.message);
+            setShowToast(true)
+            setToastType('error')
+            setToastMessage(error?.message)
             setLoading(false)
             return;
         }
@@ -61,10 +67,29 @@ const Signup = () => {
                 userId: data.user?.id,
             },
         });
+       
+        setShowToast(true)
+        setToastType('success')
+        setToastMessage('Your account has been created succesfully. Now set up your business')
         setLoading(false)
+        setName('')
+        setEmail('')
+        setPassword('')
+        setConfirmPassword('')
     }
     return (
         <SafeAreaView style={styles.container}>
+            {
+                showToast && (
+                    <CustomToast
+                        type={toastType}
+                        messageTitle={toastType === 'success' ? 'Account created' : 'Unable to create account'}
+                        messageDescription={toastMessage}
+                        visible={showToast}
+                        onHide={() => setShowToast(false)}
+                    />
+                )
+            }
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

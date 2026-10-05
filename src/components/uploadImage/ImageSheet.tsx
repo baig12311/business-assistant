@@ -43,7 +43,8 @@ const ImageSheet: React.FC<Props> = ({ bottomSheetRef,onAction, isEdit}) => {
             <BottomSheetView
                 style={[styles.sheet, {paddingBottom:inset.bottom}]}
             >
-                <SheetElement
+                <View style={{marginBottom: hp(4)}}>
+                     <SheetElement
                     iconName='camera-outline'
                     iconType='Ionicons'
                     title={isEdit ? 'Change Photo' : 'Take Photo'}
@@ -63,6 +64,8 @@ const ImageSheet: React.FC<Props> = ({ bottomSheetRef,onAction, isEdit}) => {
                     style={styles.cancel}
                     onPress={() => bottomSheetRef.current?.close()}
                 >Cancel</Text>
+                </View>
+               
 
             </BottomSheetView>
         </BottomSheet>

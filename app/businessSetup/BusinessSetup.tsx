@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Input from '../../src/components/common/Input';
 import SelectInput from '../../src/components/common/SelectInput';
 import Button from '../../src/components/common/Button';
+import {parsePhoneNumberFromString, CountryCode} from 'libphonenumber-js';
 import { takePhoto, pickFromLibrary } from '../../src/services/imagePicker';
 import { supabase } from '../../src/lib/supabase';
 import { useUser } from '../../src/hooks/useUser';
@@ -14,27 +15,42 @@ import Icon from '../../src/components/common/Icon';
 import Colors from '../../src/constants/colors';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import Header from '../../src/components/common/Header';
+import PhoneInput from '../../src/components/common/PhoneInput';
 import ImageSheet from '../../src/components/uploadImage/ImageSheet';
+import { countries } from '../../src/services/data/countries';
 import { businessSchema } from '../../src/services/schema/businessSchema';
 import CustomBottomSheet from '../../src/components/common/CustomBottomSheet';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { currencies } from '../../src/services/data/currencies';
 import { businessCategories } from '../../src/services/data/categories';
 import { Image } from 'expo-image';
+type currency = {
+    code: string
+    name: string
+    symbol: string
+    flag: string
+}
+type selected ={
+    name: string,
+    flag:string,
+    dialCode:string
+    code:CountryCode
+}
 const BusinessSetup = () => {
-
     const { data: user, isLoading, error } = useUser()
-
     const [loading, setLoading] = useState(false)
+    const [displayKeys, setDisplayKeys] = useState<string[]>([])
+    const [placeholder, setPlaceholder] = useState('')
     const [category, setCategory] = useState('')
-    const [currency, setCurrency] = useState('')
+    const [selectedCountry, setSelectedCountry]= useState<selected>(countries[0])
+    const [currency, setCurrency] = useState<currency | null>(null)
     const [businessName, setBusinessName] = useState('')
     const [number, setNumber] = useState('')
     const [image, setImage] = useState<string | null>(null)
     const [imageSheet, setShowImageSheet] = useState(false)
     const [showSheet, setShowSheet] = useState(false)
     const [sheetTitle, setSheetTitle] = useState('');
-    const [sheetOptions, setSheetOptions] = useState<string[]>([]);
+    const [sheetOptions, setSheetOptions] = useState<any[]>([]);
     const [sheetValue, setSheetValue] = useState('');
     const sheetRef = useRef<BottomSheet>(null)
     const imageSheetRef = useRef<BottomSheet>(null)
@@ -48,23 +64,32 @@ const BusinessSetup = () => {
     // Open Sheet
     const openSheet = (
         title: string,
-        options: string[],
-        value: string
+        options: any[],
+        value: any,
+        keys: string[] = [],
+        placeholder:string
     ) => {
+        
+        setPlaceholder(placeholder)
         setSheetTitle(title);
         setSheetOptions(options);
         setSheetValue(value);
-
+        setDisplayKeys(keys)
         sheetRef.current?.snapToIndex(0);
     };
 
     // Select Value Handler
-    const handleSelect = (value: string) => {
+    const handleSelect = (value: any) => {
         if (sheetTitle === 'Select Category') {
             setCategory(value);
         }
         if (sheetTitle === 'Select Currency') {
             setCurrency(value);
+        }
+        if(sheetTitle==='Select Country Code')
+        {
+           
+            setSelectedCountry(value)
         }
         sheetRef.current?.close();
         setShowSheet(false);
@@ -97,7 +122,7 @@ const BusinessSetup = () => {
             businessName,
             category,
             number,
-            currency,
+            currency: currency?.code,
         });
 
         if (!result.success) {
@@ -114,6 +139,7 @@ const BusinessSetup = () => {
         }
         if (!user) {
             console.log('No authenticated user');
+            setLoading(false)
             return;
         }
         let imageUrl
@@ -123,15 +149,29 @@ const BusinessSetup = () => {
                 user?.id
             )
         }
+        const phoneNumber = parsePhoneNumberFromString(
+        number,
+        selectedCountry.code
+    );
 
+    if (!phoneNumber?.isValid()) {
+        setErrors({
+            ...errors,
+            number: '*Please enter a valid phone number',
+        });
+        setLoading(false)
+        return;
+    }
+
+    const formattedPhone = phoneNumber.number;
         const { data, error } = await supabase
             .from('businesses')
             .insert({
                 owner_id: user.id,
                 name: businessName,
                 category: category,
-                currency: currency,
-                whatsapp_number: number,
+                currency: currency?.code,
+                whatsapp_number: formattedPhone,
                 logo_url: imageUrl
             })
             .select()
@@ -153,6 +193,7 @@ const BusinessSetup = () => {
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 >
                     <Header title='Setup Business'
+                    noBack={true}
                         onPress={() => router.back()} />
                     <ScrollView
                         contentContainerStyle={styles.scrollContainer}
@@ -215,13 +256,15 @@ const BusinessSetup = () => {
                                 openSheet(
                                     'Select Category',
                                     businessCategories,
-                                    category
+                                    category,
+                                    [],
+                                    'category'
 
                                 )
                             }}
                         />
-                        <Input
-                            title='Whatsapp number*'
+                        {/* <Input
+                            title='Phone Number (WHATSAPP)*'
                             placeholder='+92 XXXXXXXXXX'
                             iconName='call-outline'
                             iconType='Ionicons'
@@ -235,20 +278,46 @@ const BusinessSetup = () => {
                                     })
                             }}
                             error={errors.number}
+                        /> */}
+                        <PhoneInput
+                            onChangeCode={() => {
+                                setShowSheet(true),
+                                    openSheet(
+                                        'Select Country Code',
+                                        countries,
+                                        selectedCountry,
+                                        ['flag', 'name', 'dialCode'],
+                                        'code by country name'
+
+                                    )
+                            }}
+                            valueCode={selectedCountry.dialCode }
+                            flag={selectedCountry?.flag}
+                            valueNumber={number}
+                            onChangeNumber={(t: string) => {
+                                setNumber(t)
+                                setErrors({
+                                    ...errors,
+                                    number: undefined,
+                                });
+                            }}
+                            errorMessage={errors.number}
                         />
                         <SelectInput
                             title='Currency*'
                             placeholder='Select Currency'
                             iconName='currency-usd'
                             iconType='MaterialDesignIcons'
-                            value={currency}
+                            value={currency?.code}
                             error={errors.currency}
                             onPress={() => {
                                 setShowSheet(true)
                                 openSheet(
                                     'Select Currency',
                                     currencies,
-                                    currency
+                                    currency,
+                                    ['flag', 'name', 'code'],
+                                    'currency by name'
 
                                 )
                             }}
@@ -271,6 +340,10 @@ const BusinessSetup = () => {
                 showSheet && (
                     <CustomBottomSheet
                         bottomSheetRef={sheetRef}
+                        searchable={true}
+                        searchPlaceholder={placeholder}
+                        //displayKeys={['flag', 'name', 'code']}
+                        displayKeys={displayKeys && displayKeys}
                         options={sheetOptions}
                         title={sheetTitle}
                         onSelect={handleSelect}

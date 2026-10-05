@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import fonts, {fontSize} from '../../constants/typography';
+import fonts, { fontSize } from '../../constants/typography';
 import Colors from '../../constants/colors';
 import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Icon from '../common/Icon';
-type toastType = 'success' | 'error' | 'warn' | 'info'
+type toastType = 'success' | 'error'
 interface Props {
     messageTitle?: string
     messageDescription?: string
@@ -14,11 +14,11 @@ interface Props {
     onHide: () => void
 }
 const CustomToast: React.FC<Props> = ({ messageDescription, messageTitle, visible, onHide, type }) => {
-    const toastColor = type === 'success' ? '#2E7D5B' :
-        type === 'error' ? Colors.error : type === 'warn' ? '#D97706' : '#7C6A9B'
-    const icon = type === 'success' ? { name: 'check-circle', type: 'Feather' } :
-        type === 'error' ? { name: 'error-outline', type: 'MaterialIcons' } : type === 'warn' ?
-            { name: 'alert-triangle', type: 'Feather' } : { name: 'information-circle-outline', type: 'Ionicons' }
+    const toastColor = type === 'success' ? '#2E7D5B' : Colors.error
+    // : type === 'warn' ? '#D97706' : '#7C6A9B'
+    const icon = type === 'success' ? { name: 'check-circle', type: 'Feather' } : { name: 'error-outline', type: 'MaterialIcons' }
+    // type === 'warn' ?
+    //     { name: 'alert-triangle', type: 'Feather' } : { name: 'information-circle-outline', type: 'Ionicons' }
     useEffect(() => {
         if (!visible) {
             return
@@ -68,14 +68,14 @@ const styles = StyleSheet.create({
         padding: wp(3),
         backgroundColor: 'white',
         zIndex: 10,
-        top: hp(6),
+        top: hp(5),
         borderLeftWidth: 5,
         elevation: 5,
         flexDirection: 'row'
     },
     txtHeading: {
         fontFamily: fonts.semiBold,
-        fontSize: fontSize.smallText,
+        fontSize: fontSize.text,
 
         //color: Colors.text
     },
@@ -87,7 +87,8 @@ const styles = StyleSheet.create({
     },
     textView: {
         marginLeft: wp(2),
-        flex:1
+        flex: 1,
+        marginTop:-3
     }
 });
 

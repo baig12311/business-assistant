@@ -132,6 +132,7 @@ const isLoading = userLoading || businessLoading || productsLoading || isPending
                         />
                     ) : (
                         <CustomEmptyComponent
+                          illustration={require('../../assets/illustrations/noproduct.png')}
                         mainText='No Product In Stock'
                         subText='Start adding your inventory items with prices and stock levels to begin managing your sales.'
                         />

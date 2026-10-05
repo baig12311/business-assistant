@@ -11,11 +11,14 @@ interface props {
     onPress?: () => void
     isMenu?: boolean
     onPressMenu?: () => void
+    noBack?:boolean
 }
-const Header: React.FC<props> = ({ title, onPress, onPressMenu, isMenu }) => {
+const Header: React.FC<props> = ({ noBack, title, onPress, onPressMenu, isMenu }) => {
     return (
         <View style={styles.container}>
-            <TouchableOpacity
+            {
+                !noBack && (
+                    <TouchableOpacity
                 activeOpacity={0.7}
                 style={styles.icon}
                 onPress={onPress}
@@ -27,6 +30,9 @@ const Header: React.FC<props> = ({ title, onPress, onPressMenu, isMenu }) => {
                     color={Colors.text}
                 />
             </TouchableOpacity>
+                )
+            }
+            
             <Text style={styles.title}>{title}</Text>
             {
                 isMenu && (

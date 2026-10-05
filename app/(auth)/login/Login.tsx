@@ -8,12 +8,16 @@ import { getBusiness } from '../../../src/services/business';
 import { useBusiness } from '../../../src/hooks/useBusiness';
 import Input from '../../../src/components/common/Input';
 import { loginSchema } from '../../../src/services/schema/loginSchema';
+import CustomToast from '../../../src/components/common/CustomToast';
 import Button from '../../../src/components/common/Button';
 import { tr } from 'zod/v4/locales';
 const Login = () => {
-    const[loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [toastMessage, setToastMessage] = useState('')
+    const [showToast, setShowToast] = useState(false)
+    const [toastType, setToastType] = useState<'success' | 'error'>('error')
     const [errors, setErrors] = useState<{
         email?: string;
         password?: string;
@@ -40,35 +44,54 @@ const Login = () => {
             password,
         });
         if (error) {
-            console.log('Sign In Error:', error.message);
+            setShowToast(true)
+            setToastType('error')
+            setToastMessage(error?.message)
             setLoading(false)
+            setPassword('')
             return;
         }
-        const business=await getBusiness(data.user.id)
+        const business = await getBusiness(data.user.id)
 
         if (!business) {
             router.replace('/businessSetup/BusinessSetup');
             return;
         }
+        setShowToast(true)
+        setToastType('success')
+        setToastMessage('You are now logged in to your account.')
         setLoading(false)
+        setEmail('')
+        setPassword('')
         router.replace('/(tabs)/Home');
 
     }
 
     return (
         <SafeAreaView style={styles.container}>
+            {
+                showToast && (
+                    <CustomToast
+                        type={toastType}
+                        messageTitle={toastType === 'success' ? 'Login Successful' : 'Login Failed'}
+                        messageDescription={toastMessage}
+                        visible={showToast}
+                        onHide={() => setShowToast(false)}
+                    />
+                )
+            }
             <Text style={styles.heading}>Welcome Back</Text>
             <Text style={styles.subHeading}>Login to your Business Assistant account</Text>
             <Input
                 title='Email*'
                 placeholder='someone@gmail.com'
                 value={email}
-                onChangeText={(text:string)=>{
+                onChangeText={(text: string) => {
                     setEmail(text),
-                    setErrors({
-                        ...errors,
-                        email:undefined
-                    })
+                        setErrors({
+                            ...errors,
+                            email: undefined
+                        })
                 }}
                 error={errors.email}
                 iconName='mail-outline'
@@ -79,12 +102,12 @@ const Login = () => {
                 title='Password*'
                 placeholder='********'
                 value={password}
-                onChangeText={(text:string)=>{
+                onChangeText={(text: string) => {
                     setPassword(text),
-                    setErrors({
-                        ...errors,
-                        password:undefined
-                    })
+                        setErrors({
+                            ...errors,
+                            password: undefined
+                        })
                 }}
                 error={errors.password}
                 iconName='lock'
@@ -100,7 +123,7 @@ const Login = () => {
             <Text style={styles.newText}>Don't have an account?{'  '}
                 <Text style={styles.sign} onPress={() => router.push('/signup/Signup')}>
                     Create Account
-                    </Text>
+                </Text>
             </Text>
         </SafeAreaView>
     );

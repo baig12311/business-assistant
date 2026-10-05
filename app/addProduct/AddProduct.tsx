@@ -15,7 +15,7 @@ import { supabase } from '../../src/lib/supabase';
 import { useLocalSearchParams } from 'expo-router';
 import Header from '../../src/components/common/Header';
 import { useAddProduct } from '../../src/hooks/useAddProduct';
-import { useProducts, useProductById} from '../../src/hooks/useProducts';
+import { useProducts, useProductById } from '../../src/hooks/useProducts';
 import { useUpdateProduct } from '../../src/hooks/useUpdateProduct';
 import { Image } from 'expo-image';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
@@ -24,26 +24,33 @@ import styles from './AddProductStyle';
 import { uploadImage } from '../../src/services/convertImage';
 import { readonly } from 'zod';
 import BottomSheet from '@gorhom/bottom-sheet';
+import CustomToast from '../../src/components/common/CustomToast';
 const AddProduct = () => {
     const { productId } = useLocalSearchParams<{
-    productId: string;
-}>();
+        productId: string;
+    }>();
     const [image, setImage] = useState<string | null>(null)
     const [existingImage, setExistingImage] = useState<string | null>(null);
     const [showSheet, setShowSheet] = useState(false)
     const [sheetEdit, setSheetEdit] = useState(false)
+    const [toastTitle, setToastTitle] = useState('')
+    const [toastMessage, setToastMessage] = useState('')
+    const [showToast, setShowToast] = useState(false)
+    const [toastType, setToastType] = useState<'success' | 'error'>('error')
     const sheetRef = useRef<BottomSheet>(null)
     const { data: user } = useUser()
     const { data: business } = useBusiness(user?.id)
     const businessId = business.id
-    const {data: selectedProduct, isLoading:loadingProduct, error} = useProductById(productId)
+    const { data: selectedProduct, isLoading: loadingProduct, error } = useProductById(productId)
     const {
         mutateAsync: addProductMutation,
+        error: addError,
         isPending,
     } = useAddProduct(businessId);
     const {
         mutateAsync: updateProductMutation,
         isPending: pending,
+        error: updateError,
     } = useUpdateProduct(businessId);
     const isLoading = isPending || pending
     const { data: productData } = useProducts(businessId)
@@ -116,30 +123,44 @@ const AddProduct = () => {
         //     await removeImage()
         // }
     }
-    // update product 
-    const updateProducts = async () => {
-        const result = productSchema.safeParse(product)
+    // validate product
+    const validateProduct = () => {
+        const result = productSchema.safeParse(product);
+
         if (!result.success) {
             const fieldErrors = result.error.flatten().fieldErrors;
+
             setErrors({
                 name: fieldErrors.productName?.[0],
                 desc: fieldErrors.description?.[0],
                 costPrice: fieldErrors.costPrice?.[0],
                 price: fieldErrors.price?.[0],
                 stock: fieldErrors.stockQuantity?.[0],
-                lowStock: fieldErrors.lowStockThreshold?.[0]
-            })
+                lowStock: fieldErrors.lowStockThreshold?.[0],
+            });
+
+            return false;
+        }
+
+        setErrors({});
+
+        return true;
+    };
+    // update product 
+    const updateProducts = async () => {
+        if(!validateProduct())
+        {
             return
         }
         let imageUrl = existingImage;
 
-if (image && image !== existingImage) {
-    imageUrl = await uploadImage(
-        image,
-        'product-images',
-        businessId
-    );
-}
+        if (image && image !== existingImage) {
+            imageUrl = await uploadImage(
+                image,
+                'product-images',
+                businessId
+            );
+        }
         await updateProductMutation({
             productId,
             name: product.productName,
@@ -150,7 +171,18 @@ if (image && image !== existingImage) {
             lowStockThreshold: Number(product.lowStockThreshold),
             imageUrl,
         });
-        router.back()
+        
+    }
+    // add product
+    const AddProduct = async ()=>{
+        try {
+            if (productId) {
+                await updateProducts()
+                
+        setToastType('success')
+        setToastTitle('Updated Successfully')
+        setToastMessage('Product details have been updated successfully')
+        setShowToast(true)
         setProduct({
             productName: '',
             description: '',
@@ -159,60 +191,84 @@ if (image && image !== existingImage) {
             stockQuantity: '',
             lowStockThreshold: ''
         })
-    }
-    // add product
-    const AddProduct = async () => {
-        if (productId) {
-            await updateProducts()
-        }
-        else {
+        setTimeout(()=>{
+                    router.back()
+                }, 3100)
+        
+            }
+            else {
 
-            const result = productSchema.safeParse(product)
-            if (!result.success) {
-                const fieldErrors = result.error.flatten().fieldErrors;
-                setErrors({
-                    name: fieldErrors.productName?.[0],
-                    desc: fieldErrors.description?.[0],
-                    costPrice: fieldErrors.costPrice?.[0],
-                    price: fieldErrors.price?.[0],
-                    stock: fieldErrors.stockQuantity?.[0],
-                    lowStock: fieldErrors.lowStockThreshold?.[0]
-                })
-
+               if(!validateProduct())
+               {
                 return
-            }
-            let imageUrl = null;
+               }
+                let imageUrl = null;
 
-            if (image) {
-                imageUrl = await uploadImage(image,
-                    'product-images',
-                    businessId);
+                if (image) {
+                    imageUrl = await uploadImage(image,
+                        'product-images',
+                        businessId);
+                }
+                await addProductMutation({
+                    businessId,
+                    name: product.productName,
+                    description: product.description,
+                    price: Number(product.price),
+                    costPrice: Number(product.costPrice),
+                    stockQuantity: Number(product.stockQuantity),
+                    lowStockThreshold: Number(product.lowStockThreshold),
+                    imageUrl,
+                });
+                
+                setToastType('success')
+                setToastTitle('Added Successfully')
+                setToastMessage('Product details have been added successfully')
+                setShowToast(true)
+                setProduct({
+                    productName: '',
+                    description: '',
+                    costPrice: '',
+                    price: '',
+                    stockQuantity: '',
+                    lowStockThreshold: ''
+                })
+                setTimeout(()=>{
+                    router.back()
+                }, 3100)
+                
+                
             }
-            await addProductMutation({
-                businessId,
-                name: product.productName,
-                description: product.description,
-                price: Number(product.price),
-                costPrice: Number(product.costPrice),
-                stockQuantity: Number(product.stockQuantity),
-                lowStockThreshold: Number(product.lowStockThreshold),
-                imageUrl,
-            });
-            router.back()
-            setProduct({
-                productName: '',
-                description: '',
-                costPrice: '',
-                price: '',
-                stockQuantity: '',
-                lowStockThreshold: ''
-            })
+
         }
-
+        catch (error) {
+            
+            setToastType('error')
+            if(productId)
+            {
+                 setToastTitle('Unable to add product')
+            }
+            else
+            {
+                 setToastTitle('Unable to update product')
+            }
+           
+            setToastMessage("We couldn’t save this product. Please try again.")
+            setShowToast(true)
+        }
     }
+    
+
+
     return (
         <View style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>
+                <CustomToast
+                visible={showToast}
+                onHide={()=>setShowToast(false)}
+                type={toastType}
+                messageTitle={toastTitle}
+                messageDescription={toastMessage}
+                />
                 <Header title={productId ? 'Edit Product' : 'Add Product'}
                     onPress={() => router.back()}
                 />
@@ -227,7 +283,7 @@ if (image && image !== existingImage) {
                     >
                         {
                             !productId && (<Text style={styles.subHeading}>Add product details to keep your inventory organized..</Text>
-)
+                            )
                         }
                         {/* <Text style={styles.heading}>Add new product</Text> */}
                         <View style={styles.imageContainer}>
@@ -425,6 +481,11 @@ if (image && image !== existingImage) {
         </View>
 
     );
+
 };
 
 export default AddProduct;
+
+
+
+

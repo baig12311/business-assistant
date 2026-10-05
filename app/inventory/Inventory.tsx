@@ -7,6 +7,7 @@ import { useProducts } from '../../src/hooks/useProducts';
 import Input from '../../src/components/common/Input';
 import Icon from '../../src/components/common/Icon';
 import Colors from '../../src/constants/colors';
+import CustomEmptyComponent from '../../src/components/common/CustomEmptyComponent';
 import ProductCard from '../../src/components/inventory/ProductCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../../src/components/common/Header';
@@ -37,15 +38,15 @@ const Inventory = () => {
     }).length ?? 0;
 
     // render product
-    const renderProduct = ({ item, index}: any) => {
+    const renderProduct = ({ item, index }: any) => {
         return (
             <ProductCard
                 title={item.name}
-                
+
                 stock={item.stock_quantity}
                 lowStock={item.low_stock_threshold}
                 imageurl={item.image_url}
-                isLast={index === allProducts-1}
+                isLast={index === allProducts - 1}
             />
         )
 
@@ -90,17 +91,22 @@ const Inventory = () => {
                 iconName='search-outline'
                 iconType='Ionicons'
             />
-            <Text style={styles.sectionTitle}>Inventory List</Text>
-            <View style={styles.flatlist}>
-                <FlatList
+            {/* <Text style={styles.sectionTitle}>Inventory List</Text> */}
+            {/* <View style={styles.flatlist}> */}
+            <FlatList
                 contentContainerStyle={styles.containerStyle}
                 data={filterProducts ?? []}
                 renderItem={renderProduct}
                 keyExtractor={(item) => item.id}
                 showsVerticalScrollIndicator={false}
+                ListEmptyComponent={<CustomEmptyComponent
+                    illustration={require('../../assets/illustrations/noproduct.png')}
+                    mainText='Nothing in your inventory yet'
+                    subText='Add products to start tracking stock, prices, and availability.'
+                />}
             />
-            </View>
-            
+            {/* </View> */}
+
 
         </SafeAreaView>
     );

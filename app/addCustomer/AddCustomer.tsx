@@ -1,27 +1,40 @@
-import { useState, useEffect, useRef} from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../../src/components/common/Header';
 import { useCustomers, useCustomerById } from '../../src/hooks/useCustomer';
 import { router, useLocalSearchParams } from 'expo-router';
-import Button from '../../src/components/common/Button';
-import styles from './AddCustomerStyle';
-import Input from '../../src/components/common/Input';
-import BottomSheet from '@gorhom/bottom-sheet';
-import { countries} from '../../src/services/data/countries';
+import { countries } from '../../src/services/data/countries';
 import CustomBottomSheet from '../../src/components/common/CustomBottomSheet';
+import CustomToast from '../../src/components/common/CustomToast';
 import { customerSchema } from '../../src/services/schema/customerSchema';
 import { useUser } from '../../src/hooks/useUser';
 import { useBusiness } from '../../src/hooks/useBusiness';
 import { useAddCustomer } from '../../src/hooks/useAddCustomer';
 import { useUpdateCustomer } from '../../src/hooks/useUpdateCustomer';
+import { parsePhoneNumberFromString, CountryCode } from 'libphonenumber-js';
+import Button from '../../src/components/common/Button';
+import styles from './AddCustomerStyle';
+import Input from '../../src/components/common/Input';
+import BottomSheet from '@gorhom/bottom-sheet';
 import PhoneInput from '../../src/components/common/PhoneInput';
+import { number } from 'zod';
+type selected = {
+    name: string,
+    flag: string,
+    dialCode: string
+    code: CountryCode
+}
 const AddCustomer = () => {
     const [showSheet, setShowSheet] = useState(false)
     const [sheetTitle, setSheetTitle] = useState('');
-    const [sheetOptions, setSheetOptions] = useState<string[]>([]);
+    const [toastMessage, setToastMessage] = useState('')
+    const [toastTitle, setToastTitle] = useState('')
+    const [showToast, setShowToast] = useState(false)
+    const [toastType, setToastType] = useState<'success' | 'error'>('error')
+    const [sheetOptions, setSheetOptions] = useState<any[]>([]);
     const [sheetValue, setSheetValue] = useState('');
-    const [selectedCountry, setSelectedCountry] = useState(countries[0].dialCode)
+    const [selectedCountry, setSelectedCountry] = useState<selected>(countries[0])
     const sheetRef = useRef<BottomSheet>(null)
     const { customerId } = useLocalSearchParams<{
         customerId: string
@@ -54,20 +67,37 @@ const AddCustomer = () => {
         address?: string
         city?: string
     }>({})
+    useEffect(() => {
+        if (!customer) return;
+
+        const phoneNumber = parsePhoneNumberFromString(
+            customer.phone ?? ''
+        );
+
+        if (phoneNumber) {
+            const selectedCountry = countries.find(
+                item => item.code === phoneNumber.country
+            );
+
+            if (selectedCountry) {
+                setSelectedCountry(selectedCountry);
+            }
+
+            setCustomer({
+                ...customer,
+                phone: phoneNumber.nationalNumber
+            });
+        }
+    }, [customer]);
     const isDiabled = !customer.name || !customer.phone
     const countryCodes = countries.map(
-        item=>item.dialCode
+        item => item.dialCode
     )
-    // // check if customer exists
-    // const selectedCustomer = customers?.find(
-    //     (item: any) => item.id === customerId
-    // )
-
     // open sheet
     const openSheet = (
         title: string,
-        options: string[],
-        value: string
+        options: any[],
+        value: any
     ) => {
         setSheetTitle(title);
         setSheetOptions(options);
@@ -92,9 +122,8 @@ const AddCustomer = () => {
         setCustomerFields()
     }, [selectedCustomer])
 
-    // update Customer
-
-    const updateCustomer = async () => {
+    // validate customer
+    const validateCustomer = () => {
         const result = customerSchema.safeParse(customer);
 
         if (!result.success) {
@@ -108,58 +137,122 @@ const AddCustomer = () => {
                 city: fieldErrors.city?.[0],
             });
 
+            return false;
+        }
+        setErrors({})
+        return true
+    }
+
+    // update Customer
+
+    const updateCustomer = async () => {
+        if (!validateCustomer()) {
+            return
+        }
+        const phoneNumber = parsePhoneNumberFromString(
+            customer.phone,
+            selectedCountry.code
+        );
+
+        if (!phoneNumber?.isValid()) {
+            setErrors({
+                ...errors,
+                phone: '*Please enter a valid phone number',
+            });
+
             return;
         }
+
+        const formattedPhone = phoneNumber.number;
         try {
             await updateCustomerMutation({
                 customerId: customerId,
                 name: customer.name.trim(),
-                phone: customer.phone.trim(),
+                phone: formattedPhone,
                 email: customer.email.trim(),
                 address: customer.address.trim(),
                 city: customer.city.trim(),
             });
-
-            router.back();
+            setToastType('success')
+            setToastTitle('Updated Successfully')
+            setToastMessage('Customer details have been updated successfully')
+            setShowToast(true)
+            setCustomer({
+                name: '',
+                phone: '',
+                email: '',
+                address: '',
+                city: '',
+            })
+            setTimeout(() => {
+                router.back()
+            }, 3100)
 
         } catch (error) {
-            console.log('Update Customer Error:', error);
+            setToastType('error')
+            setToastTitle('Unable to update customer')
+
+            setToastMessage("We couldn’t update this customer data. Please try again.")
+            setShowToast(true)
         }
     }
 
     // add customer
 
     const addCustomer = async () => {
-        const result = customerSchema.safeParse(customer);
+        if (!validateCustomer()) {
+            return
+        }
+        const phoneNumber = parsePhoneNumberFromString(
+            customer.phone,
+            selectedCountry.code
+        );
 
-        if (!result.success) {
-            const fieldErrors = result.error.flatten().fieldErrors;
-
+        if (!phoneNumber?.isValid()) {
             setErrors({
-                name: fieldErrors.name?.[0],
-                phone: fieldErrors.phone?.[0],
-                email: fieldErrors.email?.[0],
-                address: fieldErrors.address?.[0],
-                city: fieldErrors.city?.[0],
+                ...errors,
+                phone: '*Please enter a valid phone number',
             });
 
             return;
         }
 
+        const formattedPhone = phoneNumber.number;
+
+        //console.log('DB Phone:', formattedPhone);
+
+
         try {
             await addCustomerMutation({
                 businessId,
                 name: customer.name.trim(),
-                phone: customer.phone.trim(),
+                phone: formattedPhone,
                 email: customer.email.trim(),
                 address: customer.address.trim(),
                 city: customer.city.trim(),
             });
 
-            router.back();
+            setToastType('success')
+            setToastTitle('Addedd Successfully')
+            setToastMessage('Customer details have been added successfully')
+            setShowToast(true)
+            setCustomer({
+                name: '',
+                phone: '',
+                email: '',
+                address: '',
+                city: '',
+            })
+            setTimeout(() => {
+                router.back()
+            }, 3100)
 
         } catch (error) {
-            console.log('Add Customer Error:', error);
+            setToastType('error')
+            setToastTitle('Unable to add customer')
+
+            setToastMessage("We couldn’t add this customer data. Please try again.")
+            setShowToast(true)
         }
     }
 
@@ -177,45 +270,52 @@ const AddCustomer = () => {
 
 
     return (
-        <View style={{flex:1}}>
+        <View style={{ flex: 1 }}>
 
-        
-        <SafeAreaView style={styles.container}>
-            <Header title={customerId ? 'Edit Customer' : 'Add Customer'} onPress={() => router.back()} />
-            <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            >
-                <ScrollView
-                    contentContainerStyle={styles.scrollContainer}
-                    keyboardShouldPersistTaps="handled"
-                    showsVerticalScrollIndicator={false}
+
+            <SafeAreaView style={styles.container}>
+                <CustomToast
+                    visible={showToast}
+                    onHide={() => setShowToast(false)}
+                    type={toastType}
+                    messageTitle={toastTitle}
+                    messageDescription={toastMessage}
+                />
+                <Header title={customerId ? 'Edit Customer' : 'Add Customer'} onPress={() => router.back()} />
+                <KeyboardAvoidingView
+                    style={{ flex: 1 }}
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 >
-                    {
-                        !customerId && (
-                            <Text style={styles.subHeading}>Add your customer's details to keep their information organized.</Text>
+                    <ScrollView
+                        contentContainerStyle={styles.scrollContainer}
+                        keyboardShouldPersistTaps="handled"
+                        showsVerticalScrollIndicator={false}
+                    >
+                        {
+                            !customerId && (
+                                <Text style={styles.subHeading}>Add your customer's details to keep their information organized.</Text>
 
-                        )
-                    }
-                    <Input
-                        title='Name*'
-                        placeholder='John Doe'
-                        iconName='person-outline'
-                        iconType='Ionicons'
-                        value={customer.name}
-                        onChangeText={(t: string) => {
-                            setCustomer({
-                                ...customer,
-                                name: t
-                            })
-                            setErrors({
-                                ...errors,
-                                name: undefined,
-                            });
-                        }}
-                        error={errors.name}
-                    />
-                    {/* <Input
+                            )
+                        }
+                        <Input
+                            title='Name*'
+                            placeholder='John Doe'
+                            iconName='person-outline'
+                            iconType='Ionicons'
+                            value={customer.name}
+                            onChangeText={(t: string) => {
+                                setCustomer({
+                                    ...customer,
+                                    name: t
+                                })
+                                setErrors({
+                                    ...errors,
+                                    name: undefined,
+                                });
+                            }}
+                            error={errors.name}
+                        />
+                        {/* <Input
                         title='Phone*'
                         placeholder='+92XXXXXXXXXX'
                         iconName='call-outline'
@@ -234,95 +334,112 @@ const AddCustomer = () => {
                         }}
                         error={errors.phone}
                     /> */}
-                    <PhoneInput
-                    onChangeCode={()=>{
-                        setShowSheet(true),
-                        openSheet(
-                            'Select Country Code',
-                            countryCodes,
-                            selectedCountry
+                        <PhoneInput
+                            onChangeCode={() => {
+                                setShowSheet(true),
+                                    openSheet(
+                                        'Select Country Code',
+                                        countries,
+                                        selectedCountry
 
-                        )
-                    }}
-                    valueCode={selectedCountry}
-                    //valueNumber={selectedCountry}
-                    />
-                    <Input
-                        title='Email (optional)'
-                        placeholder='someone@gmail.com'
-                        iconName='mail-outline'
-                        iconType='Ionicons'
-                        keyboard='email-address'
-                        value={customer.email}
-                        onChangeText={(t: string) => {
-                            setCustomer({
-                                ...customer,
-                                email: t
-                            })
-                            setErrors({
-                                ...errors,
-                                email: undefined,
-                            });
-                        }}
-                        error={errors.email}
-                    />
-                    <Input
-                        title='Address (optional)'
-                        placeholder='House # 0, Street X'
-                        iconName='location-outline'
-                        iconType='Ionicons'
-                        value={customer.address}
-                        onChangeText={(t: string) => {
-                            setCustomer({
-                                ...customer,
-                                address: t
-                            })
-                            setErrors({
-                                ...errors,
-                                address: undefined,
-                            });
-                        }}
-                        error={errors.address}
-                    />
-                    <Input
-                        title='City (optional)'
-                        placeholder='Lahore'
-                        iconName='location-outline'
-                        iconType='Ionicons'
-                        value={customer.city}
-                        onChangeText={(t: string) => {
-                            setCustomer({
-                                ...customer,
-                                city: t
-                            })
-                            setErrors({
-                                ...errors,
-                                city: undefined,
-                            });
-                        }}
-                        error={errors.city}
-                    />
-                    <View style={styles.button}>
-                        <Button
-                            title={customerId ? 'Edit Customer' : 'Add Customer'}
-                            onPress={handleCustomer}
-                            isLoading={isLoading}
-                            disabled={isDiabled}
+                                    )
+                            }}
+                            valueCode={selectedCountry?.dialCode}
+                            flag={selectedCountry?.flag}
+                            valueNumber={customer.phone}
+                            onChangeNumber={(t: string) => {
+                                setCustomer({
+                                    ...customer,
+                                    phone: t
+                                })
+                                setErrors({
+                                    ...errors,
+                                    phone: undefined,
+                                });
+                            }}
+                            errorMessage={errors.phone}
                         />
-                    </View>
-                </ScrollView>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
-        {
+                        <Input
+                            title='Email (optional)'
+                            placeholder='someone@gmail.com'
+                            iconName='mail-outline'
+                            iconType='Ionicons'
+                            keyboard='email-address'
+                            value={customer.email}
+                            onChangeText={(t: string) => {
+                                setCustomer({
+                                    ...customer,
+                                    email: t
+                                })
+                                setErrors({
+                                    ...errors,
+                                    email: undefined,
+                                });
+                            }}
+                            error={errors.email}
+                        />
+                        <Input
+                            title='Address (optional)'
+                            placeholder='House # 0, Street X'
+                            iconName='location-outline'
+                            iconType='Ionicons'
+                            value={customer.address}
+                            onChangeText={(t: string) => {
+                                setCustomer({
+                                    ...customer,
+                                    address: t
+                                })
+                                setErrors({
+                                    ...errors,
+                                    address: undefined,
+                                });
+                            }}
+                            error={errors.address}
+                        />
+                        <Input
+                            title='City (optional)'
+                            placeholder='Lahore'
+                            iconName='location-outline'
+                            iconType='Ionicons'
+                            value={customer.city}
+                            onChangeText={(t: string) => {
+                                setCustomer({
+                                    ...customer,
+                                    city: t
+                                })
+                                setErrors({
+                                    ...errors,
+                                    city: undefined,
+                                });
+                            }}
+                            error={errors.city}
+                        />
+                        <View style={styles.button}>
+                            <Button
+                                title={customerId ? 'Edit Customer' : 'Add Customer'}
+                                onPress={handleCustomer}
+                                isLoading={isLoading}
+                                disabled={isDiabled}
+                            />
+                        </View>
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            </SafeAreaView>
+            {
                 showSheet && (
                     <CustomBottomSheet
                         bottomSheetRef={sheetRef}
                         options={sheetOptions}
                         title={sheetTitle}
-                        onSelect={(value:any)=>{
+                        searchable={true}
+                        displayKeys={['flag', 'name', 'dialCode']}
+                        searchPlaceholder='by Country'
+                        onSelect={(value: any) => {
                             setSelectedCountry(value),
+                                console.log(value);
+
                             sheetRef.current?.close();
-        setShowSheet(false);
+                            setShowSheet(false);
                         }
                         }
                     //value=

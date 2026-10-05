@@ -9,10 +9,10 @@ import {
 interface props {
     name: string
     phone: string
-    onPress?:()=>void
-    order?:number
+    onPress?: () => void
+    order?: number
 }
-const CustomerCard: React.FC<props> = ({ name, phone,onPress, order}) => {
+const CustomerCard: React.FC<props> = ({ name, phone, onPress, order }) => {
     const initials = name
         .trim()
         .split(' ')
@@ -21,27 +21,22 @@ const CustomerCard: React.FC<props> = ({ name, phone,onPress, order}) => {
         .join('')
         .toUpperCase();
     return (
-        <TouchableOpacity 
-        style={styles.container}
-        activeOpacity={0.7}
-        onPress={onPress}
+        <TouchableOpacity
+            style={styles.container}
+            activeOpacity={0.7}
+            onPress={onPress}
         >
             <View style={styles.icon}>
-                {/* <Icon
-                name='person'
-                type='Ionicons'
-                size={wp(6)}
-                color={Colors.textSecondary}
-                /> */}
+
                 <Text style={styles.initial}>{initials}</Text>
             </View>
             <View style={styles.textContainer}>
                 <Text style={styles.textName}>{name}</Text>
-                <Text style={[styles.textPhone, {marginBottom: hp(0.8)}]}>{phone}</Text>
+                <Text style={[styles.textPhone, { marginBottom: hp(0.8) }]}>{phone}</Text>
                 {
-                    order && order>0 && <Text style={styles.textPhone}>{order} {order>1?'Orders':'Order'}</Text>
+                    order && order > 0 && <Text style={styles.textPhone}>{order} {order > 1 ? 'Orders' : 'Order'}</Text>
                 }
-                
+
             </View>
             <View style={{ alignSelf: 'center' }}>
                 <Icon
@@ -64,7 +59,7 @@ const styles = StyleSheet.create({
         padding: wp(3),
         borderRadius: wp(2),
         flexDirection: 'row',
-        marginBottom:hp(2)
+        marginBottom: hp(2)
         //alignItems: 'center'
     },
     textContainer: {
@@ -79,11 +74,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
-    initial:{
+    initial: {
         fontSize: fontSize.text,
         fontFamily: fonts.bold,
-        color:Colors.surface,
-        letterSpacing:2
+        color: Colors.surface,
+        letterSpacing: 2
     },
     textName: {
         fontFamily: fonts.medium,
@@ -95,7 +90,7 @@ const styles = StyleSheet.create({
         fontFamily: fonts.medium,
         fontSize: fontSize.smallText,
         color: Colors.textSecondary,
-        
+
     }
 });
 

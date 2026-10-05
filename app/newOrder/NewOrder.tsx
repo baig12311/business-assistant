@@ -9,6 +9,7 @@ import Icon from '../../src/components/common/Icon';
 import SelectInput from '../../src/components/common/SelectInput';
 import Input from '../../src/components/common/Input';
 import InputRow from '../../src/components/order/InputRow';
+import CustomToast from '../../src/components/common/CustomToast';
 import { useUser } from '../../src/hooks/useUser';
 import { useBusiness } from '../../src/hooks/useBusiness';
 import { useCustomers } from '../../src/hooks/useCustomer';
@@ -30,17 +31,23 @@ const NewOrder = () => {
         mutateAsync: createOrderMutation,
         isPending,
     } = useCreateOrder(business?.id);
+    const [toastTitle, setToastTitle] = useState('')
+    const [toastMessage, setToastMessage] = useState('')
+    const [showToast, setShowToast] = useState(false)
+    const [toastType, setToastType] = useState<'success' | 'error'>('error')
     const sheetRef = useRef<BottomSheet>(null)
     const [orderItems, setOrderItems] = useState<any>([])
     const [discount, setDiscount] = useState('')
     const [amountPaid, setAmountPaid] = useState('')
+    const [displayKeys, setDisplayKeys] = useState<string[]>([])
+    const [placeholder, setPlaceholder] = useState('')
     const [remainingAmount, setRemainingAmount] = useState('')
     const [selectedCustomer, setSelectedCustomer] = useState('')
     const [selectedCustomerData, setSelectedCustomerData] = useState<any>(null)
-    const [selectedProduct, setSelectedProduct] = useState('')
+    const [selectedProduct, setSelectedProduct] = useState()
     const [showSheet, setShowSheet] = useState(false);
     const [sheetTitle, setSheetTitle] = useState('');
-    const [sheetOptions, setSheetOptions] = useState<string[]>([]);
+    const [sheetOptions, setSheetOptions] = useState<any[]>([]);
     const [sheetValue, setSheetValue] = useState('');
     const subtotal = orderItems.reduce(
         (sum: any, item: any) => sum + item.price * item.quantity,
@@ -65,17 +72,27 @@ const NewOrder = () => {
 
     }
     // handle product select
-    const handleProductSelect = (selectedName: string) => {
-        const selectedProductData = products?.find(
-            item => item.name === selectedName
-        );
+    const handleProductSelect = (selectedProduct: any) => {
+        // const selectedProductData = products?.find(
+        //     item => item.name === selectedName
+        // );
 
-        if (!selectedProductData) return;
+        // if (!selectedProductData) return;
 
         const alreadyExist = orderItems?.find(
-            (item: any) => item.product_id === selectedProductData?.id
+            (item: any) => item.product_id === selectedProduct?.id
         )
-        if (!alreadyExist) {
+        const isAvailable = products?.some(
+            (item) => item.stock_quantity > 0
+        )
+        if(!isAvailable)
+        {
+            setToastType('error')
+            setToastTitle('Out of stock')
+            setToastMessage('This item is out of stock. This cannot be added')
+            setShowToast(true)
+        }
+        if (!alreadyExist && isAvailable) {
             setOrderItems([
                 ...orderItems,
                 {
@@ -83,17 +100,17 @@ const NewOrder = () => {
                     // quantity: 1
 
                     // Supabase ke liye
-                    product_id: selectedProductData.id,
+                    product_id: selectedProduct.id,
                     quantity: 1,
-                    unit_price: selectedProductData.price,
-                    subtotal: selectedProductData.price,
+                    unit_price: selectedProduct.price,
+                    subtotal: selectedProduct.price,
 
                     // UI ke liye
-                    name: selectedProductData.name,
-                    price: selectedProductData.price,
+                    name: selectedProduct.name,
+                    price: selectedProduct.price,
 
-                    image_url: selectedProductData.image_url,
-                    stock_quantity: selectedProductData.stock_quantity,
+                    image_url: selectedProduct.image_url,
+                    stock_quantity: selectedProduct.stock_quantity,
                 }
 
             ])
@@ -103,19 +120,22 @@ const NewOrder = () => {
     // Open Sheet
     const openSheet = (
         title: string,
-        options: string[],
-        value: string
+        options: any[],
+        value: any,
+        displayKeys: string[],
+        placeholder : string
     ) => {
         setSheetTitle(title);
         setSheetOptions(options);
         setSheetValue(value);
-
+        setDisplayKeys(displayKeys)
+        setPlaceholder(placeholder)
         sheetRef.current?.snapToIndex(0);
     };
 
 
     // Select Value Handler
-    const handleSelect = (value: string) => {
+    const handleSelect = (value: any) => {
         if (sheetTitle === 'Select Customer') {
             setSelectedCustomer(value);
             handleCustomerSelect(value)
@@ -178,6 +198,13 @@ const NewOrder = () => {
     return (
         <View style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>
+                <CustomToast
+                messageTitle={toastTitle}
+                messageDescription={toastMessage}
+                type={toastType}
+                visible={showToast}
+                onHide={()=>setShowToast(false)}
+                />
                 <Header title='Create Order' onPress={() => router.back()} />
                 <ScrollView
                     contentContainerStyle={styles.scrollContainer}
@@ -195,7 +222,9 @@ const NewOrder = () => {
                                 openSheet(
                                     'Select Customer',
                                     customerNames,
-                                    selectedCustomer
+                                    selectedCustomer,
+                                    [],
+                                    'customers'
                                 )
                             }}
                         />
@@ -225,8 +254,10 @@ const NewOrder = () => {
                                 setShowSheet(true)
                                 openSheet(
                                     'Select Product',
-                                    productNames,
-                                    selectedProduct
+                                    products ?? [],
+                                    selectedProduct,
+                                    ['name', 'price', 'stock_quantity'],
+                                    'products'
                                 )
                             }}
                         >
@@ -365,10 +396,14 @@ const NewOrder = () => {
             {
                 showSheet && (
                     <CustomBottomSheet
+                    searchable={true}
                         bottomSheetRef={sheetRef}
+                        searchPlaceholder={placeholder}
                         options={sheetOptions}
                         title={sheetTitle}
                         onSelect={handleSelect}
+                        displayKeys={displayKeys}
+                        currency={business?.currency}
                     //value=
                     />
                 )

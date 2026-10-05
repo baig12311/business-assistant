@@ -9,38 +9,44 @@ import {
 import Icon from "./Icon"
 import Input from "./Input"
 import SelectInput from "./SelectInput"
-interface props{
-    onPress:()=>void
-    valueNumber:string
-    valueCode:string
-    onChangeCode:()=>void
-    onChangeNumber:()=>void
+interface props {
+    //onPress: () => void
+    valueNumber: string
+    valueCode: string
+    onChangeCode: () => void
+    onChangeNumber: (text: string) => void
+    flag: string
+    errorMessage?: string
 }
-const PhoneInput: React.FC<props>= ({onPress, valueCode, valueNumber,
+const PhoneInput: React.FC<props> = ({ errorMessage, flag, valueCode, valueNumber,
     onChangeNumber, onChangeCode
 }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Phone Number*</Text>
             <View style={styles.inputRow}>
-                <View style={{ width: wp(30) }}>
-                    <SelectInput 
-                    iconName='call-outline'
-                    iconType='Ionicons'
-                    value={valueCode}
-                    onPress={onChangeCode}
-                    
+                <View style={{ width: wp(32) }}>
+                    <SelectInput
+
+                        value={valueCode}
+                        onPress={onChangeCode}
+                        flag={flag && flag}
+
 
                     />
                 </View>
 
                 <View style={{ flex: 1 }}>
 
-                    <Input 
-                    placeholder= 'XXXXXXXXXX'
-                    max={10}
-                    value={valueNumber}
-                    onChangeText={onChangeNumber}
+                    <Input
+                        iconName='call-outline'
+                        iconType='Ionicons'
+                        placeholder='XXXXXXXXXX'
+                        //max={10}
+                        value={valueNumber}
+                        onChangeText={onChangeNumber}
+                        keyboard='phone-pad'
+                        error={errorMessage}
                     />
                 </View>
 
@@ -54,8 +60,8 @@ const PhoneInput: React.FC<props>= ({onPress, valueCode, valueNumber,
 
 const styles = StyleSheet.create({
     container: {
-        
-       
+
+
     },
 
     title: {
@@ -66,7 +72,7 @@ const styles = StyleSheet.create({
     },
     inputRow: {
         flexDirection: 'row',
-       
+
         gap: 10
         //justifyContent: 'flex-start'
     }

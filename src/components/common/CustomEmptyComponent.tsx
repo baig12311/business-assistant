@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
 
   emptyText: {
     fontSize: fontSize.smallText,
-    fontFamily: fonts.regular,
+    fontFamily: fonts.medium,
     color: Colors.textSecondary,
     textAlign: 'center',
     marginBottom: hp(5),
@@ -57,6 +57,7 @@ const styles = StyleSheet.create({
   illustration: {
     width: wp(80),
     height: hp(30),
+    opacity: 0.5
   }
 });
 

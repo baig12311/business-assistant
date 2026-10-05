@@ -53,10 +53,13 @@ const styles = StyleSheet.create({
     container: {
         //borderWidth:0.5,
         padding: wp(2),
-        borderRadius: wp(2),
         flexDirection: 'row',
         alignItems: 'center',
-        borderColor: Colors.textSecondary
+        //borderColor: Colors.surface,
+        backgroundColor: Colors.surface,
+        borderRadius: wp(2),
+        elevation:1,
+        marginBottom: hp(2)
     },
     title: {
         fontFamily: fonts.medium,

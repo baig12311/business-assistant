@@ -11,29 +11,65 @@ import fonts, { fontSize } from '../../src/constants/typography';
 import Header from '../../src/components/home/Header';
 import { useBusiness } from '../../src/hooks/useBusiness';
 import { useCustomers } from '../../src/hooks/useCustomer';
+import { currencies } from '../../src/services/data/currencies';
 import Icon from '../../src/components/common/Icon';
 import { quickActions } from '../../src/services/data/quickActions';
 import { useProducts } from '../../src/hooks/useProducts';
+import { useOrders } from '../../src/hooks/useOrders';
 import ActionCard from '../../src/components/home/ActionCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DashboardCard from '../../src/components/home/DashboardCard';
 const Home = () => {
+ 
     const { data, error, isLoading } = useUser()
     const userId = data?.id
     const { data: business, error: bError, isLoading: bLoading } = useBusiness(userId)
+       
     const userName = data?.user_metadata?.name
+    const{data: orders} = useOrders(business?.id)
     const { data: products } = useProducts(business?.id)
     const { data: customers } = useCustomers(business?.id)
-    const salesData = [
-        { value: 4500, label: 'Mon' },
-        { value: 7200, label: 'Tue' },
-        { value: 5800, label: 'Wed' },
-        { value: 9100, label: 'Thu' },
-        { value: 12500, label: 'Fri' },
-        { value: 8300, label: 'Sat' },
-        { value: 15550, label: 'Sun' },
-    ];
+    // const salesData = [
+    //     { value: 4500, label: 'Mon' },
+    //     { value: 7200, label: 'Tue' },
+    //     { value: 5800, label: 'Wed' },
+    //     { value: 9100, label: 'Thu' },
+    //     { value: 12500, label: 'Fri' },
+    //     { value: 8300, label: 'Sat' },
+    //     { value: 15550, label: 'Sun' },
+    // ];
+    const salesData = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date();
+    const currentDay = date.getDay(); // Sunday = 0
+    const diff = currentDay === 0 ? -6 : 1 - currentDay;
 
+    date.setDate(date.getDate() + diff + index);
+
+    const daySales =
+        orders?.reduce((sum: number, order: any) => {
+            const orderDate = new Date(order.created_at);
+
+            const sameDay =
+                orderDate.getFullYear() === date.getFullYear() &&
+                orderDate.getMonth() === date.getMonth() &&
+                orderDate.getDate() === date.getDate();
+
+            return sameDay
+                ? sum + Number(order.total_amount)
+                : sum;
+        }, 0) ?? 0;
+
+    return {
+        value: daySales,
+        label: date.toLocaleDateString('en-US', {
+            weekday: 'short',
+        }),
+    };
+});
+     const totalSales = orders?.reduce(
+        (sum: number, order: any) => sum + Number(order.total_amount),
+        0
+    ) ?? 0;
     return (
         <SafeAreaView style={styles.container}>
             <Header
@@ -85,7 +121,7 @@ const Home = () => {
                     />
                     <DashboardCard
                         title="Orders"
-                        info={2}
+                        info={orders?.length}
                         iconName='receipt'
                         iconType='Ionicons'
                         bgColor='#FFF7ED'
@@ -94,7 +130,7 @@ const Home = () => {
                     />
                     <DashboardCard
                         title="Today's Sales"
-                        info={2}
+                        info={totalSales.toLocaleString()}
                         iconName='cash'
                         iconType='Ionicons'
                         bgColor='#F0FDF4'
