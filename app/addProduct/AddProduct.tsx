@@ -148,8 +148,7 @@ const AddProduct = () => {
     };
     // update product 
     const updateProducts = async () => {
-        if(!validateProduct())
-        {
+        if (!validateProduct()) {
             return
         }
         let imageUrl = existingImage;
@@ -171,37 +170,36 @@ const AddProduct = () => {
             lowStockThreshold: Number(product.lowStockThreshold),
             imageUrl,
         });
-        
+
     }
     // add product
-    const AddProduct = async ()=>{
+    const AddProduct = async () => {
         try {
             if (productId) {
                 await updateProducts()
-                
-        setToastType('success')
-        setToastTitle('Updated Successfully')
-        setToastMessage('Product details have been updated successfully')
-        setShowToast(true)
-        setProduct({
-            productName: '',
-            description: '',
-            costPrice: '',
-            price: '',
-            stockQuantity: '',
-            lowStockThreshold: ''
-        })
-        setTimeout(()=>{
+
+                setToastType('success')
+                setToastTitle('Updated Successfully')
+                setToastMessage('Product details have been updated successfully')
+                setShowToast(true)
+                setProduct({
+                    productName: '',
+                    description: '',
+                    costPrice: '',
+                    price: '',
+                    stockQuantity: '',
+                    lowStockThreshold: ''
+                })
+                setTimeout(() => {
                     router.back()
                 }, 3100)
-        
+
             }
             else {
 
-               if(!validateProduct())
-               {
-                return
-               }
+                if (!validateProduct()) {
+                    return
+                }
                 let imageUrl = null;
 
                 if (image) {
@@ -219,7 +217,7 @@ const AddProduct = () => {
                     lowStockThreshold: Number(product.lowStockThreshold),
                     imageUrl,
                 });
-                
+
                 setToastType('success')
                 setToastTitle('Added Successfully')
                 setToastMessage('Product details have been added successfully')
@@ -232,42 +230,40 @@ const AddProduct = () => {
                     stockQuantity: '',
                     lowStockThreshold: ''
                 })
-                setTimeout(()=>{
+                setTimeout(() => {
                     router.back()
                 }, 3100)
-                
-                
+
+
             }
 
         }
         catch (error) {
-            
+
             setToastType('error')
-            if(productId)
-            {
-                 setToastTitle('Unable to add product')
+            if (productId) {
+                setToastTitle('Unable to add product')
             }
-            else
-            {
-                 setToastTitle('Unable to update product')
+            else {
+                setToastTitle('Unable to update product')
             }
-           
+
             setToastMessage("We couldn’t save this product. Please try again.")
             setShowToast(true)
         }
     }
-    
+
 
 
     return (
         <View style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>
                 <CustomToast
-                visible={showToast}
-                onHide={()=>setShowToast(false)}
-                type={toastType}
-                messageTitle={toastTitle}
-                messageDescription={toastMessage}
+                    visible={showToast}
+                    onHide={() => setShowToast(false)}
+                    type={toastType}
+                    messageTitle={toastTitle}
+                    messageDescription={toastMessage}
                 />
                 <Header title={productId ? 'Edit Product' : 'Add Product'}
                     onPress={() => router.back()}

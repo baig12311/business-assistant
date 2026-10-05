@@ -17,3 +17,20 @@ export const getOrders = async (
 
     return data;
 };
+
+
+
+
+export const getOrderById = async (orderId: string) => {
+    const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .single();
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return data;
+};

@@ -82,17 +82,15 @@ const NewOrder = () => {
         const alreadyExist = orderItems?.find(
             (item: any) => item.product_id === selectedProduct?.id
         )
-        const isAvailable = products?.some(
-            (item) => item.stock_quantity > 0
-        )
-        if(!isAvailable)
-        {
+        if (selectedProduct.stock_quantity <= 0) {
             setToastType('error')
             setToastTitle('Out of stock')
             setToastMessage('This item is out of stock. This cannot be added')
             setShowToast(true)
+            return;
         }
-        if (!alreadyExist && isAvailable) {
+
+        if (!alreadyExist) {
             setOrderItems([
                 ...orderItems,
                 {
@@ -123,7 +121,7 @@ const NewOrder = () => {
         options: any[],
         value: any,
         displayKeys: string[],
-        placeholder : string
+        placeholder: string
     ) => {
         setSheetTitle(title);
         setSheetOptions(options);
@@ -182,14 +180,27 @@ const NewOrder = () => {
     const createOrder = async () => {
         const notes = 'Deliver on time'
         try {
-            await createOrderMutation({
+            const result = await createOrderMutation({
                 businessId: business.id,
                 customerId: selectedCustomerData?.id ?? null,
                 totalAmount,
                 notes: notes?.trim() || null,
                 items: orderItems,
             });
-            router.push('/receipt/Receipt')
+            console.log('creatd', result);
+
+
+            router.push({
+                pathname: '/receipt/Receipt',
+                params: {
+                    orderId: result,
+                    orderItems: JSON.stringify(orderItems),
+                    totalAmount: String(totalAmount),
+                    discount: String(discount),
+                    amountPaid: String(amountPaid),
+                    remaining: String(remainingAmount)
+                }
+            })
         }
         catch (error: any) {
             console.log(error?.message)
@@ -199,11 +210,11 @@ const NewOrder = () => {
         <View style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>
                 <CustomToast
-                messageTitle={toastTitle}
-                messageDescription={toastMessage}
-                type={toastType}
-                visible={showToast}
-                onHide={()=>setShowToast(false)}
+                    messageTitle={toastTitle}
+                    messageDescription={toastMessage}
+                    type={toastType}
+                    visible={showToast}
+                    onHide={() => setShowToast(false)}
                 />
                 <Header title='Create Order' onPress={() => router.back()} />
                 <ScrollView
@@ -228,9 +239,9 @@ const NewOrder = () => {
                                 )
                             }}
                         />
-                        <AddRow 
-                        text='Add Customer' 
-                        onPress={()=>router.push('/addCustomer/AddCustomer')}
+                        <AddRow
+                            text='Add Customer'
+                            onPress={() => router.push('/addCustomer/AddCustomer')}
                         />
                     </View>
                     {/* <View style={styles.slectCustomer}> */}
@@ -396,7 +407,7 @@ const NewOrder = () => {
             {
                 showSheet && (
                     <CustomBottomSheet
-                    searchable={true}
+                        searchable={true}
                         bottomSheetRef={sheetRef}
                         searchPlaceholder={placeholder}
                         options={sheetOptions}
@@ -415,12 +426,12 @@ const NewOrder = () => {
 };
 
 
-const AddRow = ({ text , onPress}: { text: string, onPress:()=>void}) => {
+const AddRow = ({ text, onPress }: { text: string, onPress: () => void }) => {
     return (
-        <TouchableOpacity 
-        activeOpacity={0.7} 
-        style={styles.addButton}
-        onPress={onPress}
+        <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.addButton}
+            onPress={onPress}
         >
             <Icon
                 name='plus'

@@ -85,7 +85,7 @@ const CustomerDetail = () => {
 
 
 
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
 
                 <View style={styles.infoContainer}>
                     <View style={styles.avatar}>

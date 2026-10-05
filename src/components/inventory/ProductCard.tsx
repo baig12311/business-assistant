@@ -19,7 +19,9 @@ const ProductCard: React.FC<props> = ({ title, stock, imageurl, lowStock, isLast
     const isStockLow = stockValue <= lowStockValue
     const isStockOut = stockValue <= 0
     return (
-        <View style={[styles.container, !isLast && { borderBottomWidth: 0.3 }]}>
+        <View style={[styles.container, 
+        //!isLast && { borderBottomWidth: 0.3 }
+        ]}>
             {/* <View style={{borderWidth:1,flex:1}}> */}
             <Image
                 source={{ uri: imageurl }}

@@ -21,6 +21,8 @@ export const createOrder = async ({
         p_notes: notes,
         p_items: items,
     });
+    console.log('Order creaitnf', data);
+    
 
     if (error) {
         throw new Error(error.message);
