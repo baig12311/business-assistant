@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         backgroundColor: Colors.surface,
         padding: wp(3),
+        marginBottom: hp(2)
         //elevation: 3
     },
     invoice: {
@@ -49,7 +50,7 @@ const styles = StyleSheet.create({
         fontFamily: fonts.medium,
         fontSize: fontSize.smallText,
         color: Colors.textSecondary,
-        marginBottom: hp(2)
+        marginBottom: hp(1)
     },
     businessName: {
         textAlign: 'center',
@@ -62,8 +63,8 @@ const styles = StyleSheet.create({
         marginBottom: hp(1)
     },
     textPrice: {
-        fontFamily: fonts.medium,
-        fontSize: fontSize.text
+        //fontFamily: fonts.medium,
+        //fontSize: fontSize.smallText
     },
     totalContainer: {
         borderBottomWidth: 1,
@@ -83,7 +84,38 @@ const styles = StyleSheet.create({
         fontSize: fontSize.text,
         color: Colors.textSecondary,
         textAlign: 'center'
+    },
+    logo:{
+        width: wp(14),
+        height: wp(14),
+        borderRadius: wp(7),
+        alignSelf: 'center'
+    },
+    logoAvatar:{
+        width: wp(18),
+        height: wp(18),
+        borderRadius: wp(9),
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: Colors.primary,
+        alignSelf: 'center'
+    },
+    initial:{
+        fontFamily: fonts.bold,
+        fontSize: fontSize.largeHeading,
+        color: Colors.surface,
+        letterSpacing: 2
+    },
+    customer:{
+        fontFamily: fonts.medium,
+        fontSize: fontSize.smallText,
+        color: Colors.text,
+        marginBottom: hp(2)
+    },
+    actionRow:{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingVertical: hp(2)
     }
-
 });
 export default styles

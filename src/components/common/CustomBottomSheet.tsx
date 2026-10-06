@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import BottomSheet, { BottomSheetView, BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import BottomSheet, { BottomSheetView, BottomSheetBackdrop, BottomSheetFlatList} from '@gorhom/bottom-sheet';
 import Colors from '../../constants/colors';
 import fonts, { fontSize } from '../../constants/typography';
 import Input from './Input';
@@ -9,6 +9,7 @@ import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
+import CustomEmptyComponent from './CustomEmptyComponent';
 import Button from './Button';
 interface Props {
     bottomSheetRef: React.RefObject<BottomSheet | null>;
@@ -18,21 +19,16 @@ interface Props {
     displayKeys: string[]
     searchPlaceholder: string
     title: string
-    currency?:string
+    currency?: string
+    emptyMessage?:string
+    emptyTitle?:string
     onSelect: (value: any) => void;
 }
 
-const CustomBottomSheet: React.FC<Props> = ({ currency, displayKeys, searchPlaceholder, bottomSheetRef, options, title, onSelect, searchable }) => {
+const CustomBottomSheet: React.FC<Props> = ({emptyMessage, emptyTitle, currency, displayKeys, searchPlaceholder, bottomSheetRef, options, title, onSelect, searchable }) => {
     const insets = useSafeAreaInsets()
     const [searchText, setSearchText] = useState('')
-    //const countryNames=options.map(item => item.name)
-    //     const filteredOptions = options.filter((option) =>
-    //         typeof option === string ? option
-    //     option.name
-    //         ?.toLowerCase()
-    //         .includes(searchText.trim().toLowerCase())
-    // );
-
+    // filter item
     const filteredOptions = options.filter((option) => {
         const text =
             typeof option === 'string'
@@ -43,6 +39,76 @@ const CustomBottomSheet: React.FC<Props> = ({ currency, displayKeys, searchPlace
             .toLowerCase()
             .includes(searchText.trim().toLowerCase());
     });
+
+    // render options
+    const renderOptions = ({ item: option, index }: { item: any, index: number }) => {
+        return (
+            <TouchableOpacity
+                key={index}
+                activeOpacity={0.7}
+                onPress={() => onSelect(option)}
+                style={[styles.optionButton,
+
+                index === 0 && { borderTopWidth: 1 },]}
+            >
+                {
+                    typeof option === 'string' ? (
+                        <Text style={styles.options}>{option}</Text>
+
+                    ) : (
+                        //     displayKeys?.map((key)=>(
+                        //     <Text key={key}>{option[key]}</Text>
+                        // ))
+                        <View style={styles.optionContent}>
+
+                            {/* Left side */}
+                            <View style={styles.optionLeft}>
+                                {displayKeys.includes('flag') && (
+                                    <Text style={styles.options}>
+                                        {option.flag}
+                                    </Text>
+                                )}
+
+                                {displayKeys.includes('name') && (
+                                    <Text style={styles.options}>
+                                        {option.name}
+                                    </Text>
+                                )}
+
+                                {displayKeys.includes('price') && (
+                                    <Text style={styles.options}>
+                                        {`${currency} ${option.price}`}
+                                    </Text>
+                                )}
+                            </View>
+
+                            {/* Right side */}
+                            {displayKeys.includes('code') && (
+                                <Text style={styles.options}>
+                                    {option.code}
+                                </Text>
+                            )}
+
+                            {displayKeys.includes('stock_quantity') && (
+                                <Text style={styles.options}>
+                                    {`Stock: ${option.stock_quantity}`}
+                                </Text>
+                            )}
+
+                            {displayKeys.includes('dialCode') && (
+                                <Text style={styles.options}>
+                                    {option.dialCode}
+                                </Text>
+                            )}
+
+                        </View>
+                    )
+                }
+
+            </TouchableOpacity>
+
+        )
+    }
     return (
         <BottomSheet
             ref={bottomSheetRef}
@@ -63,11 +129,9 @@ const CustomBottomSheet: React.FC<Props> = ({ currency, displayKeys, searchPlace
                 backgroundColor: Colors.background,
             }}
         >
-            <BottomSheetScrollView
-                showsVerticalScrollIndicator={false}
-                style={[styles.sheet, { paddingBottom: insets.bottom }]}
-            >
-                <View style={{ marginBottom: hp(10) }}>
+           
+            
+                <View style={[styles.sheet, {paddingBottom: insets.bottom + hp(6)}]}>
                     <Text style={styles.title}>{title}</Text>
                     {
                         searchable && (
@@ -80,80 +144,26 @@ const CustomBottomSheet: React.FC<Props> = ({ currency, displayKeys, searchPlace
                             />
                         )
                     }
-
-                    {
-                        filteredOptions.map((option, index) => {
-                            return (
-                                <TouchableOpacity
-                                    key={index}
-                                    activeOpacity={0.7}
-                                    onPress={() => onSelect(option)}
-                                    style={[styles.optionButton,
-
-                                    index === 0 && { borderTopWidth: 1 },]}
-                                >
-                                    {
-                                        typeof option === 'string' ? (
-                                            <Text style={styles.options}>{option}</Text>
-
-                                        ) : (
-                                            //     displayKeys?.map((key)=>(
-                                            //     <Text key={key}>{option[key]}</Text>
-                                            // ))
-                                            <View style={styles.optionContent}>
-
-                                                {/* Left side */}
-                                                <View style={styles.optionLeft}>
-                                                    {displayKeys.includes('flag') && (
-                                                        <Text style={styles.options}>
-                                                            {option.flag}
-                                                        </Text>
-                                                    )}
-
-                                                    {displayKeys.includes('name') && (
-                                                        <Text style={styles.options}>
-                                                            {option.name}
-                                                        </Text>
-                                                    )}
-
-                                                    {displayKeys.includes('price') && (
-                                                        <Text style={styles.options}>
-                                                            {`${currency} ${option.price}`}
-                                                        </Text>
-                                                    )}
-                                                </View>
-
-                                                {/* Right side */}
-                                                {displayKeys.includes('code') && (
-                                                    <Text style={styles.options}>
-                                                        {option.code}
-                                                    </Text>
-                                                )}
-
-                                                {displayKeys.includes('stock_quantity') && (
-                                                        <Text style={styles.options}>
-                                                            {`Stock: ${option.stock_quantity}`}
-                                                        </Text>
-                                                    )}
-
-                                                {displayKeys.includes('dialCode') && (
-                                                    <Text style={styles.options}>
-                                                        {option.dialCode}
-                                                    </Text>
-                                                )}
-
-                                            </View>
-                                        )
-                                    }
-
-                                </TouchableOpacity>
-
-                            )
-                        })
+                    <BottomSheetFlatList
+                    data={filteredOptions}
+                    renderItem={renderOptions}
+                    showsVerticalScrollIndicator={false}
+                    style={{borderWidth:1, borderColor: Colors.background
+                    }}
+                    contentContainerStyle={{paddingBottom:hp(6), marginBottom: hp(4)}}
+                    ListEmptyComponent={
+                        
+                             <CustomEmptyComponent
+                        mainText={emptyTitle}
+                        subText={emptyMessage}
+                        />
+                       
+                       
                     }
-                </View>
 
-            </BottomSheetScrollView>
+                    />
+                </View>
+          
         </BottomSheet>
     );
 };
@@ -161,6 +171,8 @@ const CustomBottomSheet: React.FC<Props> = ({ currency, displayKeys, searchPlace
 const styles = StyleSheet.create({
     sheet: {
         padding: hp(2),
+        //borderWidth: 4,
+        marginBottom: hp(5)
     },
     optionButton: {
         //borderWidth:1,
@@ -171,12 +183,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
         //marginBottom:hp(1),
     },
-    optionContent:{
+    optionContent: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between'
     },
-    optionLeft:{
+    optionLeft: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 15

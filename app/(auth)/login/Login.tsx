@@ -57,13 +57,17 @@ const Login = () => {
             router.replace('/businessSetup/BusinessSetup');
             return;
         }
-        setShowToast(true)
+        
         setToastType('success')
         setToastMessage('You are now logged in to your account.')
         setLoading(false)
         setEmail('')
         setPassword('')
-        router.replace('/(tabs)/Home');
+        setShowToast(true)
+        setTimeout(()=>{
+             router.replace('/(tabs)/Home');
+        }, 3100)
+       
 
     }
 

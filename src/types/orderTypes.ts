@@ -13,7 +13,7 @@ export type Order = {
     order_number: number;
     status: OrderStatus;
     total_amount: number;
-    notes: string | null;
+    paid_amount: number;
     created_at: string;
 };
 

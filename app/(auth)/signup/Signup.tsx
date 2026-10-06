@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from './SignupStyle';
 import CustomToast from '../../../src/components/common/CustomToast';
 import { router } from 'expo-router';
+import PasswordRequirements from '../../../src/components/auth/PasswrodCheck';
 import { signupSchema } from '../../../src/services/schema/signupSchema';
 import Input from '../../../src/components/common/Input';
 import Button from '../../../src/components/common/Button';
@@ -23,6 +24,7 @@ const Signup = () => {
         password?: string;
         confirmPassword?: string
     }>({});
+    
     const isDisabled = !name || !email || !password || !confirmPassword
     // SignUp
     const handleSignup = async () => {
@@ -61,16 +63,21 @@ const Signup = () => {
             setLoading(false)
             return;
         }
-        router.push({
-            pathname: '/businessSetup/BusinessSetup',
-            params: {
-                userId: data.user?.id,
-            },
-        });
-       
-        setShowToast(true)
+
+        setTimeout(() => {
+            router.push({
+                pathname: '/businessSetup/BusinessSetup',
+                params: {
+                    userId: data.user?.id,
+                },
+            });
+        }, 3100)
+
+
+
         setToastType('success')
         setToastMessage('Your account has been created succesfully. Now set up your business')
+        setShowToast(true)
         setLoading(false)
         setName('')
         setEmail('')
@@ -105,12 +112,12 @@ const Signup = () => {
                         title='Full Name*'
                         placeholder='John Doe'
                         value={name}
-                        onChangeText={(text:string)=>{
+                        onChangeText={(text: string) => {
                             setName(text),
-                            setErrors({
-                                ...errors,
-                                name:undefined
-                            })
+                                setErrors({
+                                    ...errors,
+                                    name: undefined
+                                })
                         }}
                         error={errors.name}
                         iconName='person-outline'
@@ -120,12 +127,12 @@ const Signup = () => {
                         title='Email*'
                         placeholder='someone@gmail.com'
                         value={email}
-                        onChangeText={(text:string)=>{
+                        onChangeText={(text: string) => {
                             setEmail(text),
-                            setErrors({
-                                ...errors,
-                                email:undefined
-                            })
+                                setErrors({
+                                    ...errors,
+                                    email: undefined
+                                })
                         }}
                         error={errors.email}
                         iconName='mail-outline'
@@ -136,28 +143,29 @@ const Signup = () => {
                         title='Password*'
                         placeholder='********'
                         value={password}
-                        onChangeText={(text:string)=>{
+                        onChangeText={(text: string) => {
                             setPassword(text),
-                            setErrors({
-                                ...errors,
-                                password:undefined
-                            })
+                                setErrors({
+                                    ...errors,
+                                    password: undefined
+                                })
                         }}
                         error={errors.password}
                         iconName='lock'
                         iconType='SimpleLineIcons'
 
                     />
+                    <PasswordRequirements password={password}/>
                     <Input
                         title='Confirm Password*'
                         placeholder='********'
                         value={confirmPassword}
-                        onChangeText={(text:string)=>{
+                        onChangeText={(text: string) => {
                             setConfirmPassword(text),
-                            setErrors({
-                                ...errors,
-                                confirmPassword:undefined
-                            })
+                                setErrors({
+                                    ...errors,
+                                    confirmPassword: undefined
+                                })
                         }}
                         error={errors.confirmPassword}
                         iconName='lock'
@@ -165,7 +173,7 @@ const Signup = () => {
                     />
                     <View style={styles.button}>
                         <Button
-                            title='Sign Up'
+                            title='Create Account'
                             onPress={handleSignup}
                             isLoading={loading}
                             disabled={isDisabled}

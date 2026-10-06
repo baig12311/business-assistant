@@ -27,6 +27,8 @@ const NewOrder = () => {
     const { data: business } = useBusiness(user?.id)
     const { data: customers } = useCustomers(business?.id)
     const { data: products } = useProducts(business?.id)
+    const [emptyMessage, setEmptyMessage] = useState('')
+    const [emptyTitle, setEmptyTitle] = useState('')
     const {
         mutateAsync: createOrderMutation,
         isPending,
@@ -49,6 +51,7 @@ const NewOrder = () => {
     const [sheetTitle, setSheetTitle] = useState('');
     const [sheetOptions, setSheetOptions] = useState<any[]>([]);
     const [sheetValue, setSheetValue] = useState('');
+
     const subtotal = orderItems.reduce(
         (sum: any, item: any) => sum + item.price * item.quantity,
         0
@@ -121,13 +124,20 @@ const NewOrder = () => {
         options: any[],
         value: any,
         displayKeys: string[],
-        placeholder: string
+        placeholder: string,
+        empTit: string,
+        empMes: string,
+
+
     ) => {
         setSheetTitle(title);
         setSheetOptions(options);
         setSheetValue(value);
         setDisplayKeys(displayKeys)
         setPlaceholder(placeholder)
+        setEmptyTitle(empTit)
+        setEmptyMessage(empMes)
+
         sheetRef.current?.snapToIndex(0);
     };
 
@@ -178,32 +188,42 @@ const NewOrder = () => {
     // Creat order
 
     const createOrder = async () => {
-        const notes = 'Deliver on time'
         try {
             const result = await createOrderMutation({
                 businessId: business.id,
                 customerId: selectedCustomerData?.id ?? null,
                 totalAmount,
-                notes: notes?.trim() || null,
+                paidAmount: Number(amountPaid),
                 items: orderItems,
             });
             console.log('creatd', result);
+            setToastType('success')
+            setToastTitle('Order Processed')
+            setToastMessage('Order Deatails processed successfully.')
+            setShowToast(true)
+            setTimeout(() => {
+                router.push({
+                    pathname: '/receipt/Receipt',
+                    params: {
+                        orderId: result,
+                        orderItems: JSON.stringify(orderItems),
+                        totalAmount: String(totalAmount),
+                        subTotal: String(subtotal),
+                        discount: String(discount),
+                        amountPaid: String(amountPaid),
+                        remaining: String(remainingAmount),
+                        customerName: selectedCustomer
+                    }
+                })
+            }, 3100)
 
-
-            router.push({
-                pathname: '/receipt/Receipt',
-                params: {
-                    orderId: result,
-                    orderItems: JSON.stringify(orderItems),
-                    totalAmount: String(totalAmount),
-                    discount: String(discount),
-                    amountPaid: String(amountPaid),
-                    remaining: String(remainingAmount)
-                }
-            })
         }
         catch (error: any) {
             console.log(error?.message)
+            setToastType('error')
+            setToastTitle('Unable to create order')
+            setToastMessage('Order details could not be processed at the moment.')
+            setShowToast(true)
         }
     }
     return (
@@ -235,7 +255,9 @@ const NewOrder = () => {
                                     customerNames,
                                     selectedCustomer,
                                     [],
-                                    'customers'
+                                    'customers',
+                                    'No Customers Yet',
+                                    'Add customers first to create order'
                                 )
                             }}
                         />
@@ -268,7 +290,9 @@ const NewOrder = () => {
                                     products ?? [],
                                     selectedProduct,
                                     ['name', 'price', 'stock_quantity'],
-                                    'products'
+                                    'products',
+                                    'No Products Yet',
+                                    'Add products first to create order'
                                 )
                             }}
                         >
@@ -415,6 +439,8 @@ const NewOrder = () => {
                         onSelect={handleSelect}
                         displayKeys={displayKeys}
                         currency={business?.currency}
+                        emptyMessage={emptyMessage}
+                        emptyTitle={emptyTitle}
                     //value=
                     />
                 )

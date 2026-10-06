@@ -4,13 +4,13 @@ export const createOrder = async ({
     businessId,
     customerId,
     totalAmount,
-    notes,
+    paidAmount,
     items,
 }: {
     businessId: string;
     customerId: string | null;
     totalAmount: number;
-    notes: string | null;
+    paidAmount: number;
     items: OrderItem[];
 }) => {
 
@@ -18,10 +18,9 @@ export const createOrder = async ({
         p_business_id: businessId,
         p_customer_id: customerId,
         p_total_amount: totalAmount,
-        p_notes: notes,
+        p_paid_amount: paidAmount,
         p_items: items,
     });
-    console.log('Order creaitnf', data);
     
 
     if (error) {

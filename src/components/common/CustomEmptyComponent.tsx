@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import fonts, {fontSize}from '../../constants/typography';
+import fonts, { fontSize } from '../../constants/typography';
 import Colors from '../../constants/colors';
 import Button from './Button';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
@@ -8,17 +8,22 @@ interface Props {
   mainText?: string
   subText?: string
   illustration?: any
-  
+
 }
-const CustomEmptyComponent: React.FC<Props> = ({ mainText, subText, illustration}) => {
+const CustomEmptyComponent: React.FC<Props> = ({ mainText, subText, illustration }) => {
   return (
 
 
     <View style={styles.emptyContainer}>
-      <Image source={illustration} style={styles.illustration} />
+      {
+        illustration && (
+          <Image source={illustration} style={styles.illustration} />
+        )
+      }
+
       <Text style={styles.emptyTitle}>{mainText}</Text>
       <Text style={styles.emptyText}>{subText}</Text>
-      
+
       {/* <View style={{ alignSelf: 'center' }}>
         {
           buttonTitle && (<Button title={buttonTitle} onPress={onPress} />)
@@ -41,7 +46,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: fontSize.subHeading,
     fontFamily: fonts.semiBold,
-    marginBottom:hp(1.5)
+    marginBottom: hp(1.5)
   },
 
   emptyText: {
@@ -52,7 +57,7 @@ const styles = StyleSheet.create({
     marginBottom: hp(5),
   },
   emptyText1: {
-    
+
   },
   illustration: {
     width: wp(80),
