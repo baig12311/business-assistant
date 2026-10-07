@@ -7,9 +7,13 @@ export const useUpdateProduct = (businessId?: string) => {
     return useMutation({
         mutationFn: updateProduct,
 
-        onSuccess: async () => {
+        onSuccess: async (data) => {
             await queryClient.invalidateQueries({
                 queryKey: ['products', businessId],
+            });
+
+            await queryClient.invalidateQueries({
+                queryKey: ['product', data.id],
             });
         },
     });

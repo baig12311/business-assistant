@@ -43,12 +43,12 @@ const styles = StyleSheet.create({
     },
     invoiceNumber: {
         fontFamily: fonts.bold,
-        fontSize: fontSize.subHeading,
+        fontSize: fontSize.text,
         color: Colors.text,
     },
     time: {
         fontFamily: fonts.medium,
-        fontSize: fontSize.smallText,
+        fontSize: fontSize.extraSmallText,
         color: Colors.textSecondary,
         marginBottom: hp(1)
     },
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     },
     visit: {
         fontFamily: fonts.medium,
-        fontSize: fontSize.text,
+        fontSize: fontSize.smallText,
         color: Colors.textSecondary,
         textAlign: 'center'
     },
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     },
     actionRow:{
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'space-evenly',
         paddingVertical: hp(2)
     }
 });

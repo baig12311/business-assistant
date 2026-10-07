@@ -21,8 +21,8 @@ const Colors = {
   successLight: '#E8F0EA',
 
   warning: '#D97706',
-  warningLight: '#FFF5E6',
-  //warningLight: '#FEF3C7',
+  warningLightExtra: '#FFF5E6',
+  warningLight: '#ffe9d0',
 
   error: '#C84037',
   errorLight: '#FEE2E2',

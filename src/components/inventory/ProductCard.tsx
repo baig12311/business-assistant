@@ -1,7 +1,8 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Touchable, TouchableOpacity } from 'react-native';
 import Colors from '../../constants/colors';
 import { Image } from 'expo-image';
 import fonts, { fontSize } from '../../constants/typography';
+import Icon from '../common/Icon';
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
@@ -12,21 +13,36 @@ interface props {
     imageurl?: string
     lowStock?: string,
     isLast?: boolean
+    onPress?:()=>void
 }
-const ProductCard: React.FC<props> = ({ title, stock, imageurl, lowStock, isLast }) => {
+const ProductCard: React.FC<props> = ({onPress, title, stock, imageurl, lowStock, isLast }) => {
     const stockValue = Number(stock)
     const lowStockValue = Number(lowStock)
     const isStockLow = stockValue <= lowStockValue
     const isStockOut = stockValue <= 0
     return (
-        <View style={[styles.container, 
-        //!isLast && { borderBottomWidth: 0.3 }
-        ]}>
+        <TouchableOpacity 
+        style={styles.container}
+        activeOpacity={0.7}
+        onPress={onPress}
+        >
             {/* <View style={{borderWidth:1,flex:1}}> */}
-            <Image
-                source={{ uri: imageurl }}
-                style={styles.image}
-            />
+            {
+                imageurl ? (<Image
+                    source={{ uri: imageurl }}
+                    style={styles.image}
+                />) : (
+                    <View style={styles.placeholder}>
+                        <Icon
+                            name='package-variant-closed'
+                            type='MaterialDesignIcons'
+                            size={wp(6)}
+                            color={Colors.primary}
+                        />
+                    </View>
+                )
+            }
+
             {/* </View> */}
 
             <View style={styles.textContainer}>
@@ -38,16 +54,20 @@ const ProductCard: React.FC<props> = ({ title, stock, imageurl, lowStock, isLast
 
 
 
-            <Text style={[styles.badgeText,
-            isStockOut ? styles.outStock : isStockLow ? styles.lowBadge : styles.stock
-            ]}>{isStockOut ? 'Out of Stock' : isStockLow ? 'Low Stock' : 'In Stock'}</Text>
+                    <Text style={[styles.badgeText,
+                    isStockOut ? styles.outStock : isStockLow ? styles.lowBadge : styles.stock
+                    ]}>{isStockOut ? 'Out of Stock' : isStockLow ? 'Low Stock' : 'In Stock'}</Text>
                 </View>
             </View>
+            <Icon
+                    name='chevron-small-right'
+                    type='Entypo'
+                    size={wp(7)}
+                    color={Colors.text}
+                />
 
-            
 
-
-        </View>
+        </TouchableOpacity>
     );
 };
 
@@ -60,9 +80,10 @@ const styles = StyleSheet.create({
         //borderColor: Colors.surface,
         backgroundColor: Colors.surface,
         borderRadius: wp(2),
-        elevation:1,
+        elevation: 1,
         marginBottom: hp(2)
     },
+
     title: {
         fontFamily: fonts.medium,
         fontSize: fontSize.text,
@@ -80,9 +101,20 @@ const styles = StyleSheet.create({
         height: wp(10),
         borderRadius: wp(2)
     },
+    placeholder:{
+        borderWidth: 0.3,
+        width: wp(10),
+        height: wp(10),
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: wp(2),
+        borderColor: Colors.textMuted,
+        backgroundColor: Colors.textMuted
+        //overflow: 'hidden'
+    },
     textContainer: {
         flex: 1,
-        marginLeft: wp(3),
+        marginHorizontal: wp(3),
         //width: '50%'
     },
     badgeText: {
@@ -105,10 +137,10 @@ const styles = StyleSheet.create({
         borderColor: Colors.warning
     },
     stock: {
-        color: Colors.success,
-        borderColor: Colors.success
+        color: Colors.primary,
+        borderColor: Colors.primary
     },
-    stockContainer:{
+    stockContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center'

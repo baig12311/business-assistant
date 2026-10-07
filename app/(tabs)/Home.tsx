@@ -134,7 +134,8 @@ const Home = () => {
                         iconName='cash'
                         iconType='Ionicons'
                         bgColor='#F0FDF4'
-                        iconColor='#16A34A'
+                        //iconColor='#16A34A'
+                        iconColor={Colors.primary}
                         iconBg='#DCFCE7'
                         currency={business?.currency}
                     />

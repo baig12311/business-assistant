@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
         borderRadius: wp(6),
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 1
+        //elevation: 1
     },
     valueRow: {
         flexDirection: 'row',

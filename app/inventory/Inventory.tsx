@@ -46,7 +46,13 @@ const Inventory = () => {
                 stock={item.stock_quantity}
                 lowStock={item.low_stock_threshold}
                 imageurl={item.image_url}
-                isLast={index === allProducts - 1}
+                //isLast={index === allProducts - 1}
+                onPress={()=>router.push({
+                    pathname: '/stock/[product]',
+                    params:{
+                        productId: item.id
+                    }
+                })}
             />
         )
 
@@ -72,7 +78,7 @@ const Inventory = () => {
                     text={lowStock}
                     bgColor={Colors.warningLight}
                     color={Colors.warning}
-                    iconName='warning'
+                    iconName='alert-circle'
                     iconType='Ionicons'
                 />
                 <InventoryTrackCard

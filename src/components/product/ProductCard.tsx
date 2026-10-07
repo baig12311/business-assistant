@@ -17,11 +17,11 @@ interface props {
     imageurl?: string,
     menuOpen?: boolean
     onMenuPress?: () => void
-    onPressEdit?:()=>void
-    onPressDelete?:()=>void
+    onPressEdit?: () => void
+    onPressDelete?: () => void
 }
-const ProductCard: React.FC<props> = ({ name, stock, price, lowStock, currency, 
-    imageurl, onMenuPress, menuOpen, onPressDelete, onPressEdit}) => {
+const ProductCard: React.FC<props> = ({ name, stock, price, lowStock, currency,
+    imageurl, onMenuPress, menuOpen, onPressDelete, onPressEdit }) => {
     const stockValue = Number(stock)
     const lowStockValue = Number(lowStock)
     const isStockLow = stockValue <= lowStockValue
@@ -29,12 +29,25 @@ const ProductCard: React.FC<props> = ({ name, stock, price, lowStock, currency,
     const [showView, setShowView] = useState(false)
     return (
         <View style={[styles.container, menuOpen && { zIndex: 1000 },]}>
+            {
+                imageurl ? (
+                    <Image
+                        style={styles.image}
+                        source={{ uri: imageurl }}
+                        contentFit='cover'
+                    />
+                ) : (
+                    <View style={styles.placeholder}>
+                        <Icon
+                            name='package-variant-closed'
+                            type='MaterialDesignIcons'
+                            size={wp(9)}
+                            color={Colors.primary}
+                        />
+                    </View>
+                )
+            }
 
-            <Image
-                style={styles.image}
-                source={{ uri: imageurl }}
-                contentFit='cover'
-            />
             <View style={styles.content}>
                 <View style={styles.option}>
                     <Text style={[styles.name, { color: Colors.text }]}>{name}</Text>
@@ -76,9 +89,9 @@ const ProductCard: React.FC<props> = ({ name, stock, price, lowStock, currency,
                                 name='edit'
                                 type='Feather'
                                 size={wp(5)}
-                                color={Colors.success}
+                                color={Colors.primary}
                             />
-                            <Text style={[styles.rowText, { color: Colors.success }]}>Edit</Text>
+                            <Text style={[styles.rowText, { color: Colors.primary }]}>Edit</Text>
 
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -123,6 +136,17 @@ const styles = StyleSheet.create({
         borderColor: Colors.textMuted,
         overflow: 'hidden'
     },
+    placeholder: {
+        borderWidth: 0.3,
+        width: wp(15),
+        height: wp(15),
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: wp(2),
+        borderColor: Colors.textMuted,
+        backgroundColor: Colors.textMuted
+        //overflow: 'hidden'
+    },
     content: {
         marginLeft: wp(3),
         flex: 1
@@ -146,7 +170,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.warningLight
     },
     stockBadge: {
-        color: Colors.success,
+        color: Colors.primary,
         backgroundColor: Colors.successLight
     },
     outStock: {

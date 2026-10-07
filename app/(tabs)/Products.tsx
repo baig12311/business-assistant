@@ -119,7 +119,7 @@ const isLoading = userLoading || businessLoading || productsLoading || isPending
             {
                 isLoading ? <ProductSkeleton /> : (
                     <FlatList
-                contentContainerStyle={{ flexGrow: 1, marginBottom: hp(6) }}
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: hp(6) }}
                 data={filterProducts ?? []}
                 renderItem={renderProduct}
                 keyExtractor={(item) => item.id}

@@ -331,10 +331,10 @@ const AddProduct = () => {
                                             name='edit'
                                             type='Feather'
                                             size={wp(5)}
-                                            color={Colors.success}
+                                            color={Colors.primary}
                                         />
 
-                                        <Text style={[styles.rowText, { color: Colors.success }]}>Change product image</Text>
+                                        <Text style={[styles.rowText, { color: Colors.primary }]}>Change product image</Text>
 
                                     </TouchableOpacity>
                                 )
