@@ -9,27 +9,30 @@ import Button from '../common/Button';
 import DropdownInput from './DropdownInput';
 interface Props {
     modalVisible?: boolean,
-    heading?:string
-    subHeading?:string
-    inputTitle?:string
-    stockTitle?:string
-    buttonTitle:string
+    heading?: string
+    subHeading?: string
+    inputTitle?: string
+    stockTitle?: string
+    buttonTitle: string
     onPressCancel?: () => void,
     onPressSave?: () => void,
     stock: number
     value: string
     onChangeText?: any
-    error?:string
+    error?: string
     loader?: boolean
-    open?:boolean
-    onPressDrop?:()=>void
+    open?: boolean
+    onPressDrop?: () => void
     onCloseDrop?: () => void;
+    onChangeReason?: (value: string) => void
+    reason?: string
+    reasonError?: string
 }
-const RestockModal: React.FC<Props> = ({onCloseDrop, onPressDrop, open, loader, modalVisible, onPressCancel, onPressSave, 
-    stock, value, onChangeText, error, heading, subHeading, inputTitle, stockTitle, buttonTitle}) => {
+const RestockModal: React.FC<Props> = ({ onChangeReason, reasonError, reason, onCloseDrop, onPressDrop, open, loader, modalVisible, onPressCancel, onPressSave,
+    stock, value, onChangeText, error, heading, subHeading, inputTitle, stockTitle, buttonTitle }) => {
     const enteredStock = Number(value)
     //const newStock = enteredStock + stock
-    const [reason, setReason] = useState('')
+    //const [reason, setReason] = useState('')
     return (
         <Modal visible={modalVisible} transparent={true} animationType='fade'>
             <View style={styles.modalView}>
@@ -61,29 +64,37 @@ const RestockModal: React.FC<Props> = ({onCloseDrop, onPressDrop, open, loader, 
                     />
                     {value !== '' && (
                         <Text style={styles.stock}>
-                            {stockTitle}: {enteredStock + stock} units
+                            {heading === 'Adjust Stock'
+                                ? `Stock Change: ${enteredStock - stock} units`
+                                : `${stockTitle}: ${enteredStock + stock} units`
+                            }
                         </Text>
                     )}
 
                     {
                         heading === 'Adjust Stock' && (
                             <DropdownInput
-                            value={reason}
-                            open={open}
-                            onPress={onPressDrop}
-                            onChange={(value)=>{
-                                setReason(value)
-                                onCloseDrop?.()
-                            }}
+                                value={reason ?? ''}
+                                open={open}
+                                onPress={onPressDrop}
+                                onChange={(value) => {
+                                    onChangeReason?.(value)
+                                    onCloseDrop?.()
+                                }}
+                                error={reasonError}
                             />
                         )
                     }
                     <View style={styles.button}>
                         <Button
-                        title={buttonTitle}
-                        onPress={onPressSave}
-                        isLoading={loader}
-                        disabled={!value}
+                            title={buttonTitle}
+                            onPress={onPressSave}
+                            isLoading={loader}
+                            disabled={
+                                heading === 'Adjust Stock'
+                                    ? !value || !reason
+                                    : !value
+                            }
                         />
                     </View>
                 </View>
@@ -153,7 +164,7 @@ const styles = StyleSheet.create({
         borderRadius: wp(2),
         borderColor: Colors.textSecondary
     },
-    button:{
+    button: {
         marginTop: hp(1)
     }
 });

@@ -1,16 +1,65 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { useState } from 'react';
+import { View, Text, StyleSheet, FlatList} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import { useUser } from '../../src/hooks/useUser';
+import { useBusiness } from '../../src/hooks/useBusiness';
+import { useOrders } from '../../src/hooks/useOrders';
 import Header from '../../src/components/common/Header';
+import Input from '../../src/components/common/Input';
 import { widthPercentageToDP as wp,
     heightPercentageToDP as hp
  } from 'react-native-responsive-screen';
+ import { formatDate } from '../../src/services/formatDate';
 import Colors from '../../src/constants/colors';
+import OrderCard from '../../src/components/sales/OrderCard';
 const Orders = () => {
+    const { data, isLoading:userLoading, error:userError} = useUser()
+    const userId = data?.id
+    const { data: business, isLoading:businessLoading, error:businessError } = useBusiness(userId)
+    const businessId=business?.id
+    const{data: orders, isLoading:ordersLoading} = useOrders(businessId)
+     const [searchText, setSearchText] = useState('')
+    const filterOrders = orders?.filter(item =>
+        item.order_number.toString().
+            includes(searchText.trim().toLocaleLowerCase())
+    )
+    // render order
+    const renderOrder=({item}: any)=>{
+        const date=formatDate(item?.created_at)
+        return(
+            <OrderCard
+            orderNumber={item.order_number}
+            customerId={item.customer_id}
+            date={date}
+            amount={item.total_amount}
+            currency={business?.currency}
+            onPress={()=>router.push({
+                pathname:'/orderDetail/[order]',
+                params:{
+                    orderId: item.id
+                }
+            })}
+            />
+        )
+    }
     return (
         <SafeAreaView style={styles.container}>
             <Header title='Orders' onPress={()=>router.back()}/>
-            <Text>Orders</Text>
+                <Input
+                placeholder='Search order by number...'
+                value={searchText}
+                onChangeText={setSearchText}
+                iconName='search-outline'
+                iconType='Ionicons'
+                keyboard='numeric'
+            />
+            <FlatList
+            data={filterOrders ?? []}
+            renderItem={renderOrder}
+            keyExtractor={(item)=>item.id}
+            showsVerticalScrollIndicator={false}
+            />
         </SafeAreaView>
     );
 };

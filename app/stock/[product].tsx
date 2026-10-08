@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from './style';
 import { router } from 'expo-router';
@@ -9,7 +9,12 @@ import { useUser } from '../../src/hooks/useUser';
 import { useBusiness } from '../../src/hooks/useBusiness';
 import { useLocalSearchParams } from 'expo-router';
 import { restockSchema } from '../../src/services/schema/restockSchema';
+import { adjustStockSchema } from '../../src/services/schema/adjustStockSchema';
 import { useRestockProduct } from '../../src/hooks/useRestockProduct';
+import { useAdjustStock } from '../../src/hooks/useAdjustStock';
+import { useInventoryMovements } from '../../src/hooks/useInventoryMovements';
+import { formatDate } from '../../src/services/formatDate';
+import StockCard from '../../src/components/inventory/StockCard';
 import RestockModal from '../../src/components/inventory/RestockModal';
 import ActionButton from '../../src/components/inventory/ActionButton';
 import Colors from '../../src/constants/colors';
@@ -24,15 +29,19 @@ const ProductDetail = () => {
     const { data: user, isLoading: userLoading } = useUser()
     const { data: business, isLoading: businessLoading } = useBusiness(user?.id)
     const { data, isLoading, error } = useProductById(productId)
-    const {mutateAsync: addRestockMutation, isPending} = useRestockProduct()
+    const { data: inventory, isLoading: inventoryLoading } = useInventoryMovements(productId)
+    const { mutateAsync: addRestockMutation, isPending: addPending } = useRestockProduct()
+    const { mutateAsync: addAdjustmentMutation, isPending: adjustPending } = useAdjustStock()
     const [showRestock, setShowRestock] = useState(false)
     const [showAdjustStock, setShowAdjustStock] = useState(false)
     const [restock, setRestock] = useState('')
     const [restockError, setRestockError] = useState('')
     const [adjustStock, setAdjustStock] = useState('')
-    const [adjustError, setAdjustError] = useState('')
+    const [reason, setReason] = useState('')
+    const [adjustErrors, setAdjustErrors] = useState<{ newStock?: string, reason?: string }>({})
     const [showDropdown, setShowDropdown] = useState(false)
-    const Loading = userLoading || businessLoading || isLoading
+    const Loading = userLoading || businessLoading || isLoading || inventoryLoading
+    const pending = addPending || adjustPending
     const currency = business?.currency
     const image = data?.image_url
     const name = data?.name
@@ -42,6 +51,7 @@ const ProductDetail = () => {
     const lowStockThreshold = data?.low_stock_threshold ?? 0
     const outStock = stock <= 0
     const lowStock = stock > 0 && stock <= lowStockThreshold
+    const inventoryLength = inventory?.length
     const colors = outStock ? { iconBg: Colors.errorLight, color: Colors.error } :
         lowStock ? { iconBg: Colors.warningLight, color: Colors.warning } :
             { iconBg: Colors.successLight, color: Colors.primary }
@@ -49,35 +59,77 @@ const ProductDetail = () => {
     const icon = outStock ? { name: 'close-circle', type: 'Ionicons' } :
         lowStock ? { name: 'alert-circle', type: 'Ionicons' } : { name: 'checkmark-circle', type: 'Ionicons' }
 
-        // handle save
+    // handle save
 
-        const handleRestock = async()=>{
-            try {
-               const result = restockSchema.safeParse({
-                quantity : restock
-               })
+    const handleRestock = async () => {
+        const result = restockSchema.safeParse({
+            quantity: restock
+        })
 
-               if(!result.success)
-               {
-                const fieldError = result.error.issues[0]?.message
-                setRestockError(fieldError)
-                return
-               }
-            //    const newS = Number(restock) + stock
-            //    setNewStock(newS)
-               await addRestockMutation({
+        if (!result.success) {
+            const fieldError = result.error.issues[0]?.message
+            setRestockError(fieldError)
+            return
+        }
+        try {
+            await addRestockMutation({
                 businessId: business?.id,
                 productId: productId,
                 quantity: Number(restock)
-               })
-               setShowRestock(false)
-               setRestock('')
+            })
+            setShowRestock(false)
+            setRestock('')
 
-            } catch (error) {
-                console.log('restock error', error);
-                
-            }
+        } catch (error) {
+            console.log('restock error', error);
+
         }
+    }
+
+    // handle adjust
+    const handleAdjust = async () => {
+        const result = adjustStockSchema.safeParse({
+            newStock: adjustStock,
+            reason: reason
+
+        })
+        if (!result.success) {
+            const fieldErrors = result.error.flatten().fieldErrors;
+            setAdjustErrors({
+                newStock: fieldErrors.newStock?.[0],
+                reason: fieldErrors.reason?.[0]
+
+            })
+        }
+        try {
+            await addAdjustmentMutation({
+                businessId: business!.id,
+                productId: productId!,
+                newStock: Number(adjustStock),
+                reason,
+            })
+            setShowAdjustStock(false)
+            setAdjustStock('')
+            setReason('')
+        } catch (error) {
+
+        }
+    }
+
+    // render stock
+    const renderStock = ({ item, index }: { item: any, index: number }) => {
+        const date = formatDate(item.created_at)
+        return (
+            <StockCard
+                isLast={inventory && (index === inventoryLength - 1)}
+                type={item.type}
+                quantity={item.quantity}
+                reason={item.reason}
+                date={date}
+                invoice={item.orders?.order_number}
+            />
+        )
+    }
     return (
         <SafeAreaView style={styles.container}>
             <Header title='Product Stock' onPress={() => router.back()} />
@@ -93,10 +145,10 @@ const ProductDetail = () => {
                         inputTitle='Quantiy to Add*'
                         stockTitle='New Stock'
                         buttonTitle='Confirm Restock'
-                        onChangeText={(t:string)=>{setRestock(t), setRestockError('')}}
-                        onPressCancel={() => {setShowRestock(false), setRestock(''), setRestockError('')}}
+                        onChangeText={(t: string) => { setRestock(t), setRestockError('') }}
+                        onPressCancel={() => { setShowRestock(false), setRestock(''), setRestockError('') }}
                         onPressSave={handleRestock}
-                        loader= {isPending}
+                        loader={pending}
                     />)
             }
             {
@@ -105,26 +157,48 @@ const ProductDetail = () => {
                         stock={stock}
                         modalVisible={showAdjustStock}
                         value={adjustStock}
-                        error={adjustError}
+                        reason={reason}
+                        error={adjustErrors.newStock}
+                        reasonError={adjustErrors.reason}
+                        //error={adjustError}
                         heading='Adjust Stock'
                         subHeading='Manually update inventory'
                         inputTitle='New Stock*'
                         stockTitle='Stock Change'
                         buttonTitle='Confirm Adjustment'
                         open={showDropdown}
-                        onPressDrop={()=>setShowDropdown(!showDropdown)}
-                        onCloseDrop={()=>setShowDropdown(false)}
-                        onChangeText={(t:string)=>{setAdjustStock(t), setAdjustError('')}}
-                        onPressCancel={() => {setShowAdjustStock(false), setAdjustStock(''), setAdjustError('')}}
-                        //onPressSave={handleRestock}
-                        //loader= {isPending}
+                        onPressDrop={() => setShowDropdown(!showDropdown)}
+                        onCloseDrop={() => setShowDropdown(false)}
+                        onChangeReason={(value) => {
+                            setReason(value),
+                                setAdjustErrors({
+                                    ...adjustErrors,
+                                    reason: undefined
+                                })
+                        }}
+                        onChangeText={(t: string) => {
+                            setAdjustStock(t),
+                                setAdjustErrors({
+                                    ...adjustErrors,
+                                    newStock: undefined
+                                })
+                        }}
+                        onPressCancel={() => {
+                            setShowAdjustStock(false), setAdjustStock(''), setReason('')
+                            setAdjustErrors({
+                                newStock: undefined,
+                                reason: undefined
+                            })
+                        }}
+                        onPressSave={handleAdjust}
+                        loader={pending}
                     />)
             }
             {
                 Loading ? (
                     <Text>Loading...</Text>
                 ) : (
-                    <View>
+                    <View style={{ flex: 1 }}>
                         <View style={styles.productContainer}>
                             {
                                 image ? (
@@ -193,7 +267,23 @@ const ProductDetail = () => {
                                 onPress={() => setShowAdjustStock(true)}
                             />
                         </View>
-                     
+                        {
+                            inventory && inventory.length > 0 && (
+                                <View style={styles.stockContainer}>
+                                    <Text style={styles.stockHeading}>Stock History</Text>
+                                    <FlatList
+                                        style={{ flex: 1 }}
+                                        contentContainerStyle={styles.containerStyle}
+                                        data={inventory}
+                                        renderItem={renderStock}
+                                        keyExtractor={(item) => item.id}
+                                        showsVerticalScrollIndicator={false}
+                                    />
+                                </View>
+                            )
+                        }
+
+
                     </View>
                 )
             }

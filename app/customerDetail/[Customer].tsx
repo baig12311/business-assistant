@@ -72,9 +72,9 @@ const CustomerDetail = () => {
                                     name='edit'
                                     type='Feather'
                                     size={wp(5)}
-                                    color={Colors.success}
+                                    color={Colors.primary}
                                 />
-                                <Text style={[styles.rowText, { color: Colors.success }]}>Edit Customer</Text>
+                                <Text style={[styles.rowText, { color: Colors.primary }]}>Edit Customer</Text>
 
                             </TouchableOpacity>
 

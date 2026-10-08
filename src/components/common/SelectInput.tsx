@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
         marginLeft: wp(2)
     },
     title: {
-        fontFamily: fonts.semiBold,
+        fontFamily: fonts.medium,
         fontSize: fontSize.text,
         marginBottom: hp(0.5),
         color: Colors.textSecondary

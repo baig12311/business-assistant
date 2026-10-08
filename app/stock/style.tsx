@@ -4,6 +4,7 @@ import fonts, {fontSize} from "../../src/constants/typography";
 import { widthPercentageToDP as wp,
     heightPercentageToDP as hp
 } from "react-native-responsive-screen";
+import StockCard from "../../src/components/inventory/StockCard";
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -49,6 +50,24 @@ const styles = StyleSheet.create({
         fontSize: fontSize.text,
         color: Colors.text,
         marginBottom: hp(1)
+    },
+    stockContainer:{
+        elevation:1,
+        flex:1,
+        borderRadius:wp(2),
+        padding:wp(3),
+        backgroundColor: Colors.surface
+    },
+    stockHeading:{
+        fontFamily: fonts.bold,
+        fontSize:fontSize.text,
+        color:Colors.text,
+        marginBottom: hp(2)
+    },
+    containerStyle:{
+        flexGrow:1,
+        paddingBottom:hp(3)
     }
+
 });
 export default styles

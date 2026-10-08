@@ -21,10 +21,39 @@ export const getOrders = async (
 
 
 
+// export const getOrderById = async (orderId: string) => {
+//     const { data, error } = await supabase
+//         .from('orders')
+//         .select('*')
+//         .eq('id', orderId)
+//         .single();
+
+//     if (error) {
+//         throw new Error(error.message);
+//     }
+
+//     return data;
+// };
+
+
 export const getOrderById = async (orderId: string) => {
     const { data, error } = await supabase
         .from('orders')
-        .select('*')
+        .select(`
+            *,
+            customer:customers (
+                name,
+                phone
+            ),
+            order_items (
+                id,
+                quantity,
+                unit_price,
+                product:products (
+                    name
+                )
+            )
+        `)
         .eq('id', orderId)
         .single();
 

@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
         fontFamily: fonts.medium,
         fontSize: fontSize.smallText,
         color: Colors.text,
-        marginBottom: hp(2)
+        //marginBottom: hp(2)
     },
     actionRow:{
         flexDirection: 'row',

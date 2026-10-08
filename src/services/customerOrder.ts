@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+
 export const getCustomerOrders = async (
     businessId: string,
     customerId: string
@@ -7,7 +8,8 @@ export const getCustomerOrders = async (
         .from('orders')
         .select('*')
         .eq('business_id', businessId)
-        .eq('customer_id', customerId);
+        .eq('customer_id', customerId)
+        .order('created_at', { ascending: false });
 
     if (error) {
         throw new Error(error.message);

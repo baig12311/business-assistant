@@ -206,13 +206,13 @@ const NewOrder = () => {
                     pathname: '/receipt/Receipt',
                     params: {
                         orderId: result,
-                        orderItems: JSON.stringify(orderItems),
-                        totalAmount: String(totalAmount),
-                        subTotal: String(subtotal),
-                        discount: String(discount),
-                        amountPaid: String(amountPaid),
-                        remaining: String(remainingAmount),
-                        customerName: selectedCustomer
+                        // orderItems: JSON.stringify(orderItems),
+                        // totalAmount: String(totalAmount),
+                        // subTotal: String(subtotal),
+                        // discount: String(discount),
+                        // amountPaid: String(amountPaid),
+                        // remaining: String(remainingAmount),
+                        // customerName: selectedCustomer
                     }
                 })
             }, 3100)

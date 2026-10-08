@@ -5,6 +5,7 @@ import fonts, {fontSize} from '../../constants/typography';
 import { widthPercentageToDP as wp,
     heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
+import { adjustmentReasons } from '../../services/data/adjustmentReasons';
 import Icon from '../common/Icon';
 interface props{
     onPress?:()=>void
@@ -13,14 +14,7 @@ interface props{
     error?:string
     open?:boolean
 }
-const adjustmentReasons = [
-    { label: 'Damaged', value: 'damaged' },
-    { label: 'Lost', value: 'lost' },
-    { label: 'Missing', value: 'missing' },
-    { label: 'Stock Count Correction', value: 'stock_count_correction' },
-    { label: 'Manual Correction', value: 'manual_correction' },
-    { label: 'Other', value: 'other' },
-];
+
 const DropdownInput:React.FC<props> = ({onChange, value, onPress, error, open}) => {
     const selectedReason = adjustmentReasons.find(
     (reason) => reason.value === value
@@ -103,7 +97,7 @@ const styles = StyleSheet.create({
         marginLeft: wp(2)
     },
     title: {
-        fontFamily: fonts.semiBold,
+        fontFamily: fonts.medium,
         fontSize: fontSize.text,
         marginBottom: hp(0.5),
         color: Colors.textSecondary
