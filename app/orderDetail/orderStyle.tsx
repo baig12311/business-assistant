@@ -17,6 +17,9 @@ const styles = StyleSheet.create({
         fontSize: fontSize.subHeading,
         color:Colors.text,
         marginBottom: hp(0.5)
+    },
+    buttonContainer:{
+        paddingVertical: hp(2)
     }
     
 });

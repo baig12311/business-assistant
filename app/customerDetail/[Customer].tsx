@@ -7,6 +7,7 @@ import { useUser } from '../../src/hooks/useUser';
 import { useBusiness } from '../../src/hooks/useBusiness';
 import { useCustomerById } from '../../src/hooks/useCustomer';
 import { useCustomerOrders } from '../../src/hooks/useCustomerOrders';
+import CustomerDetailSkeleton from '../../src/components/skeleton/CustomerDetailSkeleton';
 import Header from '../../src/components/common/Header';
 import Row from '../../src/components/customers/Row';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,11 +19,11 @@ import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 const CustomerDetail = () => {
     const [showMenu, setShowMenu] = useState(false)
     const { customerId } = useLocalSearchParams<{ customerId: string }>()
-    console.log(customerId);
-    const { data: userData } = useUser();
-    const { data: businessData } = useBusiness(userData?.id)
-    const { data: customer, isLoading } = useCustomerById(customerId)
-    const { data: customerOrder } = useCustomerOrders(businessData?.id, customerId)
+    const { data: userData, isLoading: userLoading } = useUser();
+    const { data: businessData, isLoading: businessLoading } = useBusiness(userData?.id)
+    const { data: customer, isLoading: customerLoading } = useCustomerById(customerId)
+    const { data: customerOrder, isLoading: orderLoading } = useCustomerOrders(businessData?.id, customerId)
+    const isLoading = userLoading || businessLoading || customerLoading || orderLoading
     const totalOrdersAmount = customerOrder?.reduce(
         (sum: number, order: any) => sum + Number(order.total_amount),
         0
@@ -48,9 +49,14 @@ const CustomerDetail = () => {
 
     if (isLoading) {
         return (
-            <View>
-                <Text>Loading</Text>
-            </View>
+            <SafeAreaView style={styles.container}>
+                <Header title='Customer Detail'
+                    isMenu={true}
+                    onPressMenu={() => setShowMenu(!showMenu)}
+                    onPress={() => router.back()} />
+                <CustomerDetailSkeleton />
+
+            </SafeAreaView>
         )
     }
     return (

@@ -7,7 +7,14 @@ export const getOrders = async (
 ): Promise<Order[]> => {
     const { data, error } = await supabase
         .from('orders')
-        .select('*')
+        .select(`
+            *,
+            customer:customers (
+                name,
+                phone
+            )
+                
+        `)
         .eq('business_id', businessId)
         .order('created_at', { ascending: false });
 
@@ -21,19 +28,7 @@ export const getOrders = async (
 
 
 
-// export const getOrderById = async (orderId: string) => {
-//     const { data, error } = await supabase
-//         .from('orders')
-//         .select('*')
-//         .eq('id', orderId)
-//         .single();
 
-//     if (error) {
-//         throw new Error(error.message);
-//     }
-
-//     return data;
-// };
 
 
 export const getOrderById = async (orderId: string) => {

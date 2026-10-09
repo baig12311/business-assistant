@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import { useUser } from '../../src/hooks/useUser';
 import { useBusiness } from '../../src/hooks/useBusiness';
 import { useOrders } from '../../src/hooks/useOrders';
+import OrderSkeleton from '../../src/components/skeleton/OrderSkeleton';
 import Header from '../../src/components/common/Header';
 import Input from '../../src/components/common/Input';
 import { widthPercentageToDP as wp,
@@ -19,6 +20,7 @@ const Orders = () => {
     const { data: business, isLoading:businessLoading, error:businessError } = useBusiness(userId)
     const businessId=business?.id
     const{data: orders, isLoading:ordersLoading} = useOrders(businessId)
+    const isLoading = userLoading || businessLoading || ordersLoading
      const [searchText, setSearchText] = useState('')
     const filterOrders = orders?.filter(item =>
         item.order_number.toString().
@@ -30,7 +32,7 @@ const Orders = () => {
         return(
             <OrderCard
             orderNumber={item.order_number}
-            customerId={item.customer_id}
+            customerName={item.customer?.name}
             date={date}
             amount={item.total_amount}
             currency={business?.currency}
@@ -41,6 +43,24 @@ const Orders = () => {
                 }
             })}
             />
+        )
+    }
+
+    if(isLoading)
+    {
+        return(
+             <SafeAreaView style={styles.container}>
+                <Header title='Orders' onPress={()=>router.back()}/>
+                <Input
+                placeholder='Search order by number...'
+                value={searchText}
+                onChangeText={setSearchText}
+                iconName='search-outline'
+                iconType='Ionicons'
+                keyboard='numeric'
+            />
+            <OrderSkeleton/>
+             </SafeAreaView>
         )
     }
     return (
@@ -60,6 +80,7 @@ const Orders = () => {
             keyExtractor={(item)=>item.id}
             showsVerticalScrollIndicator={false}
             />
+           
         </SafeAreaView>
     );
 };

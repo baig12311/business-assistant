@@ -26,7 +26,8 @@ const Customers = () => {
     const userId = data?.id
     const { data: business, isLoading: businessLoading } = useBusiness(userId)
     const { data: customers, isLoading: customersLoading } = useCustomers(business?.id)
-
+    const isLoading = userLoading || businessLoading || customersLoading 
+    
     // search customer
     const filterCustomers = customers?.filter(item =>
         item.name.toLowerCase().
@@ -35,13 +36,11 @@ const Customers = () => {
 
     // render customer
     const CustomerItem = ({ item }: any) => {
-        const { data: customerOrder, isLoading } = useCustomerOrders(business?.id, item?.id);
-        //setOrderLoading(isLoading)
         return (
             <CustomerCard
                 name={item.name}
                 phone={item.phone}
-                order={customerOrder?.length ?? 0}
+                order={item?.orders?.length ?? 0}
                 onPress={() =>
                     router.push({
                         pathname: '/customerDetail/[Customer]',
@@ -53,10 +52,24 @@ const Customers = () => {
             />
         );
     };
-    const isLoading = userLoading || businessLoading || customersLoading
     const renderCustomer = ({ item }: any) => {
         return <CustomerItem item={item} />;
     };
+
+    if(isLoading)
+    {
+        <SafeAreaView style={styles.container}>
+            <Header title='Customers' onPress={() => router.back()} />
+            <Input
+                placeholder='Search customers...'
+                value={searchText}
+                onChangeText={setSearchText}
+                iconName='search-outline'
+                iconType='Ionicons'
+            />
+            <CustomerSkeleton/>
+        </SafeAreaView>
+    }
     return (
         <SafeAreaView style={styles.container}>
             <Header title='Customers' onPress={() => router.back()} />

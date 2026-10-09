@@ -59,7 +59,8 @@ const Signup = () => {
         if (error) {
             setShowToast(true)
             setToastType('error')
-            setToastMessage(error?.message)
+            setToastMessage('Something went wrong. Try again')
+
             setLoading(false)
             return;
         }

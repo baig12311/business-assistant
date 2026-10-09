@@ -15,6 +15,7 @@ import { useAdjustStock } from '../../src/hooks/useAdjustStock';
 import { useInventoryMovements } from '../../src/hooks/useInventoryMovements';
 import { formatDate } from '../../src/services/formatDate';
 import StockCard from '../../src/components/inventory/StockCard';
+import ProductStockSkeleton from '../../src/components/skeleton/ProductStockSkeleton';
 import RestockModal from '../../src/components/inventory/RestockModal';
 import ActionButton from '../../src/components/inventory/ActionButton';
 import Colors from '../../src/constants/colors';
@@ -130,8 +131,18 @@ const ProductDetail = () => {
             />
         )
     }
+
+    if (Loading) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Header title='Product Stock' onPress={() => router.back()} />
+                <ProductStockSkeleton />
+            </SafeAreaView>
+        )
+    }
     return (
         <SafeAreaView style={styles.container}>
+
             <Header title='Product Stock' onPress={() => router.back()} />
             {
                 showRestock && (
@@ -194,99 +205,95 @@ const ProductDetail = () => {
                         loader={pending}
                     />)
             }
-            {
-                Loading ? (
-                    <Text>Loading...</Text>
-                ) : (
-                    <View style={{ flex: 1 }}>
-                        <View style={styles.productContainer}>
-                            {
-                                image ? (
-                                    <Image
-                                        source={{ uri: image }}
-                                        style={styles.image}
-                                    />
-                                ) : (
-                                    <View style={styles.placeholder}>
-                                        <Icon
-                                            name='package-variant-closed'
-                                            type='MaterialDesignIcons'
-                                            size={wp(10)}
-                                            color={Colors.primary}
-                                        />
-                                    </View>
-                                )
-                            }
-                            <View style={styles.textContainer}>
-                                <Text style={styles.name}>{name}</Text>
-                                <Row
-                                    title='Cost Price'
-                                    info={costPrice}
-                                    currency={currency}
-                                />
-                                <Row
-                                    title='Selling Price'
-                                    info={sellingPrice}
-                                    currency={currency}
+
+            <View style={{ flex: 1 }}>
+                <View style={styles.productContainer}>
+                    {
+                        image ? (
+                            <Image
+                                source={{ uri: image }}
+                                style={styles.image}
+                            />
+                        ) : (
+                            <View style={styles.placeholder}>
+                                <Icon
+                                    name='package-variant-closed'
+                                    type='MaterialDesignIcons'
+                                    size={wp(10)}
+                                    color={Colors.primary}
                                 />
                             </View>
-                        </View>
-                        <StockAlert
-                            iconBgColor={colors.iconBg}
-                            //bgColor={Colors.warningLightExtra}
-                            color={colors.color}
-                            iconName={icon.name}
-                            iconType={icon.type}
-                            stock={stock}
-                            threshold={lowStockThreshold}
-                            badge={badgeTitle}
+                        )
+                    }
+                    <View style={styles.textContainer}>
+                        <Text style={styles.name}>{name}</Text>
+                        <Row
+                            title='Cost Price'
+                            info={costPrice}
+                            currency={currency}
                         />
-                        <View style={styles.action}>
-                            <ActionButton
-                                iconName='package-variant-closed-plus'
-                                iconType='MaterialDesignIcons'
-                                iconColor={Colors.surface}
-                                mainText='Restock'
-                                subText='Add more inventory'
-                                maincolor={Colors.surface}
-                                subColor={Colors.surface}
-                                bgColor={Colors.primary}
-                                onPress={() => setShowRestock(true)}
-                            />
-                            <ActionButton
-                                iconName='options-outline'
-                                iconType='Ionicons'
-                                iconColor={Colors.primary}
-                                mainText='Adjust Stock'
-                                subText='Manually update quantity'
-                                maincolor={Colors.primary}
-                                subColor={Colors.textSecondary}
-                                bgColor={Colors.surface}
-                                borderColor={Colors.textSecondary}
-                                borderWidth={0.3}
-                                onPress={() => setShowAdjustStock(true)}
+                        <Row
+                            title='Selling Price'
+                            info={sellingPrice}
+                            currency={currency}
+                        />
+                    </View>
+                </View>
+                <StockAlert
+                    iconBgColor={colors.iconBg}
+                    //bgColor={Colors.warningLightExtra}
+                    color={colors.color}
+                    iconName={icon.name}
+                    iconType={icon.type}
+                    stock={stock}
+                    threshold={lowStockThreshold}
+                    badge={badgeTitle}
+                />
+                <View style={styles.action}>
+                    <ActionButton
+                        iconName='package-variant-closed-plus'
+                        iconType='MaterialDesignIcons'
+                        iconColor={Colors.surface}
+                        mainText='Restock'
+                        subText='Add more inventory'
+                        maincolor={Colors.surface}
+                        subColor={Colors.surface}
+                        bgColor={Colors.primary}
+                        onPress={() => setShowRestock(true)}
+                    />
+                    <ActionButton
+                        iconName='options-outline'
+                        iconType='Ionicons'
+                        iconColor={Colors.primary}
+                        mainText='Adjust Stock'
+                        subText='Manually update quantity'
+                        maincolor={Colors.primary}
+                        subColor={Colors.textSecondary}
+                        bgColor={Colors.surface}
+                        borderColor={Colors.textSecondary}
+                        borderWidth={0.3}
+                        onPress={() => setShowAdjustStock(true)}
+                    />
+                </View>
+                {
+                    inventory && inventory.length > 0 && (
+                        <View style={styles.stockContainer}>
+                            <Text style={styles.stockHeading}>Stock History</Text>
+                            <FlatList
+                                style={{ flex: 1 }}
+                                contentContainerStyle={styles.containerStyle}
+                                data={inventory}
+                                renderItem={renderStock}
+                                keyExtractor={(item) => item.id}
+                                showsVerticalScrollIndicator={false}
                             />
                         </View>
-                        {
-                            inventory && inventory.length > 0 && (
-                                <View style={styles.stockContainer}>
-                                    <Text style={styles.stockHeading}>Stock History</Text>
-                                    <FlatList
-                                        style={{ flex: 1 }}
-                                        contentContainerStyle={styles.containerStyle}
-                                        data={inventory}
-                                        renderItem={renderStock}
-                                        keyExtractor={(item) => item.id}
-                                        showsVerticalScrollIndicator={false}
-                                    />
-                                </View>
-                            )
-                        }
+                    )
+                }
 
 
-                    </View>
-                )
-            }
+            </View>
+
 
         </SafeAreaView>
     );

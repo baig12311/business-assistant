@@ -46,7 +46,7 @@ const Login = () => {
         if (error) {
             setShowToast(true)
             setToastType('error')
-            setToastMessage(error?.message)
+            setToastMessage(error?.message.includes('Invalid') ? error.message:'Something went wrong. Try again')
             setLoading(false)
             setPassword('')
             return;

@@ -3,7 +3,12 @@ import { supabase } from '../lib/supabase';
 export const getCustomers = async (businessId: string) => {
     const { data, error } = await supabase
         .from('customers')
-        .select('*')
+        .select(`
+            *,
+            orders (
+                id
+            )
+        `)
         .eq('business_id', businessId)
         .order('created_at', { ascending: false });
 

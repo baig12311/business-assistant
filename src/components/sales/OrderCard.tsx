@@ -11,14 +11,14 @@ import {
 import Icon from '../common/Icon';
 interface props {
     orderNumber?:string
-    customerId?:string
+    customerName?:string
     date?:string
     amount:string
     currency:string
     onPress?:()=>void
 }
-const OrderCard:React.FC<props> = ({orderNumber, customerId, date, amount, currency, onPress}) => {
-    const {data, isLoading} =useCustomerById(customerId)
+const OrderCard:React.FC<props> = ({orderNumber, customerName, date, amount, currency, onPress}) => {
+    // const {data, isLoading} =useCustomerById(customerId)
     return (
         <TouchableOpacity 
         style={styles.container}
@@ -30,7 +30,7 @@ const OrderCard:React.FC<props> = ({orderNumber, customerId, date, amount, curre
                 <Text style={styles.order}>{currency} {amount.toLocaleString()}</Text>
             </View>
             
-            <Text style={styles.customer}>{data?.name}</Text>
+            <Text style={styles.customer}>{customerName}</Text>
             <Text style={styles.date}>{date}</Text>
         </TouchableOpacity>
     );
