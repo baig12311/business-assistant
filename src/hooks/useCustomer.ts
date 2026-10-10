@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery} from '@tanstack/react-query';
 import { getCustomers, getCustomerById} from '../services/customer';
 
 export const useCustomers = (businessId?: string) => {

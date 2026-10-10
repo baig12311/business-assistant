@@ -6,7 +6,9 @@ export const getCustomers = async (businessId: string) => {
         .select(`
             *,
             orders (
-                id
+                id,
+                total_amount,
+                paid_amount
             )
         `)
         .eq('business_id', businessId)

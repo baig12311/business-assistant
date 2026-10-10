@@ -20,6 +20,10 @@ export const useCreateOrder = (businessId?: string) => {
             await queryClient.invalidateQueries({
                 queryKey: ['customerOrders'],
             });
+
+            await queryClient.invalidateQueries({
+                queryKey: ['customers', businessId],
+            });
         },
     });
 };

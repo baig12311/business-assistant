@@ -12,8 +12,9 @@ interface props{
     date?:any
     orderNumber?:string
     amount:any
+    credit: any
 }
-const CustomerOrderCard:React.FC<props> = ({date, orderNumber, amount}) => {
+const CustomerOrderCard:React.FC<props> = ({date, orderNumber, amount, credit}) => {
     const formatDate = new Date(date).toLocaleDateString('en-GB', {
         day: '2-digit',
         month: 'short',
@@ -24,6 +25,7 @@ const CustomerOrderCard:React.FC<props> = ({date, orderNumber, amount}) => {
             <View>
                 <Text style={styles.order}>Order # {orderNumber}</Text>
                 <Text style={styles.date}>{formatDate}</Text>
+                <Text style={styles.date}>{credit}</Text>
             </View>
             <Text style={styles.order}>{amount}</Text>
         </View>
@@ -50,7 +52,8 @@ const styles = StyleSheet.create({
     order:{
         fontFamily:fonts.bold,
         fontSize: fontSize.text,
-        color:Colors.text
+        color:Colors.text,
+        marginBottom: hp(1)
     },
     date:{
         fontFamily:fonts.medium,

@@ -15,6 +15,7 @@ import DashboardCard from '../../src/components/home/DashboardCard';
 import CustomerOrderCard from '../../src/components/customers/CustomerOrderCard';
 import Icon from '../../src/components/common/Icon';
 import Colors from '../../src/constants/colors';
+import { formatAmount } from '../../src/utils/formatAmount';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 const CustomerDetail = () => {
     const [showMenu, setShowMenu] = useState(false)
@@ -150,7 +151,9 @@ const CustomerDetail = () => {
                                 />
                                 <DashboardCard
                                     title='Total Spent'
-                                    info={totalOrdersAmount.toLocaleString()}
+                                    currency={businessData?.currency}
+                                    //info={totalOrdersAmount}
+                                    info={formatAmount(totalOrdersAmount)}
                                     bgColor={Colors.surface}
                                     iconName='cash-outline'
                                     iconType='Ionicons'
@@ -160,14 +163,19 @@ const CustomerDetail = () => {
                             </View>
 
                             {
-                                customerOrder?.map((order, index) => (
+                                customerOrder?.map((order, index) => {
+                                    const credit = order.paid_amount - order.total_amount
+                                    const pending = credit.toLocaleString()
+                                    return(
                                     <CustomerOrderCard
                                         key={index}
                                         orderNumber={order.order_number}
                                         amount={`${businessData.currency} ${order.total_amount.toLocaleString()}`}
                                         date={order.created_at}
+                                        credit={credit < 0 ? `Credit Amount(udhar): ${pending}`: 'Paid'}
+
                                     />
-                                ))
+                                )})
                             }
                         </>
                     )

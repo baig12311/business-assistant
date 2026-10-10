@@ -50,7 +50,10 @@ const OrderDetail = () => {
     return (
         <SafeAreaView style={styles.container}>
             <Header title='Order Detail' onPress={() => router.back()} />
-            <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}>
+            <ScrollView 
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
+            >
                 <Text style={styles.sectionTitle}>Order #{order.order_number}</Text>
                 <OrderDetailCard
                     cName={order?.customer.name}

@@ -14,13 +14,17 @@ interface props {
     quantity?: string
     reason?: string
     date?: string
-    invoice?:string
+    invoice?: string
 }
-const StockCard: React.FC<props> = ({ type, isLast, quantity, reason, date, invoice}) => {
+const StockCard: React.FC<props> = ({ type, isLast, quantity, reason, date, invoice }) => {
     const formatType = type.charAt(0).toUpperCase() + type?.slice(1)
-    const formatQuantity = type === 'restock' ? `+${quantity}` : quantity
-    const reasonLabel=adjustmentReasons.find(item=>item.value === reason)?.label ?? reason
-    const reasonText = reason === 'Order sale' ? `Invoice #${invoice}`: reasonLabel 
+    const formatQuantity =
+        type === 'restock' || (type === 'adjustment' && Number(quantity) > 0)
+            ? `+${quantity}`
+            : quantity;
+    quantity
+    const reasonLabel = adjustmentReasons.find(item => item.value === reason)?.label ?? reason
+    const reasonText = reason === 'Order sale' ? `Invoice #${invoice}` : reasonLabel
     const icon = type === 'sale' ? { name: 'arrow-down', type: 'Ionicons' } :
         type === 'restock' ? { name: 'arrow-up', type: 'Ionicons' } :
             { name: 'minus', type: 'Entypo' }
@@ -47,8 +51,8 @@ const StockCard: React.FC<props> = ({ type, isLast, quantity, reason, date, invo
                     reason && (<Text style={styles.reason}>{reasonText}</Text>)
                 }
             </View>
-            <View style={{flex:1, alignItems: 'flex-end'}}>
-                            <Text style={[styles.reason,]}>{date}</Text>
+            <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                <Text style={[styles.reason,]}>{date}</Text>
 
             </View>
 
@@ -64,9 +68,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
-    iconContainer:{
-        flex: 1, 
-        flexDirection: 'row', 
+    iconContainer: {
+        flex: 1,
+        flexDirection: 'row',
         alignItems: 'center',
     },
     icon: {

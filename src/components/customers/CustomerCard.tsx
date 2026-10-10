@@ -11,8 +11,11 @@ interface props {
     phone: string
     onPress?: () => void
     order?: number
+    totalPurchase?: string
+    balance?: string
+    currency?: string
 }
-const CustomerCard: React.FC<props> = ({ name, phone, onPress, order }) => {
+const CustomerCard: React.FC<props> = ({ name, phone, onPress, order, currency, totalPurchase, balance }) => {
     const initials = name
         .trim()
         .split(' ')
@@ -33,10 +36,19 @@ const CustomerCard: React.FC<props> = ({ name, phone, onPress, order }) => {
             <View style={styles.textContainer}>
                 <Text style={styles.textName}>{name}</Text>
                 <Text style={[styles.textPhone, { marginBottom: hp(0.8) }]}>{phone}</Text>
-                {
-                    order && order > 0 && <Text style={styles.textPhone}>{order} {order > 1 ? 'Orders' : 'Order'}</Text>
-                }
+                <View style={styles.amountRow}>
 
+                    {
+                        order && order > 0 && <Text style={styles.textPhone}>{order} {order > 1 ? 'Orders' : 'Order'}</Text>
+                    }
+                    <View style={styles.divider} />
+                    <Text style={styles.textPhone}>{currency} {totalPurchase}</Text>
+                </View>
+
+
+            </View>
+            <View>
+                <Text>{balance}</Text>
             </View>
             <View style={{ alignSelf: 'center' }}>
                 <Icon
@@ -91,6 +103,17 @@ const styles = StyleSheet.create({
         fontSize: fontSize.smallText,
         color: Colors.textSecondary,
 
+    },
+    amountRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10
+
+    },
+    divider: {
+        height: hp(3),
+        borderWidth: 0.5,
+        borderColor: Colors.textMuted
     }
 });
 

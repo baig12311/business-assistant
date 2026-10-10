@@ -17,8 +17,7 @@ import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
-import { json } from 'zod';
-import { is } from 'zod/v4/locales';
+
 const Customers = () => {
     const [searchText, setSearchText] = useState('')
     // const [orderLoading, setOrderLoading] = useState(false)
@@ -36,11 +35,31 @@ const Customers = () => {
 
     // render customer
     const CustomerItem = ({ item }: any) => {
+        const orders = item.orders ?? []
+         const totalPurchases = orders.reduce(
+        (sum: number, order: any) =>
+            sum + Number(order.total_amount ?? 0),
+        0
+    );
+
+    const outstandingBalance = orders.reduce(
+        (sum: number, order: any) => {
+            const due =
+                Number(order.total_amount ?? 0) -
+                Number(order.paid_amount ?? 0);
+
+            return sum + Math.max(0, due);
+        },
+        0
+    );
         return (
             <CustomerCard
                 name={item.name}
                 phone={item.phone}
                 order={item?.orders?.length ?? 0}
+                balance={outstandingBalance.toLocaleString()}
+                currency = {business?.currency}
+                totalPurchase={totalPurchases.toLocaleString()}
                 onPress={() =>
                     router.push({
                         pathname: '/customerDetail/[Customer]',

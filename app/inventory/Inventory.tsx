@@ -41,15 +41,16 @@ const Inventory = () => {
     const renderProduct = ({ item, index }: any) => {
         return (
             <ProductCard
+
                 title={item.name}
 
                 stock={item.stock_quantity}
                 lowStock={item.low_stock_threshold}
                 imageurl={item.image_url}
                 //isLast={index === allProducts - 1}
-                onPress={()=>router.push({
+                onPress={() => router.push({
                     pathname: '/stock/[product]',
-                    params:{
+                    params: {
                         productId: item.id
                     }
                 })}
