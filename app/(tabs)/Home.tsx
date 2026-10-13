@@ -305,9 +305,9 @@ const Home = () => {
                         info={products?.length}
                         iconName='cube'
                         iconType='Ionicons'
-                        bgColor='#EFF6FF'
-                        iconColor='#2563EB'
-                        iconBg='#DBEAFE'
+                        bgColor={Colors.blueExtraLight}
+                        iconColor={Colors.blue}
+                        iconBg={Colors.blueLight}
                     />
 
                     <DashboardCard
@@ -315,9 +315,9 @@ const Home = () => {
                         info={customers?.length}
                         iconName='people'
                         iconType='Ionicons'
-                        bgColor='#FAF5FF'
-                        iconColor='#9333EA'
-                        iconBg='#F3E8FF'
+                        bgColor={Colors.purpleExtraLight}
+                        iconColor={Colors.purple}
+                        iconBg={Colors.purpleLight}
                     />
 
                     <DashboardCard
@@ -325,9 +325,9 @@ const Home = () => {
                         info={orders?.length}
                         iconName='receipt'
                         iconType='Ionicons'
-                        bgColor='#FFF7ED'
-                        iconColor='#D97706'
-                        iconBg='#FEF3C7'
+                        bgColor={Colors.yellowExtraLight}
+                        iconColor={Colors.yellow}
+                        iconBg={Colors.yellowLight}
                     />
 
                     <DashboardCard
@@ -337,10 +337,10 @@ const Home = () => {
                         info={formatAmount(totalSales)}
                         iconName='cash'
                         iconType='Ionicons'
-                        bgColor='#F0FDF4'
+                        bgColor={Colors.succesExtraLight}
                         //iconColor='#16A34A'
                         iconColor={Colors.primary}
-                        iconBg='#DCFCE7'
+                        iconBg='#E8F0EA'
                         currency={business?.currency}
                     />
 

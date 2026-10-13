@@ -7,6 +7,7 @@ import { useBusiness } from '../../src/hooks/useBusiness';
 import { useOrders } from '../../src/hooks/useOrders';
 import OrderSkeleton from '../../src/components/skeleton/OrderSkeleton';
 import Header from '../../src/components/common/Header';
+import CustomerOrderCard from '../../src/components/customers/CustomerOrderCard';
 import Input from '../../src/components/common/Input';
 import { widthPercentageToDP as wp,
     heightPercentageToDP as hp
@@ -30,11 +31,25 @@ const Orders = () => {
     const renderOrder=({item}: any)=>{
         const date=formatDate(item?.created_at)
         return(
-            <OrderCard
+            // <OrderCard
+            // orderNumber={item.order_number}
+            // customerName={item.customer?.name}
+            // date={date}
+            // amount={item.total_amount}
+            // currency={business?.currency}
+            // onPress={()=>router.push({
+            //     pathname:'/orderDetail/[order]',
+            //     params:{
+            //         orderId: item.id
+            //     }
+            // })}
+            // />
+            <CustomerOrderCard
             orderNumber={item.order_number}
-            customerName={item.customer?.name}
+            customer={item.customer?.name}
             date={date}
             amount={item.total_amount}
+            paidAmount={item.paid_amount}
             currency={business?.currency}
             onPress={()=>router.push({
                 pathname:'/orderDetail/[order]',

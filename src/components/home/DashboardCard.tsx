@@ -20,13 +20,13 @@ interface props {
 const DashboardCard: React.FC<props> = ({ currency, title, info, iconName, iconType,
     iconColor, bgColor, iconBg }) => {
     return (
-        <View style={[styles.container, { backgroundColor: bgColor }]}>
+        <View style={[styles.container, { backgroundColor: bgColor,}]}>
             <View style={styles.row}>
                 <View style={[styles.icon, { backgroundColor: iconBg }]}>
                     <Icon
                         name={iconName}
                         type={iconType}
-                        size={wp(7)}
+                        size={wp(5.5)}
                         color={iconColor}
                     />
                 </View>
@@ -73,8 +73,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     icon: {
-        width: wp(12),
-        height: wp(12),
+        width: wp(10),
+        height: wp(10),
         borderRadius: wp(6),
         justifyContent: 'center',
         alignItems: 'center',

@@ -16,6 +16,11 @@ interface props {
     currency?: string
 }
 const CustomerCard: React.FC<props> = ({ name, phone, onPress, order, currency, totalPurchase, balance }) => {
+    const balanceString = balance?.toLocaleString()
+    const dues = Number(balance) > 0 ? `${currency} ${balanceString}` : 'No Dues' 
+    const Color = Number(balance) > 0 ? {bg: Colors.errorLight, color:Colors.error} : 
+    {bg: Colors.successLight, color: Colors.primary}
+    
     const initials = name
         .trim()
         .split(' ')
@@ -47,8 +52,14 @@ const CustomerCard: React.FC<props> = ({ name, phone, onPress, order, currency, 
 
 
             </View>
-            <View>
-                <Text>{balance}</Text>
+            <View style={[styles.badge, {backgroundColor: Color.bg}]}>
+                {
+                    Number(balance) > 0 && (
+                        <Text style={[styles.textDue, {color:Colors.error}]}>Dues</Text>
+                    )
+                }
+                
+                <Text style={[styles.textDue, {color:Color.color}]}>{dues}</Text>
             </View>
             <View style={{ alignSelf: 'center' }}>
                 <Icon
@@ -114,7 +125,19 @@ const styles = StyleSheet.create({
         height: hp(3),
         borderWidth: 0.5,
         borderColor: Colors.textMuted
-    }
+    },
+    badge:{
+        paddingHorizontal: wp(3),
+        padding: wp(0.5),
+        alignItems:'center',
+        alignSelf: 'flex-start',
+        borderRadius: wp(50),
+        marginRight: wp(3)
+    },
+    textDue: {
+        fontFamily: fonts.medium,
+        fontSize: fontSize.extraSmallText,
+    },
 });
 
 //make this component available to the app

@@ -13,9 +13,12 @@ interface props {
     cName: string
     orderDate: string
     phone: string
-    pStatus: string | number
+    amount: number
+    paidAmount: number
+    
+    //pStatus: string | number
 }
-const OrderDetailCard: React.FC<props> = ({ cName, orderDate, phone, pStatus}) => {
+const OrderDetailCard: React.FC<props> = ({ cName, orderDate, phone, amount, paidAmount }) => {
     const initials = cName
         .trim()
         .split(' ')
@@ -23,6 +26,12 @@ const OrderDetailCard: React.FC<props> = ({ cName, orderDate, phone, pStatus}) =
         .slice(0, 2)
         .join('')
         .toUpperCase();
+    const due = paidAmount - amount
+    const badgeText = (paidAmount > 0 && due < 0) ? 'Partially Paid' : paidAmount === 0 ? `Due: ${due.toLocaleString()}` : 'Paid'
+    const badgeColor = badgeText === 'Paid' ? { bg: Colors.successLight, color: Colors.primary } :
+        badgeText === 'Partially Paid' ? { bg: Colors.warningLight, color: Colors.yellow }
+            : { bg: Colors.errorLight, color: Colors.error }
+
     return (
         <View style={styles.container}>
             <View style={styles.customerInfo}>
@@ -31,19 +40,22 @@ const OrderDetailCard: React.FC<props> = ({ cName, orderDate, phone, pStatus}) =
 
                 </View>
                 <View style={styles.textContainer}>
-                    <Text style={[styles.name, {color:Colors.text}]}>{cName}</Text>
-                    <Text style={[styles.name, {color:Colors.textSecondary}]}>{phone}</Text>
+                    <Text style={[styles.name, { color: Colors.text }]}>{cName}</Text>
+                    <Text style={[styles.name, { color: Colors.textSecondary }]}>{phone}</Text>
                 </View>
             </View>
 
             <View style={styles.orderInfo}>
                 <View>
-                    <Text style={[styles.name, {color:Colors.text}]}>Order Date</Text>
+                    <Text style={[styles.name, { color: Colors.text }]}>Order Date</Text>
                     <Text style={styles.date}>{orderDate}</Text>
                 </View>
                 <View>
-                    <Text style={[styles.name, {color:Colors.text}]}>Payment Status</Text>
-                    <Text style={[styles.name, {color:Colors.text}]}>{pStatus}</Text>
+                    <Text style={[styles.name, { color: Colors.text }]}>Payment Status</Text>
+                    <Text style={[styles.badge, {
+                        backgroundColor: badgeColor.bg,
+                        color: badgeColor.color
+                    }]}>{badgeText}</Text>
                 </View>
             </View>
 
@@ -86,15 +98,24 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     name: {
-        fontFamily:fonts.medium,
+        fontFamily: fonts.medium,
         fontSize: fontSize.text,
         marginBottom: hp(0.5)
     },
-    date:{
-        fontFamily:fonts.medium,
+    date: {
+        fontFamily: fonts.medium,
         fontSize: fontSize.smallText,
-        color:Colors.textSecondary
-    }
+        color: Colors.textSecondary
+    },
+    badge: {
+        fontFamily: fonts.medium,
+        fontSize: fontSize.text,
+        paddingHorizontal: wp(3),
+        borderRadius: wp(50),
+        paddingVertical: wp(0.5),
+        marginBottom: hp(0.5),
+        textAlign: 'center'
+    },
 });
 
 //make this component available to the app

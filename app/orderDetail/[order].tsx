@@ -3,6 +3,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatDate } from '../../src/services/formatDate';
 import Button from '../../src/components/common/Button';
 import Header from '../../src/components/common/Header';
+import Colors from '../../src/constants/colors';
+import { useUser } from '../../src/hooks/useUser';
+import { useBusiness } from '../../src/hooks/useBusiness';
 import OrderDetailCard from '../../src/components/orderDetail/OrderDetailCard';
 import OrderItems from '../../src/components/orderDetail/OrderItems';
 import PriceSummaryCard from '../../src/components/orderDetail/PriceSummary';
@@ -13,13 +16,17 @@ import { useOrderById } from '../../src/hooks/useOrderById';
 import styles from './orderStyle';
 const OrderDetail = () => {
     const { orderId } = useLocalSearchParams<{ orderId: string }>()
+    const {data: user, isLoading: userLoading} = useUser()
+    const {data: business, isLoading: businessLoading} = useBusiness(user?.id)
     const { data: order, isLoading } = useOrderById(orderId)
     const orderItems = order?.order_items ?? [];
     const paidAmount = order?.paid_amount
     const total = order?.total_amount
     // const paidAmount = 850
     // const totalAmount = 900
-    const paymentStatus = paidAmount >= total ? 'Paid' : paidAmount < total ? total - paidAmount : 0
+    //const due = paidAmount-total
+    //const paymentStatus = paidAmount >= total ? 'Paid' : paidAmount < total ? total - paidAmount : 0
+
 
     // Subtotal
     const subTotal = orderItems.reduce((total: any, item: any) => {
@@ -59,7 +66,9 @@ const OrderDetail = () => {
                     cName={order?.customer.name}
                     phone={order?.customer.phone}
                     orderDate={formatDate(order?.created_at)}
-                    pStatus={paymentStatus}
+                    amount={order?.total_amount}
+                    paidAmount={order?.paid_amount}
+                    
 
                 />
                 <Text style={styles.sectionTitle}>Order Items</Text>
@@ -73,6 +82,7 @@ const OrderDetail = () => {
                     paid={amountPaid}
                     discount={discount}
                     change={returnAmount}
+                    currency = {business?.currency}
                 />
 
             </ScrollView>

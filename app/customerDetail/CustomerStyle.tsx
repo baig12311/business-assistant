@@ -66,6 +66,8 @@ const styles = StyleSheet.create({
     },
     dashboard:{
         flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap:10,
         justifyContent: 'space-between',
         marginBottom:hp(2)
     }

@@ -1,5 +1,5 @@
 
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 import Colors from '../../constants/colors';
 import Icon from '../common/Icon';
@@ -8,58 +8,127 @@ import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
-interface props{
-    date?:any
-    orderNumber?:string
-    amount:any
-    credit: any
+interface props {
+    date?: any
+    orderNumber?: string
+    amount: number
+    paidAmount: number
+    currency?: string
+    onPress?:()=>void
+    disabled?:boolean
+    customer?:string
 }
-const CustomerOrderCard:React.FC<props> = ({date, orderNumber, amount, credit}) => {
-    const formatDate = new Date(date).toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-    });
+const CustomerOrderCard: React.FC<props> = ({ customer, onPress, date, orderNumber, amount, paidAmount, currency, disabled}) => {
+    // const formatDate = new Date(date).toLocaleDateString('en-GB', {
+    //     day: '2-digit',
+    //     month: 'short',
+    //     year: 'numeric',
+    // });
+
+    const due = paidAmount - amount
+    const totalPaid = paidAmount > amount ? amount : paidAmount
+    const badgeText = (paidAmount > 0 && due < 0) ? 'Partially Paid' : paidAmount === 0 ? 'Due' : 'Paid'
+    const badgeColor = badgeText === 'Paid' ? { bg: Colors.successLight, color: Colors.primary } :
+        badgeText === 'Due' ? { bg: Colors.errorLight, color: Colors.error } :
+            { bg: Colors.warningLight, color: Colors.yellow }
     return (
-        <View style={styles.container}>
-            <View>
+        <TouchableOpacity 
+        style={styles.container}
+        activeOpacity={0.7}
+        disabled={disabled}
+        onPress={onPress}
+        >
+            <View style={styles.header}>
                 <Text style={styles.order}>Order # {orderNumber}</Text>
-                <Text style={styles.date}>{formatDate}</Text>
-                <Text style={styles.date}>{credit}</Text>
+                <Text style={[styles.badgeText,
+                { backgroundColor: badgeColor.bg, color: badgeColor.color }
+                ]}>{badgeText}</Text>
+
             </View>
-            <Text style={styles.order}>{amount}</Text>
-        </View>
+            {
+                customer && (<Text style={styles.customer}>{customer}</Text>)
+            }
+            <Text style={styles.date}>{date}</Text>
+
+
+            <View style={styles.amountRow}>
+                <Text style={styles.date}>Total: <Text style={{ color: Colors.text }}>{currency} {amount.toLocaleString()}</Text></Text>
+                <View style={styles.divider} />
+                <Text style={styles.date}>Paid: <Text style={{ color: Colors.primary }}>{currency} {totalPaid.toLocaleString()}</Text></Text>
+
+                {
+                    due < 0 && (
+                        <>
+                            <View style={styles.divider} />
+                            <Text style={styles.date}>Due: <Text style={{ color: Colors.error }}>{currency} {due.toLocaleString()}</Text></Text>
+                        </>
+
+
+                    )
+                }
+            </View>
+
+        </TouchableOpacity>
     );
 };
 
 
 const styles = StyleSheet.create({
     container: {
-        borderRadius:wp(2),
-        padding:wp(3),
-        flexDirection:'row',
-        alignItems: 'center',
-        justifyContent:'space-between',
+        borderRadius: wp(2),
+        padding: wp(3),
         backgroundColor: Colors.surface,
-        elevation:1,
-        marginBottom:hp(2),
-       
+        elevation: 1,
+        marginBottom: hp(2),
+
     },
-    textContainer:{
-        flex:1,
+    textContainer: {
+        flex: 1,
         marginLeft: wp(3)
     },
-    order:{
-        fontFamily:fonts.bold,
+    order: {
+        fontFamily: fonts.bold,
         fontSize: fontSize.text,
-        color:Colors.text,
-        marginBottom: hp(1)
+        color: Colors.text,
+        //marginBottom: hp(1)
     },
-    date:{
-        fontFamily:fonts.medium,
+    date: {
+        fontFamily: fonts.medium,
+        fontSize: fontSize.smallText,
+        color: Colors.textSecondary
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    },
+    amountRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        marginTop: hp(1),
+        flexWrap: 'wrap'
+    },
+    divider: {
+        height: hp(2.5),
+        borderWidth: 0.5,
+        borderColor: Colors.textMuted
+    },
+    badgeText: {
+        fontFamily: fonts.medium,
+        fontSize: fontSize.extraSmallText,
+        paddingHorizontal: wp(2),
+        paddingVertical: wp(0.5),
+        borderRadius: wp(50)
+        //color: Colors.textSecondary
+    },
+    customer:{
+         fontFamily: fonts.medium,
         fontSize:fontSize.smallText,
-        color:Colors.textSecondary
+        color:Colors.text,
+        marginBottom:hp(0.5)
     }
+   
 });
 
 //make this component available to the app

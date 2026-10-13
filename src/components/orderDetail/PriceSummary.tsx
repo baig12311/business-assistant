@@ -13,8 +13,9 @@ interface Props {
     discount: string | number
     change: string | number
     paid: string | number
+    currency?:string
 }
-const PriceSummaryCard: React.FC<Props> = ({ subTotal, total, paid, discount, change }) => {
+const PriceSummaryCard: React.FC<Props> = ({currency, subTotal, total, paid, discount, change }) => {
 
     return (
         <View style={styles.container}>
@@ -29,18 +30,21 @@ const PriceSummaryCard: React.FC<Props> = ({ subTotal, total, paid, discount, ch
                 info={discount.toLocaleString()}
                 fontWeight={fonts.medium}
                 fsize={fontSize.text}
+                currency={currency}
             />
             <Row
                 title='Total'
                 info={total.toLocaleString()}
                 fontWeight={fonts.bold}
                 fsize={fontSize.subHeading}
+                currency={currency}
             />
             <Row
                 title='Amount Paid'
                 info={paid.toLocaleString()}
                 fontWeight={fonts.medium}
                 fsize={fontSize.text}
+                currency={currency}
             />
 
         </View>
@@ -51,13 +55,14 @@ interface props {
     info: string
     fontWeight?:string
     fsize?:number
+    currency?:string
 }
-const Row: React.FC<props> = ({ title, info, fontWeight, fsize}) => {
+const Row: React.FC<props> = ({ currency, title, info, fontWeight, fsize}) => {
     
     return (
         <View style={styles.row}>
             <Text style={{fontFamily: fontWeight, fontSize:fsize}}>{title}</Text>
-            <Text  style={{fontFamily: fontWeight, fontSize:fsize}}>{info}</Text>
+            <Text  style={{fontFamily: fontWeight, fontSize:fsize}}>{currency} {info}</Text>
         </View>
     )
 

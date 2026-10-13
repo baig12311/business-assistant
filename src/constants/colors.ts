@@ -19,6 +19,7 @@ const Colors = {
   success: '#16A34A',
   //successLight: '#DCFCE7',
   successLight: '#E8F0EA',
+  succesExtraLight: '#F0FDF4',
 
   warning: '#D97706',
   warningLightExtra: '#FFF5E6',
@@ -29,6 +30,20 @@ const Colors = {
 
   info: '#2563EB',
   infoLight: '#DBEAFE',
+
+  blueExtraLight: '#EFF6FF',
+  blueLight: '#DBEAFE',
+  blue: '#2563EB',
+
+  yellowExtraLight: '#FFF7ED',
+  yellowLight: '#FEF3C7',
+  yellow: '#D97706',
+
+  purpleExtraLight: '#FAF5FF',
+  purpleLight: '#F3E8FF',
+  purple: '#9333EA'
+
+
 };
 
 export default Colors;

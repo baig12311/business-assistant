@@ -57,7 +57,7 @@ const Customers = () => {
                 name={item.name}
                 phone={item.phone}
                 order={item?.orders?.length ?? 0}
-                balance={outstandingBalance.toLocaleString()}
+                balance={outstandingBalance}
                 currency = {business?.currency}
                 totalPurchase={totalPurchases.toLocaleString()}
                 onPress={() =>

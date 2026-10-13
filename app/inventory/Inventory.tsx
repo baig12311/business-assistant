@@ -77,7 +77,7 @@ const Inventory = () => {
                 <InventoryTrackCard
                     title='Low Stock'
                     text={lowStock}
-                    bgColor={Colors.warningLight}
+                    bgColor={Colors.yellowExtraLight}
                     color={Colors.warning}
                     iconName='alert-circle'
                     iconType='Ionicons'
