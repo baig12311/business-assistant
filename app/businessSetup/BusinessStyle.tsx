@@ -58,6 +58,18 @@ const styles = StyleSheet.create({
         fontSize: fontSize.smallText,
         color: Colors.textSecondary,
         marginTop: hp(0.5)
+    },
+    title: {
+        fontFamily: fonts.medium,
+        fontSize: fontSize.text,
+        marginBottom: hp(0.5),
+        color: Colors.textSecondary
+    },
+    error: {
+        fontFamily: fonts.regular,
+        fontSize: fontSize.smallText,
+        marginBottom: hp(0.5),
+        color: Colors.error
     }
 
 })

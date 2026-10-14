@@ -229,12 +229,12 @@ const ProductDetail = () => {
                         <Text style={styles.name}>{name}</Text>
                         <Row
                             title='Cost Price'
-                            info={costPrice}
+                            info={costPrice.toLocaleString()}
                             currency={currency}
                         />
                         <Row
                             title='Selling Price'
-                            info={sellingPrice}
+                            info={sellingPrice.toLocaleString()}
                             currency={currency}
                         />
                     </View>

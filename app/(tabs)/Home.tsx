@@ -29,6 +29,8 @@ const Home = () => {
     const [showSelector, setShowSelector] = useState(false)
     const [salesPeriod, setSalesPeriod] = useState<'Today' | 'Yesterday' | 'Week' | 'Month'>('Today');
     const { data, error, isLoading: userLoading } = useUser()
+    console.log(error);
+    
     const userId = data?.id
     const { data: business, error: bError, isLoading: bLoading } = useBusiness(userId)
 

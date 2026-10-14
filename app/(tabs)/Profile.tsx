@@ -43,6 +43,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
+import { logout } from '../../src/services/authService';
 
 import Colors from '../../src/constants/colors';
 import fonts, { fontSize } from '../../src/constants/typography';
@@ -120,16 +121,7 @@ const Profile = () => {
                         try {
                             setLoggingOut(true);
 
-                            const { error } =
-                                await supabase.auth.signOut();
-
-                            if (error) {
-                                throw error;
-                            }
-
-                            queryClient.clear();
-
-                            router.replace('/sign-in' as any);
+                            await logout()
                         } catch (error) {
                             Alert.alert(
                                 'Unable to log out',

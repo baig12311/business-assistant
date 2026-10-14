@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     },
     badge: {
         fontFamily: fonts.medium,
-        fontSize: fontSize.text,
+        fontSize: fontSize.smallText,
         paddingHorizontal: wp(3),
         borderRadius: wp(50),
         paddingVertical: wp(0.5),

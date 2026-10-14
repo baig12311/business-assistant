@@ -17,10 +17,10 @@ interface props {
 }
 const CustomerCard: React.FC<props> = ({ name, phone, onPress, order, currency, totalPurchase, balance }) => {
     const balanceString = balance?.toLocaleString()
-    const dues = Number(balance) > 0 ? `${currency} ${balanceString}` : 'No Dues' 
-    const Color = Number(balance) > 0 ? {bg: Colors.errorLight, color:Colors.error} : 
-    {bg: Colors.successLight, color: Colors.primary}
-    
+    const dues = Number(balance) > 0 ? `${currency} ${balanceString}` : 'No Dues'
+    const Color = Number(balance) > 0 ? { bg: Colors.errorLight, color: Colors.error } :
+        { bg: Colors.successLight, color: Colors.primary }
+
     const initials = name
         .trim()
         .split(' ')
@@ -46,20 +46,28 @@ const CustomerCard: React.FC<props> = ({ name, phone, onPress, order, currency, 
                     {
                         order && order > 0 && <Text style={styles.textPhone}>{order} {order > 1 ? 'Orders' : 'Order'}</Text>
                     }
-                    <View style={styles.divider} />
-                    <Text style={styles.textPhone}>{currency} {totalPurchase}</Text>
+
+                    {
+                        Number(totalPurchase) > 0 && (<>
+                            <View style={styles.divider} />
+                            <Text style={styles.textPhone}>{currency} {totalPurchase}</Text>
+                        </>
+
+
+                        )
+                    }
                 </View>
 
 
             </View>
-            <View style={[styles.badge, {backgroundColor: Color.bg}]}>
+            <View style={[styles.badge, { backgroundColor: Color.bg }]}>
                 {
                     Number(balance) > 0 && (
-                        <Text style={[styles.textDue, {color:Colors.error}]}>Dues</Text>
+                        <Text style={[styles.textDue, { color: Colors.error }]}>Dues</Text>
                     )
                 }
-                
-                <Text style={[styles.textDue, {color:Color.color}]}>{dues}</Text>
+
+                <Text style={[styles.textDue, { color: Color.color }]}>{dues}</Text>
             </View>
             <View style={{ alignSelf: 'center' }}>
                 <Icon
@@ -126,10 +134,10 @@ const styles = StyleSheet.create({
         borderWidth: 0.5,
         borderColor: Colors.textMuted
     },
-    badge:{
+    badge: {
         paddingHorizontal: wp(3),
         padding: wp(0.5),
-        alignItems:'center',
+        alignItems: 'center',
         alignSelf: 'flex-start',
         borderRadius: wp(50),
         marginRight: wp(3)

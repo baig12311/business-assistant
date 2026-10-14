@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import fonts, { fontSize } from '../../constants/typography';
 import Colors from '../../constants/colors';
+import LottieView from 'lottie-react-native';
 import Icon from '../common/Icon';
 import Input from '../common/Input';
 import Button from '../common/Button';
@@ -15,41 +16,41 @@ interface Props {
     value: string
     onChangeText: any
     currency?: string
-    error?:string
-    loading?:boolean
-    onPressReceive?:()=>void
-    // heading?: string
-    // subHeading?: string
-    // inputTitle?: string
-    // stockTitle?: string
-    // buttonTitle: string
-
-    // onPressSave?: () => void,
-    // stock: number
-    // value: string
-    // onChangeText?: any
-    // error?: string
-    // loader?: boolean
-    // open?: boolean
-    // onPressDrop?: () => void
-    // onCloseDrop?: () => void;
-    // onChangeReason?: (value: string) => void
-    // reason?: string
-    // reasonError?: string
+    error?: string
+    loading?: boolean
+    onPressReceive?: () => void
+    done?:boolean,
+    onPressDone?:()=>void
+    prev?:number | string
+    newBalance?:number | string
+    amount?:number | string
 }
 const PaymentModal: React.FC<Props> = ({
-    // onChangeReason, reasonError, reason, onCloseDrop, onPressDrop, open, loader, modalVisible, onPressCancel, onPressSave,
-    // stock, value, onChangeText, error, heading, subHeading, inputTitle, stockTitle, buttonTitle 
     modalVisible, onPressCancel, name, due, value, onChangeText, currency,
-    error, onPressReceive, loading
+    error, onPressReceive, loading, done, onPressDone, prev, newBalance, amount
 }) => {
 
     //const newStock = enteredStock + stock
     //const [reason, setReason] = useState('')
+    const remainingBalance = Number(due) - Number(value)
+    const received = value
     return (
         <Modal visible={modalVisible} transparent={true} animationType='fade'>
             <View style={styles.modalView}>
-                <View style={styles.modalContentView}>
+                {
+                    done ? (
+                        <PaymentDone
+                    due={prev}
+                    customer={name}
+                    received={amount}
+                    newBalance={newBalance}
+                    //newBalance={remainingBalance}
+                    currency={currency}
+                    onPress={onPressDone}
+                    />
+                    ) : (
+                        <View style={styles.modalContentView}>
+                    
                     <View style={styles.header}>
                         <Text style={styles.heading}>Receive Payment</Text>
                         <TouchableOpacity
@@ -99,7 +100,7 @@ const PaymentModal: React.FC<Props> = ({
                                     Remaining Balance: {due} - {value}
                                 </Text> */}
                                 <Text style={[styles.textDes, { marginBottom: hp(2) }]}>
-                                    Remaining Balance after payment: {(Number(due) - Number(value)).toLocaleString()}
+                                    Remaining Balance after payment: {remainingBalance.toLocaleString()}
                                 </Text>
                             </>
 
@@ -107,22 +108,77 @@ const PaymentModal: React.FC<Props> = ({
                     }
 
                     <Button
-                        title='Record Payment'
+                        title='Receive Payment'
                         onPress={onPressReceive}
                         isLoading={loading}
                         disabled={!value}
                     />
+                    
                 </View>
 
 
+                    )
+                }
+                
             </View>
         </Modal>
 
 
     );
 };
-
-
+interface payProps{
+    received?:number | string
+    due?:number | string
+    newBalance?:string | number
+    customer?:string
+    currency?:string
+    onPress?:()=>void
+}
+const PaymentDone:React.FC<payProps> = ({received, due, newBalance, customer, currency, onPress}) => {
+    return (
+        
+        <View style={styles.modalContentView}>
+        <View>
+            <LottieView
+            source={require('../../../assets/animations/Success.json')}
+            style={styles.animation}
+            autoPlay
+            loop={false}
+            // colorFilters={[
+            //     {
+            //         keypath: 'Background',
+            //         color: Colors.primary
+            //     }
+            // ]}
+            />
+            <Text style={styles.paymentText}>Payment Received!</Text>
+            <Text style={styles.recText}>{currency} {received} received from {customer}.</Text> 
+            <View style={styles.textView}>
+                <View style={[styles.textRow, {borderBottomWidth: 0.3}]}>
+                    <Text style={styles.textPaid}>
+                        Previous Due
+                    </Text>
+                    <Text style={styles.textPaid}>
+                        {currency} {due?.toLocaleString()}
+                    </Text>
+                </View>
+                <View style={styles.textRow} >
+                    <Text style={styles.textPaid}> 
+                        New Balance
+                    </Text>
+                    <Text style={styles.textPaid}>
+                        {currency} {newBalance?.toLocaleString()}
+                    </Text>
+                </View>
+            </View>
+            <Button
+                        title='Done'
+                        onPress={onPress}
+                    />
+        </View>
+        </View>
+    )
+}
 const styles = StyleSheet.create({
     modalView: {
         flex: 1,
@@ -189,8 +245,49 @@ const styles = StyleSheet.create({
         fontSize: fontSize.text,
         fontFamily: fonts.semiBold,
         color: Colors.text
+    },
+    animation:{
+        width: wp(50),
+        height: wp(28),
+        alignSelf: 'center',
+        marginTop: hp(4)
+    },
+    paymentText:{
+        fontFamily: fonts.extraBold,
+        fontSize: fontSize.heading,
+        color: Colors.text,
+        textAlign: 'center',
+        marginBottom: hp(0.5)
+    },
+    recText:{
+        fontFamily: fonts.medium,
+        fontSize: fontSize.text,
+        color: Colors.textSecondary,
+        textAlign: 'center',
+        marginBottom: hp(3)
+    },
+    textView:{
+        borderRadius: wp(2),
+        padding: wp(3),
+        backgroundColor: Colors.border,
+        marginBottom:hp(3)
+    },
+    textRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingVertical: hp(1)
+    },
+    textPaid:{
+        fontFamily: fonts.semiBold,
+        fontSize: fontSize.text,
+        color: Colors.text
     }
 });
 
 
 export default PaymentModal;
+
+
+
+
+

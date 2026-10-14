@@ -17,6 +17,7 @@ import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import Header from '../../src/components/common/Header';
 import PhoneInput from '../../src/components/common/PhoneInput';
 import ImageSheet from '../../src/components/uploadImage/ImageSheet';
+import BusinessType from '../../src/components/common/BusinessType';
 import { countries } from '../../src/services/data/countries';
 import { businessSchema } from '../../src/services/schema/businessSchema';
 import CustomBottomSheet from '../../src/components/common/CustomBottomSheet';
@@ -39,6 +40,7 @@ type selected ={
 const BusinessSetup = () => {
     const { data: user, isLoading, error } = useUser()
     const [loading, setLoading] = useState(false)
+    const [businessType, setBusinessType] = useState('')
     const [displayKeys, setDisplayKeys] = useState<string[]>([])
     const [placeholder, setPlaceholder] = useState('')
     const [category, setCategory] = useState('')
@@ -54,6 +56,7 @@ const BusinessSetup = () => {
     const [sheetValue, setSheetValue] = useState('');
     const sheetRef = useRef<BottomSheet>(null)
     const imageSheetRef = useRef<BottomSheet>(null)
+    const [businessTypeError, setBusinessTypeError] = useState('')
     const [errors, setErrors] = useState<{
         businessName?: string;
         number?: string;
@@ -162,6 +165,11 @@ const BusinessSetup = () => {
         setLoading(false)
         return;
     }
+    if(!businessType){
+        setBusinessTypeError('*Please select business type')
+        setLoading(false)
+        return
+    }
 
     const formattedPhone = phoneNumber.number;
         const { data, error } = await supabase
@@ -172,7 +180,8 @@ const BusinessSetup = () => {
                 category: category,
                 currency: currency?.code,
                 whatsapp_number: formattedPhone,
-                logo_url: imageUrl
+                logo_url: imageUrl,
+                business_type: businessType
             })
             .select()
             .single();
@@ -263,22 +272,6 @@ const BusinessSetup = () => {
                                 )
                             }}
                         />
-                        {/* <Input
-                            title='Phone Number (WHATSAPP)*'
-                            placeholder='+92 XXXXXXXXXX'
-                            iconName='call-outline'
-                            iconType='Ionicons'
-                            keyboard='phone-pad'
-                            value={number}
-                            onChangeText={(text: string) => {
-                                setNumber(text),
-                                    setErrors({
-                                        ...errors,
-                                        number: undefined
-                                    })
-                            }}
-                            error={errors.number}
-                        /> */}
                         <PhoneInput
                             onChangeCode={() => {
                                 setShowSheet(true),
@@ -322,6 +315,33 @@ const BusinessSetup = () => {
                                 )
                             }}
                         />
+                        <Text style={styles.title}>Select Business Type</Text>
+                        {/* business type */}
+                        <BusinessType
+                        title='Online Business'
+                        subText='Whatsapp, Instagram online orders'
+                        iconName='phone-portrait-outline'
+                        iconType='Ionicons'
+                        selected={businessType==='online'}
+                        onPress={()=>{setBusinessType('online'), setBusinessTypeError('')}}
+                        />
+                        <BusinessType
+                        title='Physical Shop'
+                        subText='Counter Sales'
+                        iconName='storefront-outline'
+                        iconType='Ionicons'
+                        selected={businessType==='physical'}
+                        onPress={()=>{setBusinessType('physical'), setBusinessTypeError('')}}
+                        />
+                        <BusinessType
+                        title='Both'
+                        subText='Online & Physical orders'
+                        iconName='bag-outline'
+                        iconType='Ionicons'
+                        selected={businessType==='both'}
+                        onPress={()=>{setBusinessType('both'), setBusinessTypeError('')}}
+                        />
+                        <Text style={styles.error}>{businessTypeError}</Text>
                         <View style={styles.button}>
                             <Button
                                 title='Create Business'

@@ -46,28 +46,31 @@ const Login = () => {
         if (error) {
             setShowToast(true)
             setToastType('error')
-            setToastMessage(error?.message.includes('Invalid') ? error.message:'Something went wrong. Try again')
+            setToastMessage(error?.message.includes('Invalid') ? error.message : 'Something went wrong. Try again')
             setLoading(false)
             setPassword('')
             return;
         }
+
+
+
         const business = await getBusiness(data.user.id)
 
         if (!business) {
             router.replace('/businessSetup/BusinessSetup');
             return;
         }
-        
+
         setToastType('success')
         setToastMessage('You are now logged in to your account.')
         setLoading(false)
         setEmail('')
         setPassword('')
         setShowToast(true)
-        setTimeout(()=>{
-             router.replace('/(tabs)/Home');
+        setTimeout(() => {
+            router.replace('/(tabs)/Home');
         }, 3100)
-       
+
 
     }
 
@@ -116,6 +119,7 @@ const Login = () => {
                 error={errors.password}
                 iconName='lock'
                 iconType='SimpleLineIcons'
+                keyboard='default'
             />
             <Text style={styles.forgotText}>Forgot password?</Text>
             <Button

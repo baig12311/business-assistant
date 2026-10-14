@@ -1,4 +1,4 @@
-import { useState } from 'react';
+
 import { View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import { useCustomerById } from '../../hooks/useCustomer';
 import Colors from '../../constants/colors';
@@ -8,7 +8,6 @@ import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
-import Icon from '../common/Icon';
 interface props {
     orderNumber?:string
     customerName?:string

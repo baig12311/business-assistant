@@ -70,6 +70,24 @@ const styles = StyleSheet.create({
         gap:10,
         justifyContent: 'space-between',
         marginBottom:hp(2)
+    },
+    new:{
+        flex:1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    newHead:{
+        fontFamily: fonts.bold,
+        fontSize: fontSize.heading,
+        color: Colors.text,
+        textAlign: 'center',
+        marginBottom: hp(1)
+    },
+    newSub:{
+        fontFamily: fonts.medium,
+        fontSize: fontSize.text,
+        color: Colors.textSecondary,
+        textAlign: 'center'
     }
 });
 export default styles

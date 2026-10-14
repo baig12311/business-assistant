@@ -26,7 +26,7 @@ const CustomerOrderCard: React.FC<props> = ({ customer, onPress, date, orderNumb
     // });
 
     const due = paidAmount - amount
-    const totalPaid = paidAmount > amount ? amount : paidAmount
+    const totalPaid = paidAmount >= amount ? amount : paidAmount
     const badgeText = (paidAmount > 0 && due < 0) ? 'Partially Paid' : paidAmount === 0 ? 'Due' : 'Paid'
     const badgeColor = badgeText === 'Paid' ? { bg: Colors.successLight, color: Colors.primary } :
         badgeText === 'Due' ? { bg: Colors.errorLight, color: Colors.error } :
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     },
     date: {
         fontFamily: fonts.medium,
-        fontSize: fontSize.smallText,
+        fontSize: fontSize.extraSmallText,
         color: Colors.textSecondary
     },
     header: {
