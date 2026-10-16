@@ -11,23 +11,25 @@ import Icon from '../common/Icon';
 interface props {
     userName?: string
     business?: string
-    imageurl?:string
+    imageurl?: string
 }
-const Header: React.FC<props> = ({ userName, business, imageurl}) => {
+const Header: React.FC<props> = ({ userName, business, imageurl }) => {
     return (
         <View style={styles.container}>
             {
                 imageurl && (
                     <Image
-            style={styles.logo}
-            source={{uri:imageurl}}
-            />
+                        style={styles.logo}
+                        source={{ uri: imageurl }}
+                    />
                 )
             }
-            
+
             <View style={styles.textContainer}>
-                <Text style={styles.text} numberOfLines={1}>Good Afternoon, {userName}</Text>
-                <Text style={styles.text}>{business}</Text>
+                <Text style={styles.text} numberOfLines={1}>Good Afternoon, <Text style={{
+                    fontFamily: fonts.extraBold, color: Colors.text
+                }}>{userName}</Text></Text>
+                <Text style={[styles.text, { fontFamily: fonts.extraBold, color: Colors.text }]}>{business}</Text>
             </View>
             <TouchableOpacity
                 activeOpacity={0.7}
@@ -51,8 +53,8 @@ const styles = StyleSheet.create({
         marginBottom: hp(2),
         flexDirection: 'row',
         alignItems: 'center',
-        borderBottomWidth:0.5,
-        borderColor:Colors.border
+        borderBottomWidth: 0.5,
+        borderColor: Colors.border
         //justifyContent: ''
     },
     textContainer: {
@@ -67,14 +69,14 @@ const styles = StyleSheet.create({
         borderRadius: wp(3)
     },
     text: {
-        fontFamily: fonts.semiBold,
+        fontFamily: fonts.medium,
         fontSize: fontSize.text,
-        color: Colors.text
+        color: Colors.textSecondary
     },
-    logo:{
+    logo: {
         width: wp(14),
         height: wp(14),
-        borderRadius:wp(7)
+        borderRadius: wp(7)
     }
 });
 

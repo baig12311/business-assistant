@@ -63,7 +63,7 @@ const ProductCard: React.FC<props> = ({onPress, title, stock, imageurl, lowStock
                     name='chevron-small-right'
                     type='Entypo'
                     size={wp(7)}
-                    color={Colors.text}
+                    color={Colors.textSecondary}
                 />
 
 

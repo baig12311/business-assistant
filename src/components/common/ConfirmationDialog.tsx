@@ -10,15 +10,16 @@ interface Props {
     msg?: string,
     txtButton?: string,
     title?: string
+    iconName:string
 }
-const ConfirmationDialog: React.FC<Props> = ({ title, modalVisible, onPressCancel, onPressDelete, msg, txtButton }) => {
+const ConfirmationDialog: React.FC<Props> = ({ iconName,title, modalVisible, onPressCancel, onPressDelete, msg, txtButton }) => {
     return (
         <Modal visible={modalVisible} transparent={true} animationType='fade'>
             <View style={styles.modalView}>
                 <View style={styles.modalContentView}>
                     <View style={styles.icon}>
                         <Icon
-                            name='trash-outline'
+                            name={iconName}
                             type='Ionicons'
                             size={wp(6)}
                             color={Colors.error}

@@ -53,7 +53,7 @@ const CustomerOrderCard: React.FC<props> = ({ orderSource, customer, onPress, da
 
                             customer && (<Text style={styles.customer}>{customer}</Text>)}
 
-                        <Text style={[styles.customer, {color: Colors.textSecondary}]}>{orderSource} order</Text>
+                        {orderSource && <Text style={[styles.customer, {color: Colors.textSecondary}]}>{orderSource} order</Text>}
 
                     </View>
                 )

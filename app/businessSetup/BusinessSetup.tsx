@@ -299,8 +299,10 @@ const BusinessSetup = () => {
                         <SelectInput
                             title='Currency*'
                             placeholder='Select Currency'
-                            iconName='currency-usd'
-                            iconType='MaterialDesignIcons'
+                            // iconName='currency-usd'
+                            // iconType='MaterialDesignIcons'
+                            iconName='cash-outline'
+                            iconType='Ionicons'
                             value={currency?.code}
                             error={errors.currency}
                             onPress={() => {

@@ -34,6 +34,11 @@ const OnlineOrderCard: React.FC<props> = ({ orderSource, status, customer, onPre
         status === 'Confirmed' ? { bg: Colors.blueLight, color: Colors.blue } :
             status === 'Shipped' ? { bg: Colors.successLight, color: Colors.primary } :
                 { bg: Colors.errorLight, color: Colors.error }
+
+    const badgeText = (paidAmount > 0 && due < 0) ? 'Partially Paid' : paidAmount === 0 ? 'Due' : 'Paid'
+    const amountBadgeColor = badgeText === 'Paid' ? { bg: Colors.successLight, color: Colors.primary } :
+        badgeText === 'Due' ? { bg: Colors.errorLight, color: Colors.error } :
+            { bg: Colors.warningLight, color: Colors.yellow }
     return (
         <TouchableOpacity
             style={styles.container}
@@ -43,24 +48,32 @@ const OnlineOrderCard: React.FC<props> = ({ orderSource, status, customer, onPre
         >
             <View style={styles.header}>
                 <Text style={styles.order}>Order # {orderNumber}</Text>
-                <Text style={[styles.badgeText,
-                { backgroundColor: badgeColor.bg, color: badgeColor.color }
-                ]}>{status}</Text>
+                <View style={styles.badgeRow}>
+                    <Text style={[styles.badgeText,
+                    { backgroundColor: badgeColor.bg, color: badgeColor.color }
+                    ]}>{status}</Text>
+
+                    <Text style={[styles.badgeText,
+                    { backgroundColor: amountBadgeColor.bg, color: amountBadgeColor.color }
+                    ]}>{badgeText}</Text>
+                </View>
+
+
 
             </View>
             {
                 (orderSource || customer) && (
-                     <View style={styles.statusView}>
-                {
+                    <View style={styles.statusView}>
+                        {
 
-                    customer && (<Text style={styles.customer}>{customer}</Text>)}
-                    
-                <Text style={[styles.customer, {color: Colors.textSecondary}]}>{orderSource} order</Text>
+                            customer && (<Text style={styles.customer}>{customer}</Text>)}
 
-            </View>
+                        {orderSource && <Text style={[styles.customer, {color: Colors.textSecondary}]}>{orderSource} order</Text>}
+
+                    </View>
                 )
             }
-           
+
 
             <Text style={styles.date}>{date}</Text>
 
@@ -106,6 +119,10 @@ const styles = StyleSheet.create({
         color: Colors.text,
         //marginBottom: hp(1)
     },
+    badgeRow: {
+        flexDirection: 'row',
+        gap: 3
+    },
     date: {
         fontFamily: fonts.medium,
         fontSize: fontSize.extraSmallText,
@@ -131,7 +148,7 @@ const styles = StyleSheet.create({
     badgeText: {
         fontFamily: fonts.medium,
         fontSize: fontSize.extraSmallText,
-        paddingHorizontal: wp(2),
+        paddingHorizontal: wp(3),
         paddingVertical: wp(0.5),
         borderRadius: wp(50)
         //color: Colors.textSecondary

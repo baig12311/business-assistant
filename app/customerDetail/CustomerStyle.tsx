@@ -88,6 +88,24 @@ const styles = StyleSheet.create({
         fontSize: fontSize.text,
         color: Colors.textSecondary,
         textAlign: 'center'
+    },
+    sectionTitle: {
+        fontFamily: fonts.bold,
+        fontSize: fontSize.subHeading,
+     
+        color: Colors.text
+    },
+    sectionrRow:{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+           marginBottom: hp(1),
+    },
+    textView:{
+        fontFamily: fonts.medium,
+        fontSize: fontSize.smallText,
+        color: Colors.primary,
+        padding:wp(1)
     }
 });
 export default styles

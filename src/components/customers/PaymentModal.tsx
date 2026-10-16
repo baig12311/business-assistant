@@ -152,7 +152,7 @@ const PaymentDone:React.FC<payProps> = ({received, due, newBalance, customer, cu
             // ]}
             />
             <Text style={styles.paymentText}>Payment Received!</Text>
-            <Text style={styles.recText}>{currency} {received} received from {customer}.</Text> 
+            <Text style={styles.recText}>{currency} {received?.toLocaleString()} received from {customer}.</Text> 
             <View style={styles.textView}>
                 <View style={[styles.textRow, {borderBottomWidth: 0.3}]}>
                     <Text style={styles.textPaid}>

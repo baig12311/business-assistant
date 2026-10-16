@@ -91,6 +91,7 @@ const isLoading = userLoading || businessLoading || productsLoading || isPending
         <SafeAreaView style={styles.container}>
             <ConfirmationDialog
             modalVisible={showDialog}
+            iconName='trash-outline'
             title='Delete Product?'
             msg='Are you sure you want to delete this product?'
             txtButton='Delete'

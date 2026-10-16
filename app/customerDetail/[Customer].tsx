@@ -7,6 +7,7 @@ import { useUser } from '../../src/hooks/useUser';
 import { useBusiness } from '../../src/hooks/useBusiness';
 import { useCustomerById } from '../../src/hooks/useCustomer';
 import { useCustomerOrders } from '../../src/hooks/useCustomerOrders';
+import { useCustomerPayments } from '../../src/hooks/useCustomerPayment';
 import CustomerDetailSkeleton from '../../src/components/skeleton/CustomerDetailSkeleton';
 import Header from '../../src/components/common/Header';
 import Row from '../../src/components/customers/Row';
@@ -17,6 +18,7 @@ import CustomerOrderCard from '../../src/components/customers/CustomerOrderCard'
 import Icon from '../../src/components/common/Icon';
 import PaymentModal from '../../src/components/customers/PaymentModal';
 import Colors from '../../src/constants/colors';
+import PaymentCard from '../../src/components/customers/PaymentCard';
 import { formatAmount } from '../../src/utils/formatAmount';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import PendingCard from '../../src/components/customers/PendingCard';
@@ -37,6 +39,8 @@ const CustomerDetail = () => {
     const { data: businessData, isLoading: businessLoading } = useBusiness(userData?.id)
     const { data: customer, isLoading: customerLoading } = useCustomerById(customerId)
     const { data: customerOrder, isLoading: orderLoading } = useCustomerOrders(businessData?.id, customerId)
+    const { data: customerPayment, isLoading: paymentLoading } = useCustomerPayments(businessData?.id, customerId)
+
     const { mutateAsync: receivePaymentMutation, isPending, error } = useReceiveCustomerPayment()
     const businessType = businessData?.business_type
     const isLoading = userLoading || businessLoading || customerLoading || orderLoading
@@ -132,42 +136,7 @@ const CustomerDetail = () => {
         }
     };
 
-    // render order
 
-       const renderOrder = ({ item }: any) => {
-        const date = formatDate(item?.created_at)
-        if (item.order_source === 'online') {
-            return (
-                <OnlineOrderCard
-                    orderNumber={item.order_number}
-                    customer={item.customer?.name}
-                    date={date}
-                    status={item.status}
-                    amount={item.total_amount}
-                    paidAmount={item.paid_amount}
-                    currency={businessData?.currency}
-                    orderSource={businessType === 'both' && item?.order_source}
-                    disabled={true}
-                />
-            )
-        }
-        if (item.order_source === 'physical') {
-            return (
-                <CustomerOrderCard
-                    orderNumber={item.order_number}
-                    customer={item.customer?.name}
-                    date={date}
-                    amount={item.total_amount}
-                    paidAmount={item.paid_amount}
-                    currency={businessData?.currency}
-                    orderSource={businessType === 'both' && item?.order_source}
-                    disabled={true}
-                />
-            )
-        }
-        return null
-
-    }
     if (isLoading) {
         return (
             <SafeAreaView style={styles.container}>
@@ -188,8 +157,8 @@ const CustomerDetail = () => {
                         <PaymentModal
                             onPressCancel={() => {
                                 setShowModal(false),
-                                setRePaid(''),
-                                setInputError('')
+                                    setRePaid(''),
+                                    setInputError('')
                             }}
                             value={rePaid}
                             onChangeText={(t: string) => {
@@ -208,7 +177,7 @@ const CustomerDetail = () => {
                             done={showSuccess}
                             onPressDone={() => {
                                 setShowModal(false),
-                                setShowSuccess(false)
+                                    setShowSuccess(false)
                             }}
                         />
                     )
@@ -242,7 +211,7 @@ const CustomerDetail = () => {
 
 
 
-            {/* <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}> */}
+            <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
 
                 <View style={styles.infoContainer}>
                     <View style={styles.avatar}>
@@ -330,23 +299,104 @@ const CustomerDetail = () => {
                                 )
                             }
 
+                            <View style={styles.sectionrRow}>
+                                <Text style={styles.sectionTitle}>Recent Orders</Text>
+                                {
+                                    customerOrder && (customerOrder.length > 3) &&(
+                                        <Text style={styles.textView}
+                                    onPress={() => router.push({
+                                        pathname: '/customerOrders/CustomerOrders',
+                                        params: {
 
-                            <FlatList
-                              data={customerOrder ?? []}
-                            renderItem={({item})=>renderOrder({item})}
-                                                    keyExtractor={(item) => item.id}
-                                                    contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
-                                                    showsVerticalScrollIndicator={false}
-                            />
+                                            businessId: businessData?.id,
+                                            customerId: customerId
+                                        }
+                                    })}
+                                >View All →</Text>
+                                    )
+                                }
+                                
+                            </View>
+                            {
+                                customerOrder.slice(0, 3).map((item, index) => {
+                                    const date = formatDate(item?.created_at)
+                                    if (item.order_source === 'online') {
+                                        return (
+                                            <OnlineOrderCard
+                                                key={item.id}
+                                                orderNumber={item.order_number}
+                                                customer={item.customer?.name}
+                                                date={date}
+                                                status={item.status}
+                                                amount={item.total_amount}
+                                                paidAmount={item.paid_amount}
+                                                currency={businessData?.currency}
+                                                orderSource={businessType === 'both' && item?.order_source}
+                                                disabled={true}
+                                            />
+                                        )
+                                    }
+                                    if (item.order_source === 'physical') {
+                                        return (
+                                            <CustomerOrderCard
+                                                key={item.id}
+                                                orderNumber={item.order_number}
+                                                customer={item.customer?.name}
+                                                date={date}
+                                                amount={item.total_amount}
+                                                paidAmount={item.paid_amount}
+                                                currency={businessData?.currency}
+                                                orderSource={businessType === 'both' && item?.order_source}
+                                                disabled={true}
+                                            />
+                                        )
+                                    }
+                                    return null
+
+                                })
+                            }
+
+                            <View style={styles.sectionrRow}>
+                                <Text style={styles.sectionTitle}>Recent Payments</Text>
+                                {
+                                    customerPayment && (customerPayment.length) > 3 && (
+                                        <Text style={styles.textView}
+                                    onPress={() => router.push({
+                                        pathname: '/customerPayment/CustomerPayment',
+                                        params: {
+
+                                            businessId: businessData?.id,
+                                            customerId: customerId
+                                        }
+                                    })}
+                                >View All →</Text>
+                                    )
+                                }
+                                
+                            </View>
+                            {
+                                customerPayment?.slice(0, 3).map((item, index) => {
+                                    return (
+                                        <PaymentCard
+                                            key={item.id}
+                                            amount={item.amount}
+                                            allocations={item.customer_payment_allocations}
+                                            date={formatDate(item.created_at)}
+                                            currency={businessData?.currency}
+                                        />
+                                    )
+                                })
+                            }
+
                         </>
-                    ): (<View style={styles.new}>
+                    ) : (<View style={styles.new}>
                         <Text style={styles.newHead}>Customer Overview</Text>
                         <Text style={styles.newSub}>Your customer summary will appear here once their first order is created.</Text>
                     </View>)
                 }
 
 
-            {/* </ScrollView> */}
+            </ScrollView>
         </SafeAreaView>
     );
 };

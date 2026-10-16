@@ -23,10 +23,18 @@ export const useReceiveCustomerPayment = () => {
         }),
         queryClient.invalidateQueries({
           queryKey: ['orders', variables.businessId],
-        }),
+        }),    
         queryClient.invalidateQueries({
       queryKey: [
         'customerOrders',
+        variables.businessId,
+        variables.customerId,
+      ],
+    }),
+
+    queryClient.invalidateQueries({
+      queryKey: [
+        'customerPayments',
         variables.businessId,
         variables.customerId,
       ],
