@@ -70,7 +70,7 @@ const ProductCard: React.FC<props> = ({ name, stock, price, lowStock, currency,
                     {currency} {price?.toLocaleString()}
                 </Text>
                 <View style={styles.bottom}>
-                    <Text style={[styles.name, { color: Colors.textSecondary, fontFamily: fonts.regular }]}>
+                    <Text style={[styles.name, { color: Colors.textSecondary, fontSize: fontSize.smallText, fontFamily: fonts.medium }]}>
                         stock: {Number(stock) <= 999 ? stock : '999+'}</Text>
                     <Text style={[styles.badge,
                     isStockOut ? styles.outStock : isStockLow ? styles.lowBadge : styles.stockBadge
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     name: {
-        fontFamily: fonts.medium,
+        fontFamily: fonts.semiBold,
         fontSize: fontSize.text,
     },
     badge: {

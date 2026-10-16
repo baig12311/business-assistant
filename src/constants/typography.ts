@@ -12,13 +12,22 @@ const fonts = {
   extraBold: 'Manrope_800ExtraBold'
 }
 
+// export const fontSize = {
+//   largeHeading:wp(7),
+//   heading:wp(6),
+//   subHeading:wp(5),
+//   text:wp(4),
+//   smallText:wp(3.5),
+//   extraSmallText:wp(3)
+// }
+
 export const fontSize = {
-  largeHeading:wp(7),
-  heading:wp(6),
-  subHeading:wp(5),
-  text:wp(4),
-  smallText:wp(3.5),
-  extraSmallText:wp(3)
-}
+  largeHeading: wp(6.5),
+  heading: wp(5.5),
+  subHeading: wp(4.5),
+  text: wp(3.5),
+  smallText: wp(3),
+  extraSmallText: wp(2.8),
+};
 
 export default fonts

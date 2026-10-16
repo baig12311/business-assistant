@@ -59,7 +59,7 @@ const Customers = () => {
                 order={item?.orders?.length ?? 0}
                 balance={outstandingBalance}
                 currency = {business?.currency}
-                totalPurchase={totalPurchases.toLocaleString()}
+                totalPurchase={totalPurchases}
                 onPress={() =>
                     router.push({
                         pathname: '/customerDetail/[Customer]',

@@ -35,7 +35,8 @@ const BusinessType:React.FC<props> = ({title, subText, iconName, iconType, selec
                 <Text style={styles.textSub}>{subText}</Text>
             </View>
             <View style={[styles.check, {
-                backgroundColor: selected ? Colors.primary : Colors.textMuted
+                backgroundColor: selected ? Colors.primary : Colors.surface,
+                borderWidth: !selected ? 1 : 0
             }]}>
                 {
                     selected && (<View style={styles.selectedCheck}/>)
@@ -67,7 +68,8 @@ const styles = StyleSheet.create({
         borderRadius: wp(3),
         //backgroundColor: Colors.textMuted,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        borderColor: Colors.border
     },
     icon:{
         width: wp(10),
@@ -83,7 +85,7 @@ const styles = StyleSheet.create({
         color:Colors.text
     },
     textSub:{
-        fontSize: fontSize.extraSmallText,
+        fontSize: fontSize.smallText,
         fontFamily: fonts.medium,
         color:Colors.textSecondary
     },

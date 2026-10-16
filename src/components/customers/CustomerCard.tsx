@@ -44,18 +44,19 @@ const CustomerCard: React.FC<props> = ({ name, phone, onPress, order, currency, 
                 <View style={styles.amountRow}>
 
                     {
-                        order && order > 0 && <Text style={styles.textPhone}>{order} {order > 1 ? 'Orders' : 'Order'}</Text>
+                        order && order > 0 && <Text style={styles.textData}>{order} {order > 1 ? 'Orders' : 'Order'}</Text>
                     }
 
                     {
                         Number(totalPurchase) > 0 && (<>
                             <View style={styles.divider} />
-                            <Text style={styles.textPhone}>{currency} {totalPurchase}</Text>
+                            <Text style={styles.textData}>{currency} {totalPurchase?.toLocaleString()}</Text>
                         </>
 
 
                         )
                     }
+                    {/* <Text>{totalPurchase}</Text> */}
                 </View>
 
 
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
         letterSpacing: 2
     },
     textName: {
-        fontFamily: fonts.medium,
+        fontFamily: fonts.semiBold,
         fontSize: fontSize.text,
         color: Colors.text,
         marginBottom: hp(0)
@@ -145,6 +146,12 @@ const styles = StyleSheet.create({
     textDue: {
         fontFamily: fonts.medium,
         fontSize: fontSize.extraSmallText,
+    },
+    textData: {
+        fontFamily: fonts.medium,
+        fontSize: fontSize.extraSmallText,
+        color: Colors.textSecondary,
+
     },
 });
 

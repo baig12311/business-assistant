@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
         borderRadius: wp(3)
     },
     text: {
-        fontFamily: fonts.medium,
+        fontFamily: fonts.semiBold,
         fontSize: fontSize.text,
         color: Colors.text
     },

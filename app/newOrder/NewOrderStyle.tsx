@@ -106,5 +106,11 @@ const styles = StyleSheet.create({
         marginTop: hp(4),
         marginBottom: hp(2)
     },
+    title: {
+        fontFamily: fonts.medium,
+        fontSize: fontSize.text,
+        marginBottom: hp(0.5),
+        color: Colors.textSecondary
+    },
 });
 export default styles

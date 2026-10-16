@@ -85,14 +85,14 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        fontFamily: fonts.medium,
+        fontFamily: fonts.semiBold,
         fontSize: fontSize.text,
         color: Colors.text,
         //marginBottom: hp(1)
     },
     text: {
         fontFamily: fonts.medium,
-        fontSize: fontSize.text,
+        fontSize: fontSize.smallText,
         color: Colors.textSecondary,
 
     },
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     },
     badgeText: {
         fontSize: fontSize.extraSmallText,
-        fontFamily: fonts.regular,
+        fontFamily: fonts.medium,
         paddingVertical: wp(1),
         borderWidth: 1,
         borderRadius: wp(2),

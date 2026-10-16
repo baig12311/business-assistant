@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
         elevation: 1,
         borderRadius: wp(2),
         padding: wp(2),
-        marginBottom:hp(4)
+        marginBottom:hp(2)
 
     },
     row: {

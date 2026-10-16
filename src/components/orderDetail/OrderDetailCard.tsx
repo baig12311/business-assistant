@@ -15,10 +15,11 @@ interface props {
     phone: string
     amount: number
     paidAmount: number
+    orderStatus?:string
     
     //pStatus: string | number
 }
-const OrderDetailCard: React.FC<props> = ({ cName, orderDate, phone, amount, paidAmount }) => {
+const OrderDetailCard: React.FC<props> = ({ orderStatus, cName, orderDate, phone, amount, paidAmount }) => {
     const initials = cName
         .trim()
         .split(' ')
@@ -31,6 +32,13 @@ const OrderDetailCard: React.FC<props> = ({ cName, orderDate, phone, amount, pai
     const badgeColor = badgeText === 'Paid' ? { bg: Colors.successLight, color: Colors.primary } :
         badgeText === 'Partially Paid' ? { bg: Colors.warningLight, color: Colors.yellow }
             : { bg: Colors.errorLight, color: Colors.error }
+
+            const orderBadgeColor = orderStatus === 'Pending' ? { bg: Colors.warningLight, color: Colors.yellow } :
+         orderStatus === 'Confirmed' ? { bg: Colors.blueLight, color: Colors.blue } :
+           orderStatus === 'Shipped' ? { bg: Colors.successLight, color: Colors.primary }:
+           {bg: Colors.errorLight, color: Colors.error }
+            
+
 
     return (
         <View style={styles.container}>
@@ -50,6 +58,17 @@ const OrderDetailCard: React.FC<props> = ({ cName, orderDate, phone, amount, pai
                     <Text style={[styles.name, { color: Colors.text }]}>Order Date</Text>
                     <Text style={styles.date}>{orderDate}</Text>
                 </View>
+                {
+                 orderStatus && (
+                    <View>
+                    <Text style={[styles.name, { color: Colors.text }]}>Order Status</Text>
+                    <Text style={[styles.badge, {
+                        backgroundColor: orderBadgeColor.bg, color: orderBadgeColor.color
+                    }]}>{orderStatus}</Text>
+                </View>
+                 )   
+                }
+                
                 <View>
                     <Text style={[styles.name, { color: Colors.text }]}>Payment Status</Text>
                     <Text style={[styles.badge, {

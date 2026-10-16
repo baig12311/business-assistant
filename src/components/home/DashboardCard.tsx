@@ -26,7 +26,7 @@ const DashboardCard: React.FC<props> = ({ currency, title, info, iconName, iconT
                     <Icon
                         name={iconName}
                         type={iconType}
-                        size={wp(5.5)}
+                        size={wp(5)}
                         color={iconColor}
                     />
                 </View>
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     },
     textInfo: {
         fontFamily: fonts.semiBold,
-        fontSize: fontSize.heading,
+        fontSize: fontSize.subHeading,
         marginLeft: wp(2),
         alignSelf: 'flex-end'
     },
@@ -73,8 +73,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     icon: {
-        width: wp(10),
-        height: wp(10),
+        width: wp(9),
+        height: wp(9),
         borderRadius: wp(6),
         justifyContent: 'center',
         alignItems: 'center',

@@ -20,6 +20,20 @@ const styles = StyleSheet.create({
     },
     buttonContainer:{
         paddingVertical: hp(2)
+    },
+    orderTrackcontainer: {
+        width: '100%',
+        padding: wp(4),
+        borderRadius: wp(3),
+        backgroundColor: Colors.surface,
+        borderWidth: 1,
+        borderColor: Colors.surface,
+        elevation: 1,
+    },
+    buttonOutline:{
+        width: wp(45),
+        alignSelf: 'center',
+
     }
     
 });

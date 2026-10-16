@@ -47,6 +47,7 @@ const styles = StyleSheet.create({
     text:{
         fontFamily:fonts.semiBold,
         fontSize: fontSize.smallText,
+        //textAlignVertical: 'center',
         color: Colors.text,
         marginTop: hp(0.5),
         textAlign: 'center',

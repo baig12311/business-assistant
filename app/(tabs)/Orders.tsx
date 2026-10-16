@@ -20,6 +20,7 @@ import Colors from '../../src/constants/colors';
 import { orderStatus } from '../../src/services/data/orderStatus';
 import Status from '../../src/components/sales/Status';
 import OrderCard from '../../src/components/sales/OrderCard';
+import OrderSourceSelector from '../../src/components/common/OrderSourceSelector';
 const Orders = () => {
     const { data, isLoading: userLoading, error: userError } = useUser()
     const userId = data?.id
@@ -30,68 +31,81 @@ const Orders = () => {
     const [selectedStatus, setSelectedStatus] = useState('All')
     const isLoading = userLoading || businessLoading || ordersLoading
     const [searchText, setSearchText] = useState('')
-    const filterOrders = orders?.filter(item =>
-        item.order_number.toString().
-            includes(searchText.trim().toLocaleLowerCase())
-    )
+    const [selectedSource, setSelectedSource] = useState<
+        'all' | 'online' | 'physical'
+    >('all');
+
+    // filter orders
+    // const filterOrders = orders?.filter(item =>
+    //     item.order_number.toString().
+    //         includes(searchText.trim().toLocaleLowerCase())
+    // )
+
+    const filterOrders = orders?.filter(item => {
+        const matchesSearch = item.order_number
+            .toString()
+            .includes(searchText.trim());
+
+        const matchesSource =
+            businessType !== 'both' ||
+            selectedSource === 'all' ||
+            item.order_source === selectedSource;
+
+        const matchesStatus =
+            businessType !== 'online' &&
+                !(businessType === 'both' && selectedSource === 'online')
+                ? true
+                : selectedStatus === 'All' ||
+                item.status === selectedStatus;
+
+        return matchesSearch && matchesSource && matchesStatus;
+    });
     // render order
     const renderOrder = ({ item }: any) => {
         const date = formatDate(item?.created_at)
-        return (
-            // <OrderCard
-            // orderNumber={item.order_number}
-            // customerName={item.customer?.name}
-            // date={date}
-            // amount={item.total_amount}
-            // currency={business?.currency}
-            // onPress={()=>router.push({
-            //     pathname:'/orderDetail/[order]',
-            //     params:{
-            //         orderId: item.id
-            //     }
-            // })}
-            // />
-            <CustomerOrderCard
-                orderNumber={item.order_number}
-                customer={item.customer?.name}
-                date={date}
-                amount={item.total_amount}
-                paidAmount={item.paid_amount}
-                currency={business?.currency}
-                onPress={() => router.push({
-                    pathname: '/orderDetail/[order]',
-                    params: {
-                        orderId: item.id
-                    }
-                })}
-            />
-        )
+        if (item.order_source === 'online') {
+            return (
+                <OnlineOrderCard
+                    orderNumber={item.order_number}
+                    customer={item.customer?.name}
+                    date={date}
+                    status={item.status}
+                    amount={item.total_amount}
+                    paidAmount={item.paid_amount}
+                    currency={business?.currency}
+                    orderSource={businessType === 'both' && item?.order_source}
+                    onPress={() => router.push({
+                        pathname: '/orderDetail/[order]',
+                        params: {
+                            orderId: item.id
+                        }
+                    })}
+                />
+            )
+        }
+        if (item.order_source === 'physical') {
+            return (
+                <CustomerOrderCard
+                    orderNumber={item.order_number}
+                    customer={item.customer?.name}
+                    date={date}
+                    amount={item.total_amount}
+                    paidAmount={item.paid_amount}
+                    currency={business?.currency}
+                    orderSource={businessType === 'both' && item?.order_source}
+                    onPress={() => router.push({
+                        pathname: '/orderDetail/[order]',
+                        params: {
+                            orderId: item.id
+                        }
+                    })}
+                />
+            )
+        }
+
     }
 
-    // render online order
-    const renderOnlineOrder = ({ item }: any) => {
-        const date = formatDate(item?.created_at)
-        return (
-            
-            <OnlineOrderCard
-                orderNumber={item.order_number}
-                customer={item.customer?.name}
-                date={date}
-                status={item.status}
-                // amount={item.total_amount}
-                // paidAmount={item.paid_amount}
-                // currency={business?.currency}
-                onPress={() => router.push({
-                    pathname: '/orderDetail/[order]',
-                    params: {
-                        orderId: item.id
-                    }
-                })}
-            />
-        )
-    }
 
-    
 
     if (isLoading) {
         return (
@@ -121,71 +135,43 @@ const Orders = () => {
                 keyboard='numeric'
             />
             {
-                businessType === 'online' ? (
-                    <View>
-                        <View style={styles.statusContainer}>
-                            {
-                                orderStatus.map((status, index) => {
-                                    const selected = selectedStatus === status
-                                    return (
-                                        <Status
-                                            key={index}
-                                            title={status}
-                                            isSelected={selected}
-                                            onPress={() => setSelectedStatus(status)}
-                                        />
-                                    )
-                                })
-                            }
-                        </View>
-                        <FlatList
-                            data={filterOrders ?? []}
-                            renderItem={renderOnlineOrder}
-                            keyExtractor={(item) => item.id}
-                            contentContainerStyle={{ flexGrow: 1, paddingBottom: hp(6) }}
-                            showsVerticalScrollIndicator={false}
-                            ListEmptyComponent={
-                                searchText.trim() !== '' ? (
-                                    <CustomEmptyComponent
-                                        mainText={`No orders found.`}
-                                        subText='Try another order number.'
-                                    />
-                                ) : (
-                                    <CustomEmptyComponent
-                                        illustration={require('../../assets/illustrations/noproduct.png')}
-                                        mainText='No Order or Sales yet'
-                                        subText='Your Order or Sales will appear here.'
+                businessType === 'both' && (
+                    <OrderSourceSelector
+                        onSelect={(value) => setSelectedSource(value)}
+                        value={selectedSource}
+                        viewOrder = {true}
+                    />
+                )
+            }
+            {
+                (businessType === 'online' ||
+                    (businessType === 'both' && selectedSource === 'online')) && (
+                    <View style={styles.statusContainer}>
+                        {
+                            orderStatus.map((status, index) => {
+                                const selected = selectedStatus === status
+                                return (
+                                    <Status
+                                        key={index}
+                                        title={status}
+                                        isSelected={selected}
+                                        onPress={() => setSelectedStatus(status)}
                                     />
                                 )
-                            }
-                        />
-                    </View>
-
-
-                ) : businessType === 'physical' ? (
-                    <FlatList
-                        data={filterOrders ?? []}
-                        renderItem={renderOrder}
-                        keyExtractor={(item) => item.id}
-                        contentContainerStyle={{ flexGrow: 1, paddingBottom: hp(6) }}
-                        showsVerticalScrollIndicator={false}
-                        ListEmptyComponent={
-                            searchText.trim() !== '' ? (
-                                <CustomEmptyComponent
-                                    mainText={`No orders found.`}
-                                    subText='Try another order number.'
-                                />
-                            ) : (
-                                <CustomEmptyComponent
-                                    illustration={require('../../assets/illustrations/noproduct.png')}
-                                    mainText='No Order or Sales yet'
-                                    subText='Your Order or Sales will appear here.'
-                                />
-                            )
+                            })
                         }
-                    />
-                ) : (null)
+                    </View>
+                )
             }
+
+            <FlatList
+                data={filterOrders ?? []}
+                renderItem={({ item }) => renderOrder({ item })}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: hp(6) }}
+                showsVerticalScrollIndicator={false}
+            />
+
 
 
 
@@ -194,19 +180,7 @@ const Orders = () => {
     );
 };
 
-// const PhysicalBusiness=()=>{
-//     return (
-//         <View style={{flex:1}}>
-//             <FlatList
-//             data={filterOrders ?? []}
-//             renderItem={renderOrder}
-//             keyExtractor={(item)=>item.id}
-//             showsVerticalScrollIndicator={false}
 
-//             />
-//         </View>
-//     )
-// }
 
 const styles = StyleSheet.create({
     container: {

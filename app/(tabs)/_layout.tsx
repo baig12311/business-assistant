@@ -21,7 +21,7 @@ const TabLayout = () => {
 
                 // Style the native label directly
                 tabBarLabelStyle: {
-                    fontSize: wp(3.2),
+                    fontSize: wp(2.8),
                     fontFamily:fonts.medium,
                     //fontSize:fontSize.extraSmallText
                 },

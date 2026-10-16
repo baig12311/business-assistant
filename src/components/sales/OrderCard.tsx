@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
         //marginBottom: hp(0.5)
     },
     order:{
-        fontFamily: fonts.bold,
+        fontFamily: fonts.semiBold,
         fontSize:fontSize.text,
         color:Colors.text
     },

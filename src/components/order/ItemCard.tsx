@@ -17,15 +17,16 @@ interface props {
     imageurl?: string,
     onIcrease?: () => void,
     onDecrease?: () => void
+    onPressRemove?: () => void
     quantity?: number
-    isLast?:boolean
+    isLast?: boolean
 }
-const ItemCard: React.FC<props> = ({ isLast, onIcrease, onDecrease, quantity, name, stock, price, currency,
+const ItemCard: React.FC<props> = ({ isLast, onIcrease, onDecrease, onPressRemove, quantity, name, stock, price, currency,
     imageurl, }) => {
     return (
-        <View style={[styles.container, 
+        <View style={[styles.container,
         !isLast && { borderBottomWidth: 0.3 }
-    ]}
+        ]}
         >
 
             <Image
@@ -35,7 +36,7 @@ const ItemCard: React.FC<props> = ({ isLast, onIcrease, onDecrease, quantity, na
             />
             <View style={styles.content}>
 
-                <Text style={styles.name}>{name}</Text>
+                <Text style={styles.name} numberOfLines={2}>{name}</Text>
 
 
 
@@ -44,41 +45,58 @@ const ItemCard: React.FC<props> = ({ isLast, onIcrease, onDecrease, quantity, na
                 </Text>
 
             </View>
-            <View style={styles.quantityControls}>
+            <View style={{ gap:5, marginLeft: wp(2), flexDirection: 'row'}}>
+
+                <View style={styles.quantityControls}>
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        style={styles.button}
+                        onPress={onDecrease}
+                    >
+                        <Icon
+                            name="minus"
+                            type="Entypo"
+                            size={wp(5)}
+                            color={Colors.text}
+                        />
+                    </TouchableOpacity>
+
+                    <Text
+                        style={styles.quantityText}
+                        numberOfLines={1}
+
+                    >{quantity}</Text>
+
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        style={styles.button}
+                        onPress={onIcrease}
+                    >
+
+                        <Icon
+                            name="plus"
+                            type="Entypo"
+                            size={wp(5)}
+                            color={Colors.text}
+                        />
+                    </TouchableOpacity>
+
+                </View>
                 <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={styles.button}
-                    onPress={onDecrease}
+                activeOpacity={0.7}
+                style={{padding: wp(2)}}
+                onPress={onPressRemove}
                 >
                     <Icon
-                        name="minus"
-                        type="Entypo"
-                        size={wp(5)}
-                        color={Colors.text}
-                    />
+                    name="trash-outline"
+                    type="Ionicons"
+                    size={wp(5)}
+                    color={Colors.error}
+                />
                 </TouchableOpacity>
-
-                <Text
-                    style={styles.quantityText}
-                    numberOfLines={1}
-
-                >{quantity}</Text>
-
-                <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={styles.button}
-                    onPress={onIcrease}
-                >
-
-                    <Icon
-                        name="plus"
-                        type="Entypo"
-                        size={wp(5)}
-                        color={Colors.text}
-                    />
-                </TouchableOpacity>
-
+                
             </View>
+
         </View>
     );
 };
@@ -113,13 +131,14 @@ const styles = StyleSheet.create({
     name: {
         fontFamily: fonts.medium,
         fontSize: fontSize.text,
+        marginBottom: hp(0.5)
     },
     price: {
         fontFamily: fonts.medium,
         fontSize: fontSize.smallText
     },
     quantityControls: {
-        flexDirection: 'row'
+        flexDirection: 'row',
     },
     controlText: {
         fontFamily: fonts.bold,

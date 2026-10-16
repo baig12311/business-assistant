@@ -17,10 +17,12 @@ import { useProducts } from '../../src/hooks/useProducts';
 import { useCreateOrder } from '../../src/hooks/useCreateOrder';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
+import OrderSourceSelector from '../../src/components/common/OrderSourceSelector';
 import CustomBottomSheet from '../../src/components/common/CustomBottomSheet';
 import Button from '../../src/components/common/Button';
 import ItemCard from '../../src/components/order/ItemCard';
 import BottomSheet from '@gorhom/bottom-sheet';
+import { OrderSource } from '../../src/services/createOrder';
 
 const NewOrder = () => {
     const { data: user } = useUser()
@@ -51,6 +53,20 @@ const NewOrder = () => {
     const [sheetTitle, setSheetTitle] = useState('');
     const [sheetOptions, setSheetOptions] = useState<any[]>([]);
     const [sheetValue, setSheetValue] = useState('');
+    const [selectedOrderSource, setSelectedOrderSource] = useState('online')
+    //type OrderSource = 'online' | 'physical';
+
+// const [selectedOrderSource, setSelectedOrderSource] =
+//     useState<OrderSource | null>(null);
+
+// const orderSource: OrderSource | null =
+//     business?.business_type === 'online'
+//         ? 'online'
+//         : business?.business_type === 'physical'
+//             ? 'physical'
+//             : business?.business_type === 'both'
+//                 ? selectedOrderSource
+//                 : null;
 
     const subtotal = orderItems.reduce(
         (sum: any, item: any) => sum + item.price * item.quantity,
@@ -116,8 +132,21 @@ const NewOrder = () => {
 
             ])
         }
+        else {
+            setToastType('error')
+            setToastTitle('Duplicate Selection')
+            setToastMessage('This item is already added to your orders list.')
+            setShowToast(true)
+            return;
+        }
 
     };
+
+    // remove item from order
+    const removeItem = (itemId: string) => {
+        const newList = orderItems.filter((item: any) => item.id !== itemId)
+        setOrderItems(newList)
+    }
     // Open Sheet
     const openSheet = (
         title: string,
@@ -186,7 +215,14 @@ const NewOrder = () => {
     };
 
     // Creat order
-
+    const orderSource : any=
+    business?.business_type === 'online'
+        ? 'online'
+        : business?.business_type === 'physical'
+            ? 'physical'
+            : business?.business_type === 'both'
+                ? selectedOrderSource
+                : null;
     const createOrder = async () => {
         try {
             const result = await createOrderMutation({
@@ -195,6 +231,7 @@ const NewOrder = () => {
                 totalAmount,
                 paidAmount: Number(amountPaid),
                 items: orderItems,
+                orderSource:orderSource!
             });
             console.log('creatd', result);
             setToastType('success')
@@ -206,13 +243,6 @@ const NewOrder = () => {
                     pathname: '/receipt/Receipt',
                     params: {
                         orderId: result,
-                        // orderItems: JSON.stringify(orderItems),
-                        // totalAmount: String(totalAmount),
-                        // subTotal: String(subtotal),
-                        // discount: String(discount),
-                        // amountPaid: String(amountPaid),
-                        // remaining: String(remainingAmount),
-                        // customerName: selectedCustomer
                     }
                 })
             }, 3100)
@@ -241,6 +271,21 @@ const NewOrder = () => {
                     contentContainerStyle={styles.scrollContainer}
                     showsVerticalScrollIndicator={false}
                 >
+
+                    {/* select order type  */}
+{
+    business?.business_type === 'both' && (
+        <>
+        <Text style={styles.title}>Order Source</Text>
+<OrderSourceSelector
+onSelect={(value)=>setSelectedOrderSource(value)}
+value={selectedOrderSource}
+/>
+</>
+    )
+}
+
+                    {/* Select Customer */}
                     <View style={styles.slectCustomer}>
                         <SelectInput
                             title='Customer'
@@ -266,7 +311,23 @@ const NewOrder = () => {
                             onPress={() => router.push('/addCustomer/AddCustomer')}
                         />
                     </View>
-                    {/* <View style={styles.slectCustomer}> */}
+
+                    {/* add products */}
+                    {/* <Button
+                    title='Add Product'
+                    onPress={() => {
+                                setShowSheet(true)
+                                openSheet(
+                                    'Select Product',
+                                    products ?? [],
+                                    selectedProduct,
+                                    ['name', 'price', 'stock_quantity'],
+                                    'products',
+                                    'No Products Yet',
+                                    'Add products first to create order'
+                                )
+                            }}
+                    /> */}
                     <View style={styles.searchRow}>
                         <View style={{ flex: 1 }}>
                             <Input
@@ -311,7 +372,7 @@ const NewOrder = () => {
                     {
                         orderItems.length > 0 && (
                             <View>
-                                <Text style={styles.titleText}>Order Items</Text>
+                                <Text style={styles.titleText}>Order Items ({orderItems.length})</Text>
                                 <View style={styles.summaryContainer}>
                                     {
                                         orderItems.map((item: any, index: number) => (
@@ -323,6 +384,7 @@ const NewOrder = () => {
                                                 imageurl={item.image_url}
                                                 stock={item.stock_quantity}
                                                 quantity={item.quantity}
+                                                onPressRemove={() => removeItem(item.id)}
                                                 onIcrease={() => increaseQuantity(item.product_id)}
                                                 onDecrease={() => decreaseQuantity(item.product_id)}
                                                 isLast={index === orderItems.length - 1}
@@ -421,7 +483,7 @@ const NewOrder = () => {
                 </ScrollView>
                 <View style={styles.button}>
                     <Button
-                        title='Create order & continue'
+                        title='Confirm order & continue'
                         onPress={createOrder}
                         isLoading={isPending}
                         disabled={orderItems.length === 0 || !selectedCustomer || !totalAmount}

@@ -5,8 +5,10 @@ import { formatDate } from '../../src/services/formatDate';
 import Button from '../../src/components/common/Button';
 import Header from '../../src/components/common/Header';
 import Colors from '../../src/constants/colors';
+import OutlineButton from '../../src/components/common/OutlineButton';
 import { useUser } from '../../src/hooks/useUser';
 import { useBusiness } from '../../src/hooks/useBusiness';
+import { useUpdateOrderStatus } from '../../src/hooks/useUpdateOrderStatus';
 import OrderDetailCard from '../../src/components/orderDetail/OrderDetailCard';
 import OrderItems from '../../src/components/orderDetail/OrderItems';
 import PriceSummaryCard from '../../src/components/orderDetail/PriceSummary';
@@ -16,14 +18,22 @@ import OrderStatusModal from '../../src/components/sales/ChangeStatusModal';
 import OrderTracking from '../../src/components/sales/OrderTracking';
 import { useLocalSearchParams } from 'expo-router';
 import { useOrderById } from '../../src/hooks/useOrderById';
+// import { OrderStatusType } from '../../src/components/sales/ChangeStatusModal';
 import styles from './orderStyle';
 const OrderDetail = () => {
     const { orderId } = useLocalSearchParams<{ orderId: string }>()
-    const [showModal,setShowModal] = useState(false)
-    const {data: user, isLoading: userLoading} = useUser()
-    const {data: business, isLoading: businessLoading} = useBusiness(user?.id)
+    const [showModal, setShowModal] = useState(false)
+    const { data: user, isLoading: userLoading } = useUser()
+    const { data: business, isLoading: businessLoading } = useBusiness(user?.id)
     const businessType = business?.business_type
     const { data: order, isLoading } = useOrderById(orderId)
+
+    const {mutateAsync: updateStatusMutation, isPending: updatingStatus} = useUpdateOrderStatus({
+        orderId:order?.id, businessId: business?.id
+    })
+    const orderStatus = businessType === 'online' || (
+        businessType === 'both' && order?.order_source === 'online'
+    ) && order?.status
     const orderItems = order?.order_items ?? [];
     const paidAmount = order?.paid_amount
     const total = order?.total_amount
@@ -51,6 +61,28 @@ const OrderDetail = () => {
     // Discount
     const discount = Math.max(subTotal - totalAmount, 0);
 
+    // handle Update status
+    const handleUpdateStatus = async (
+    status: 'Pending' | 'Confirmed' | 'Shipped'
+) => {
+    try {
+        await updateStatusMutation(status);
+
+        setShowModal(false);
+
+        // setToastMessage({
+        //     type: 'success',
+        //     message: 'Order status updated successfully.',
+        // });
+    } catch (error) {
+        // setToastMessage({
+        //     type: 'error',
+        //     message: error instanceof Error
+        //         ? error.message
+        //         : 'Failed to update order status.',
+        // });
+    }
+};
     if (isLoading) {
         return (
             <SafeAreaView style={styles.container}>
@@ -62,17 +94,20 @@ const OrderDetail = () => {
     return (
         <SafeAreaView style={styles.container}>
             <Header title='Order Detail' onPress={() => router.back()} />
-                {
-                    showModal&&(
-                        <OrderStatusModal
+            {
+                showModal && (
+                    <OrderStatusModal
                         modalVisible={showModal}
-                        
-                        />
-                    )
-                }
-            <ScrollView 
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
+                        currentStatus={order?.status}
+                        onPressCancel={() => setShowModal(false)}
+                        onPressUpdate={handleUpdateStatus}
+                        loading={updatingStatus}
+                    />
+                )
+            }
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
             >
                 <Text style={styles.sectionTitle}>Order #{order.order_number}</Text>
                 <OrderDetailCard
@@ -82,8 +117,8 @@ const OrderDetail = () => {
                     amount={order?.total_amount}
                     paidAmount={order?.paid_amount}
                     
-
-                />
+                    orderStatus={orderStatus}              
+                    />
                 <Text style={styles.sectionTitle}>Order Items</Text>
                 <OrderItems
                     orderItem={order?.order_items}
@@ -95,24 +130,31 @@ const OrderDetail = () => {
                     paid={amountPaid}
                     discount={discount}
                     change={returnAmount}
-                    currency = {business?.currency}
+                    currency={business?.currency}
                 />
 
                 {
-                    businessType === 'online' && (
-                        <>
-                        <OrderTracking
-                        orderStatus={order?.status}/>
-                        <View style={styles.buttonContainer}>
-                <Button
-                    title='Chahne order status'
-                    onPress={()=>setShowModal(true)}
-                />
-            </View>
-                        </>
-                        
+                    (businessType === 'online') || (
+                        businessType === 'both' && order?.order_source === 'online') && (<>
+                        <Text style={styles.sectionTitle}>Order Status</Text>
+                        <View style={styles.orderTrackcontainer}>
+
+                            <OrderTracking
+                                status={order?.status} />
+                                <View style={styles.buttonOutline}>
+                                    <OutlineButton
+                                title='Change status'
+                                onPress={() => setShowModal(true)}
+                            />
+                                </View>
+                            
+
+                        </View>
+                    </>
+
+
                     )
-                    
+
                 }
 
             </ScrollView>

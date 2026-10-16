@@ -10,6 +10,7 @@ import { useCustomerOrders } from '../../src/hooks/useCustomerOrders';
 import CustomerDetailSkeleton from '../../src/components/skeleton/CustomerDetailSkeleton';
 import Header from '../../src/components/common/Header';
 import Row from '../../src/components/customers/Row';
+import OnlineOrderCard from '../../src/components/sales/OnlineOrderCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DashboardCard from '../../src/components/home/DashboardCard';
 import CustomerOrderCard from '../../src/components/customers/CustomerOrderCard';
@@ -21,6 +22,7 @@ import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import PendingCard from '../../src/components/customers/PendingCard';
 import { formatDate } from '../../src/services/formatDate';
 import { useReceiveCustomerPayment } from '../../src/hooks/useReceiveCustmerPayment';
+import { FlatList } from 'react-native-gesture-handler';
 const CustomerDetail = () => {
     const [showMenu, setShowMenu] = useState(false)
     const [showSuccess, setShowSuccess] = useState(false)
@@ -36,6 +38,7 @@ const CustomerDetail = () => {
     const { data: customer, isLoading: customerLoading } = useCustomerById(customerId)
     const { data: customerOrder, isLoading: orderLoading } = useCustomerOrders(businessData?.id, customerId)
     const { mutateAsync: receivePaymentMutation, isPending, error } = useReceiveCustomerPayment()
+    const businessType = businessData?.business_type
     const isLoading = userLoading || businessLoading || customerLoading || orderLoading
     const totalOrdersAmount = customerOrder?.reduce(
         (sum: number, order: any) => sum + Number(order.total_amount),
@@ -92,7 +95,7 @@ const CustomerDetail = () => {
             return;
         }
 
-        if (amount > outstandingBalance) {
+        if (amount > (outstandingBalance ?? 0)) {
             setInputError(
                 'Payment cannot exceed the customer’s outstanding balance.'
             );
@@ -105,7 +108,7 @@ const CustomerDetail = () => {
         // }
 
         try {
-            const currentDue = outstandingBalance;
+            const currentDue = outstandingBalance ?? 0;
             await receivePaymentMutation({
                 businessId: businessData.id,
                 customerId: customer.id,
@@ -129,6 +132,42 @@ const CustomerDetail = () => {
         }
     };
 
+    // render order
+
+       const renderOrder = ({ item }: any) => {
+        const date = formatDate(item?.created_at)
+        if (item.order_source === 'online') {
+            return (
+                <OnlineOrderCard
+                    orderNumber={item.order_number}
+                    customer={item.customer?.name}
+                    date={date}
+                    status={item.status}
+                    amount={item.total_amount}
+                    paidAmount={item.paid_amount}
+                    currency={businessData?.currency}
+                    orderSource={businessType === 'both' && item?.order_source}
+                    disabled={true}
+                />
+            )
+        }
+        if (item.order_source === 'physical') {
+            return (
+                <CustomerOrderCard
+                    orderNumber={item.order_number}
+                    customer={item.customer?.name}
+                    date={date}
+                    amount={item.total_amount}
+                    paidAmount={item.paid_amount}
+                    currency={businessData?.currency}
+                    orderSource={businessType === 'both' && item?.order_source}
+                    disabled={true}
+                />
+            )
+        }
+        return null
+
+    }
     if (isLoading) {
         return (
             <SafeAreaView style={styles.container}>
@@ -158,7 +197,7 @@ const CustomerDetail = () => {
                                     setInputError('')
                             }}
                             name={customer?.name}
-                            due={outstandingBalance}
+                            due={outstandingBalance ?? 0}
                             prev={previousDue}
                             amount={receivedAmount}
                             newBalance={newBalance}
@@ -203,7 +242,7 @@ const CustomerDetail = () => {
 
 
 
-            <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+            {/* <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}> */}
 
                 <View style={styles.infoContainer}>
                     <View style={styles.avatar}>
@@ -282,7 +321,7 @@ const CustomerDetail = () => {
                                 /> */}
                             </View>
                             {
-                                outstandingBalance && (outstandingBalance > 0) && (
+                                (outstandingBalance ?? 0) > 0 && (
                                     <PendingCard
                                         pending={`${businessData?.currency} ${outstandingBalance?.toLocaleString()}`}
                                         onPress={() => setShowModal(true)}
@@ -291,25 +330,14 @@ const CustomerDetail = () => {
                                 )
                             }
 
-                            {
-                                customerOrder?.map((order, index) => {
-                                    // const credit = order.paid_amount - order.total_amount
-                                    // const pending = credit.toLocaleString()
-                                    const date = formatDate(order.created_at)
-                                    return (
-                                        <CustomerOrderCard
-                                            key={index}
-                                            orderNumber={order.order_number}
-                                            amount={order.total_amount}
-                                            date={date}
-                                            paidAmount={order.paid_amount}
-                                            currency={businessData?.currency}
-                                            disabled={true}
 
-                                        />
-                                    )
-                                })
-                            }
+                            <FlatList
+                              data={customerOrder ?? []}
+                            renderItem={({item})=>renderOrder({item})}
+                                                    keyExtractor={(item) => item.id}
+                                                    contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
+                                                    showsVerticalScrollIndicator={false}
+                            />
                         </>
                     ): (<View style={styles.new}>
                         <Text style={styles.newHead}>Customer Overview</Text>
@@ -318,7 +346,7 @@ const CustomerDetail = () => {
                 }
 
 
-            </ScrollView>
+            {/* </ScrollView> */}
         </SafeAreaView>
     );
 };

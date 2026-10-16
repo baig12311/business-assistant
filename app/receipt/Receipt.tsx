@@ -238,15 +238,17 @@ const Receipt = () => {
                                 font={fonts.medium}
                                 currency={business?.currency}
                             />
-
-                            <Row
-                                title='Return Amount'
+                            {
+                                returnAmount > 0 && <Row
+                                title='Change'
                                 text={returnAmount.toLocaleString()}
                                 color={Colors.textSecondary}
                                 fontSize={fontSize.smallText}
                                 font={fonts.medium}
                                 currency={business?.currency}
                             />
+                            }
+                            
 
                         </View>
 

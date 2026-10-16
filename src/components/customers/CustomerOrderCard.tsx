@@ -14,11 +14,12 @@ interface props {
     amount: number
     paidAmount: number
     currency?: string
-    onPress?:()=>void
-    disabled?:boolean
-    customer?:string
+    onPress?: () => void
+    disabled?: boolean
+    customer?: string
+    orderSource?: string
 }
-const CustomerOrderCard: React.FC<props> = ({ customer, onPress, date, orderNumber, amount, paidAmount, currency, disabled}) => {
+const CustomerOrderCard: React.FC<props> = ({ orderSource, customer, onPress, date, orderNumber, amount, paidAmount, currency, disabled }) => {
     // const formatDate = new Date(date).toLocaleDateString('en-GB', {
     //     day: '2-digit',
     //     month: 'short',
@@ -32,11 +33,11 @@ const CustomerOrderCard: React.FC<props> = ({ customer, onPress, date, orderNumb
         badgeText === 'Due' ? { bg: Colors.errorLight, color: Colors.error } :
             { bg: Colors.warningLight, color: Colors.yellow }
     return (
-        <TouchableOpacity 
-        style={styles.container}
-        activeOpacity={0.7}
-        disabled={disabled}
-        onPress={onPress}
+        <TouchableOpacity
+            style={styles.container}
+            activeOpacity={0.7}
+            disabled={disabled}
+            onPress={onPress}
         >
             <View style={styles.header}>
                 <Text style={styles.order}>Order # {orderNumber}</Text>
@@ -46,7 +47,16 @@ const CustomerOrderCard: React.FC<props> = ({ customer, onPress, date, orderNumb
 
             </View>
             {
-                customer && (<Text style={styles.customer}>{customer}</Text>)
+                (orderSource || customer) && (
+                    <View style={styles.statusView}>
+                        {
+
+                            customer && (<Text style={styles.customer}>{customer}</Text>)}
+
+                        <Text style={[styles.customer, {color: Colors.textSecondary}]}>{orderSource} order</Text>
+
+                    </View>
+                )
             }
             <Text style={styles.date}>{date}</Text>
 
@@ -87,7 +97,7 @@ const styles = StyleSheet.create({
         marginLeft: wp(3)
     },
     order: {
-        fontFamily: fonts.bold,
+        fontFamily: fonts.semiBold,
         fontSize: fontSize.text,
         color: Colors.text,
         //marginBottom: hp(1)
@@ -122,13 +132,17 @@ const styles = StyleSheet.create({
         borderRadius: wp(50)
         //color: Colors.textSecondary
     },
-    customer:{
-         fontFamily: fonts.medium,
-        fontSize:fontSize.smallText,
-        color:Colors.text,
-        marginBottom:hp(0.5)
+    customer: {
+        fontFamily: fonts.medium,
+        fontSize: fontSize.smallText,
+        color: Colors.text,
+        marginBottom: hp(0.5)
+    },
+    statusView: {
+        flexDirection: 'row',
+        gap: 20
     }
-   
+
 });
 
 //make this component available to the app

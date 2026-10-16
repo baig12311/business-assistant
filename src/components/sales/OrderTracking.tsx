@@ -5,14 +5,16 @@ import Animated, {
     useSharedValue,
     useAnimatedStyle,
     withTiming,
+    withDelay,
 } from 'react-native-reanimated';
-
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+
 import Colors from '../../constants/colors';
 import fonts from '../../constants/typography';
+import Icon from '../common/Icon';
 
 type OrderStatusType = 'Pending' | 'Confirmed' | 'Shipped';
 
@@ -27,26 +29,48 @@ const statuses: OrderStatusType[] = [
 ];
 
 const OrderStatus: React.FC<Props> = ({ status }) => {
-    const currentIndex = statuses.indexOf(status);
+    const statusIndex = statuses.indexOf(status);
 
     const progress = useSharedValue(0);
+    const circleScale = useSharedValue(1);
+    const checkScale = useSharedValue(0);
 
     useEffect(() => {
         progress.value = withTiming(
-            Math.max(currentIndex, 0),
+            Math.max(statusIndex, 0),
             { duration: 800 }
         );
-    }, [currentIndex]);
+
+        circleScale.value = 0;
+        checkScale.value = 0;
+
+        circleScale.value = withDelay(
+            300,
+            withTiming(1, { duration: 300 })
+        );
+
+        checkScale.value = withDelay(
+            500,
+            withTiming(1, { duration: 300 })
+        );
+    }, [statusIndex]);
 
     const animatedLine = useAnimatedStyle(() => ({
-        width: `${(progress.value / 2) * 100}%`,
+        width: `${(progress.value / 2) * 66.68}%`,
+    }));
+
+    const animatedCircle = useAnimatedStyle(() => ({
+        transform: [{ scale: circleScale.value }],
+    }));
+
+    const animatedCheck = useAnimatedStyle(() => ({
+        transform: [{ scale: checkScale.value }],
     }));
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.heading}>Order Status</Text>
+        // <View style={styles.container}>
 
-            <View style={styles.progressContainer}>
+            <View style={styles.tracker}>
                 <View style={styles.baseLine} />
 
                 <Animated.View
@@ -54,7 +78,9 @@ const OrderStatus: React.FC<Props> = ({ status }) => {
                 />
 
                 {statuses.map((item, index) => {
-                    const isActive = index <= currentIndex;
+                    const isCompleted = index < statusIndex;
+                    const isCurrent = index === statusIndex;
+                    const isActive = index <= statusIndex;
 
                     return (
                         <View
@@ -63,10 +89,40 @@ const OrderStatus: React.FC<Props> = ({ status }) => {
                         >
                             <View
                                 style={[
-                                    styles.circle,
-                                    isActive && styles.activeCircle,
+                                    styles.circleWrapper,
+                                    isCurrent && styles.currentWrapper,
                                 ]}
-                            />
+                            >
+                                <Animated.View
+                                    style={[
+                                        styles.circle,
+                                        isActive && styles.activeCircle,
+                                        isCurrent && animatedCircle,
+                                    ]}
+                                >
+                                    {isCompleted && (
+                                        <Icon
+                                            name="checkmark"
+                                            type="Ionicons"
+                                            color={Colors.background}
+                                            size={wp(4)}
+                                        />
+                                    )}
+
+                                    {isCurrent && (
+                                        <Animated.View
+                                            style={animatedCheck}
+                                        >
+                                            <Icon
+                                                name="checkmark"
+                                                type="Ionicons"
+                                                color={Colors.background}
+                                                size={wp(4)}
+                                            />
+                                        </Animated.View>
+                                    )}
+                                </Animated.View>
+                            </View>
 
                             <Text
                                 style={[
@@ -80,7 +136,8 @@ const OrderStatus: React.FC<Props> = ({ status }) => {
                     );
                 })}
             </View>
-        </View>
+           
+        // </View>
     );
 };
 
@@ -90,9 +147,9 @@ const styles = StyleSheet.create({
         padding: wp(4),
         borderRadius: wp(3),
         backgroundColor: Colors.surface,
-        elevation:1,
         borderWidth: 1,
         borderColor: Colors.surface,
+        elevation: 1,
     },
 
     heading: {
@@ -102,41 +159,57 @@ const styles = StyleSheet.create({
         marginBottom: hp(2),
     },
 
-    progressContainer: {
+    tracker: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         position: 'relative',
+        marginBottom: hp(2),
     },
 
     baseLine: {
         position: 'absolute',
-        height: 2,
+        height: wp(0.5),
         backgroundColor: Colors.textMuted,
         left: '16.66%',
         right: '16.66%',
-        top: wp(2),
+        top: wp(4),
     },
 
     activeLine: {
         position: 'absolute',
-        height: 2,
+        height: wp(0.5),
         backgroundColor: Colors.primary,
         left: '16.66%',
-        top: wp(2),
+        top: wp(4),
         maxWidth: '66.68%',
     },
 
     stepContainer: {
         flex: 1,
         alignItems: 'center',
+        zIndex: 2,
+    },
+
+    circleWrapper: {
+        width: wp(8),
+        height: wp(8),
+        borderRadius: wp(4),
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: Colors.surface,
+    },
+
+    currentWrapper: {
+        borderWidth: 1.5,
+        borderColor: Colors.primary,
     },
 
     circle: {
-        width: wp(4),
-        height: wp(4),
-        borderRadius: wp(2),
+        width: wp(6),
+        height: wp(6),
+        borderRadius: wp(3),
         backgroundColor: Colors.textMuted,
-        zIndex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 
     activeCircle: {
@@ -144,10 +217,11 @@ const styles = StyleSheet.create({
     },
 
     statusText: {
-        fontFamily: fonts.medium,
-        fontSize: wp(3),
-        color: Colors.textSecondary,
         marginTop: wp(2),
+        fontFamily: fonts.medium,
+        fontSize: wp(3.2),
+        color: Colors.textSecondary,
+        textAlign: 'center',
     },
 
     activeText: {

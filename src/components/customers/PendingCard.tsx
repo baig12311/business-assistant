@@ -27,7 +27,7 @@ const PendingCard:React.FC<props> = ({pending, onPress}) => {
                 <Text style={[styles.outText, {color:Colors.text}]}>Outstanding Balance</Text>
             </View>
             <Text style={styles.pend}>{pending}</Text>
-            <Text style={[styles.outText, {color:Colors.textSecondary, marginBottom: hp(2)}]}>Amount Pending from this customer</Text>
+            <Text style={styles.subText}>Amount Pending from this customer</Text>
             <Button
             title='Receive Payment'
             onPress={onPress}
@@ -60,8 +60,14 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     outText:{
-        fontFamily: fonts.medium,
+        fontFamily: fonts.semiBold,
         fontSize: fontSize.text
+    },
+    subText:{
+        fontFamily: fonts.medium,
+        fontSize: fontSize.smallText,
+        color:Colors.textSecondary, 
+        marginBottom: hp(2)
     },
     pend:{
         fontFamily: fonts.extraBold,

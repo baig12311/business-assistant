@@ -72,7 +72,7 @@ const OrderStatusModal: React.FC<Props> = ({
     }, [selectedIndex]);
 
     const animatedProgress = useAnimatedStyle(() => ({
-        width: `${(progress.value / 2) * 100}%`,
+        width: `${(progress.value / 2) * 65}%`,
     }));
 
     const isCancelled = selectedStatus === 'Cancelled';
@@ -256,16 +256,7 @@ const OrderStatusModal: React.FC<Props> = ({
 
                     {/* Actions */}
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity
-                            style={styles.backButton}
-                            activeOpacity={0.7}
-                            onPress={onPressCancel}
-                            disabled={loading}
-                        >
-                            <Text style={styles.backButtonText}>
-                                Back
-                            </Text>
-                        </TouchableOpacity>
+                       
 
                         <View style={styles.updateButton}>
                             <Button
