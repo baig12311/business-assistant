@@ -2,6 +2,7 @@
   "expo": {
     "name": "business-assistant",
     "slug": "business-assistant",
+    "scheme": "businessassistant",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

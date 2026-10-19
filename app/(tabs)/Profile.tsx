@@ -61,7 +61,7 @@ const Profile = () => {
                 contentContainerStyle={styles.scroll}
                 showsVerticalScrollIndicator={false}
             >
-                <Text style={styles.heading}>Your Profile</Text>
+                <Text style={styles.heading}>Hi, <Text style={{fontSize: fontSize.heading, fontFamily:fonts.extraBold}}>{userName}</Text></Text>
                 <Text style={styles.subHeading}>Manage your account and business details</Text>
                 <ProfileInfoCard name={userName} email={email} />
                 {/* section personal */}
@@ -74,6 +74,7 @@ const Profile = () => {
                         iconType='Ionicons'
                         paddingVertical={hp(1)}
                         borderBottomWidth={0.3}
+                        onPress={()=>router.push('/profile/personalInfo/PersonalInfo')}
                     />
                     <CustomSectionRow
                         mainText='Change Password'
@@ -96,6 +97,8 @@ const Profile = () => {
                         iconType='Ionicons'
                         paddingVertical={hp(1)}
                         borderBottomWidth={0.3}
+                        onPress={()=>router.push('/profile/businessInfo/BusinessInfo')}
+
                     />
                     <CustomSectionRow
                         mainText='Currency'
@@ -145,7 +148,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
     heading: {
-        fontFamily: fonts.extraBold,
+        fontFamily: fonts.bold,
         fontSize: fontSize.subHeading,
         color: Colors.text
     },

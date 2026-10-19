@@ -17,13 +17,17 @@ interface props {
     onChangeNumber: (text: string) => void
     flag: string
     errorMessage?: string
+    isEditable?: boolean
+    onBlur?:()=>void
+    onPressEditCode?:()=>void
+    onPressEditNumber?:()=>void
 }
 const PhoneInput: React.FC<props> = ({ errorMessage, flag, valueCode, valueNumber,
-    onChangeNumber, onChangeCode
+    onChangeNumber, onChangeCode, isEditable, onBlur, onPressEditNumber, onPressEditCode
 }) => {
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Phone Number*</Text>
+            <Text style={styles.title}>Phone Number</Text>
             <View style={styles.inputRow}>
                 <View style={{ width: wp(32) }}>
                     <SelectInput
@@ -31,7 +35,8 @@ const PhoneInput: React.FC<props> = ({ errorMessage, flag, valueCode, valueNumbe
                         value={valueCode}
                         onPress={onChangeCode}
                         flag={flag && flag}
-
+                        //onPressEdit={onPressEditCode}
+                        //isPhone= {true}
 
                     />
                 </View>
@@ -39,14 +44,17 @@ const PhoneInput: React.FC<props> = ({ errorMessage, flag, valueCode, valueNumbe
                 <View style={{ flex: 1 }}>
 
                     <Input
-                        iconName='call-outline'
-                        iconType='Ionicons'
+                        // iconName='call-outline'
+                        // iconType='Ionicons'
                         placeholder='XXXXXXXXXX'
                         //max={10}
                         value={valueNumber}
                         onChangeText={onChangeNumber}
                         keyboard='phone-pad'
                         error={errorMessage}
+                        isEditable={isEditable}
+                        onBlur={onBlur}
+                        onPressEdit={onPressEditNumber}
                     />
                 </View>
 

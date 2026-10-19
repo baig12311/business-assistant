@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardTypeOptions } from "react-native"
 import Colors from "../../../src/constants/colors"
 import fonts, { fontSize } from "../../../src/constants/typography"
@@ -12,20 +12,35 @@ interface props {
     value?: string
     onChangeText?: any
     title?: string
-    placeholder: string
+    placeholder?: string
     secure?: boolean
     error?: string
-    max?:number
+    max?: number
     iconName?: string
     iconType?: string
     keyboard?: KeyboardTypeOptions
     isOrderInput?: boolean
+    isEditable?: boolean
+    onPressEdit?: () => void
+    autoFocus?: boolean
+    onBlur?:()=>void
 }
-const Input: React.FC<props> = ({ isOrderInput,max, value, onChangeText, title, placeholder,
-    error, iconName, iconType, keyboard }) => {
+const Input: React.FC<props> = ({ autoFocus, onBlur, isOrderInput, max, value, onChangeText, title, placeholder,
+    error, iconName, iconType, keyboard, isEditable = true, onPressEdit }) => {
     const [show, setShow] = useState(false)
+    const inputRef = useRef<TextInput>(null);
+
+    useEffect(() => {
+        if (!isEditable) return;
+
+        const timer = setTimeout(() => {
+            inputRef.current?.focus();
+        }, 100);
+
+        return () => clearTimeout(timer);
+    }, [isEditable]);
     return (
-        <View style={!isOrderInput && {marginBottom: hp(2)}}>
+        <View style={!isOrderInput && { marginBottom: hp(2) }}>
             {
                 title && (<Text style={styles.title}>{title}</Text>
                 )
@@ -43,6 +58,7 @@ const Input: React.FC<props> = ({ isOrderInput,max, value, onChangeText, title, 
                 }
 
                 <TextInput
+                    ref={inputRef}
                     value={value}
                     onChangeText={onChangeText}
                     placeholder={placeholder}
@@ -50,6 +66,9 @@ const Input: React.FC<props> = ({ isOrderInput,max, value, onChangeText, title, 
                     maxLength={max}
                     placeholderTextColor={Colors.textSecondary}
                     style={styles.input}
+                    editable={isEditable}
+                    autoFocus={autoFocus}
+                    onBlur={onBlur}
                     secureTextEntry={(title === 'Password*' || title === 'Confirm Password*') && !show}
                 />
                 {
@@ -68,7 +87,21 @@ const Input: React.FC<props> = ({ isOrderInput,max, value, onChangeText, title, 
 
                     )
                 }
-
+                {
+                    !isEditable && (
+                        <TouchableOpacity
+                            activeOpacity={0.7}
+                            onPress={onPressEdit}
+                        >
+                            <Icon
+                                name='edit'
+                                type='Feather'
+                                size={wp(5)}
+                                color={Colors.textSecondary}
+                            />
+                        </TouchableOpacity>
+                    )
+                }
             </View>
             {
                 error && (
@@ -82,7 +115,7 @@ const Input: React.FC<props> = ({ isOrderInput,max, value, onChangeText, title, 
 
 const styles = StyleSheet.create({
     container: {
-        
+
     },
     inputContainer: {
         flexDirection: 'row',
@@ -93,7 +126,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: wp(2),
         alignItems: 'center',
         backgroundColor: Colors.surface,
-        elevation:1,
+        elevation: 1,
     },
     input: {
         flex: 1,

@@ -14,13 +14,16 @@ interface props{
     iconType:string
     onPress?:()=>void
     selected?:boolean
+    isEdit?:boolean
+    onPressEdit?:()=>void
 }
-const BusinessType:React.FC<props> = ({title, subText, iconName, iconType, selected, onPress}) => {
+const BusinessType:React.FC<props> = ({onPressEdit, title, isEdit, subText, iconName, iconType, selected, onPress}) => {
     return (
         <TouchableOpacity
         activeOpacity={0.7} 
         style={[styles.container,selected&&{borderWidth:1.5}]}
         onPress={onPress}
+        disabled={!isEdit}
         >
             <View style={styles.icon}>
                 <Icon
@@ -34,7 +37,9 @@ const BusinessType:React.FC<props> = ({title, subText, iconName, iconType, selec
                 <Text style={styles.textTitle}>{title}</Text>
                 <Text style={styles.textSub}>{subText}</Text>
             </View>
-            <View style={[styles.check, {
+            {
+                isEdit ? (
+                    <View style={[styles.check, {
                 backgroundColor: selected ? Colors.primary : Colors.surface,
                 borderWidth: !selected ? 1 : 0
             }]}>
@@ -42,6 +47,22 @@ const BusinessType:React.FC<props> = ({title, subText, iconName, iconType, selec
                     selected && (<View style={styles.selectedCheck}/>)
                 }
             </View>
+                ) : (
+                    <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={onPressEdit}
+                    >
+                        <Icon
+                    name='edit'
+                    type='Feather'
+                    size={wp(5)}
+                    color={Colors.textSecondary}
+                    />
+                        </TouchableOpacity>
+                    
+                )
+            }
+            
         </TouchableOpacity>
     );
 };

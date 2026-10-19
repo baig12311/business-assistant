@@ -9,6 +9,7 @@ import PasswordRequirements from '../../../src/components/auth/PasswrodCheck';
 import { signupSchema } from '../../../src/services/schema/signupSchema';
 import Input from '../../../src/components/common/Input';
 import Button from '../../../src/components/common/Button';
+import * as Linking from 'expo-linking';
 const Signup = () => {
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
@@ -24,6 +25,7 @@ const Signup = () => {
         password?: string;
         confirmPassword?: string
     }>({});
+    
     
     const isDisabled = !name || !email || !password || !confirmPassword
     // SignUp
@@ -47,32 +49,52 @@ const Signup = () => {
             setLoading(false)
             return;
         }
+
+        const redirectTo = Linking.createURL('auth/callback');
+        console.log('Redirect URL:', redirectTo);
+        
+
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
                 data: {
                     name
-                }
+                },
+                
+                emailRedirectTo: redirectTo,
+                
             }
         });
         if (error) {
             setShowToast(true)
             setToastType('error')
             setToastMessage('Something went wrong. Try again')
-
+            console.log(error.message);
+            
             setLoading(false)
             return;
         }
-
-        setTimeout(() => {
+        if(!data.session)
+        {
             router.push({
-                pathname: '/businessSetup/BusinessSetup',
-                params: {
-                    userId: data.user?.id,
-                },
-            });
-        }, 3100)
+                pathname: '/verifyEmail/VerifyEmail',
+                params:{
+                    email: email
+                }
+            })
+            setLoading(false)
+            return
+        }
+
+        // setTimeout(() => {
+        //     router.push({
+        //         pathname: '/businessSetup/BusinessSetup',
+        //         params: {
+        //             userId: data.user?.id,
+        //         },
+        //     });
+        // }, 3100)
 
 
 

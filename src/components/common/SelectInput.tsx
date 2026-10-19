@@ -16,8 +16,14 @@ interface props {
     iconName?: string
     iconType?: string
     flag?: string
+    // isEditable?: boolean
+    // onPressEdit?:()=>void
+    // isPhone?:boolean
 }
-const SelectInput: React.FC<props> = ({ flag, value, title, placeholder, error, onPress, iconName, iconType }) => {
+const SelectInput: React.FC<props> = ({ flag, value, title, placeholder, error, onPress, iconName, 
+    iconType, 
+    // isEditable, onPressEdit, isPhone
+}) => {
     const newValue = flag ? flag + '  ' + value : value
     return (
         <View style={styles.container}>
@@ -30,6 +36,7 @@ const SelectInput: React.FC<props> = ({ flag, value, title, placeholder, error, 
                 style={styles.inputContainer}
                 activeOpacity={0.7}
                 onPress={onPress}
+                //disabled={!isEditable}
             >
                 {
                     iconName && iconType && (
@@ -47,13 +54,20 @@ const SelectInput: React.FC<props> = ({ flag, value, title, placeholder, error, 
                 ]}>
                     {value ? newValue : placeholder}
                 </Text>
-                <Icon
+
+                {/* <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={onPressEdit}
+                > */}
+                    <Icon
                     name='chevron-small-down'
                     type='Entypo'
                     size={wp(7)}
-                    color={Colors.text}
+                    color={Colors.textSecondary}
                 />
-            </TouchableOpacity>
+                </TouchableOpacity>
+                
+            {/* </TouchableOpacity> */}
             {
                 error && (
                     <Text style={styles.error}>{error}</Text>
