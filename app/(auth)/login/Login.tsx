@@ -91,7 +91,7 @@ const Login = () => {
             <Text style={styles.subHeading}>Login to your Business Assistant account</Text>
             <Input
                 title='Email*'
-                placeholder='someone@gmail.com'
+                placeholder='someone@example.com'
                 value={email}
                 onChangeText={(text: string) => {
                     setEmail(text),
@@ -121,7 +121,10 @@ const Login = () => {
                 iconType='SimpleLineIcons'
                 keyboard='default'
             />
-            <Text style={styles.forgotText}>Forgot password?</Text>
+            <Text style={styles.forgotText} onPress={()=>router.push('/forgotPassword/ForgotPassword')}>
+                Forgot password?
+                </Text>
+                
             <Button
                 title='Log in'
                 onPress={handleSignin}

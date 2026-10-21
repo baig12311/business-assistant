@@ -21,8 +21,9 @@ interface props {
     onBlur?:()=>void
     onPressEditCode?:()=>void
     onPressEditNumber?:()=>void
+    autoFocus?:boolean
 }
-const PhoneInput: React.FC<props> = ({ errorMessage, flag, valueCode, valueNumber,
+const PhoneInput: React.FC<props> = ({ autoFocus, errorMessage, flag, valueCode, valueNumber,
     onChangeNumber, onChangeCode, isEditable, onBlur, onPressEditNumber, onPressEditCode
 }) => {
     return (
@@ -54,6 +55,7 @@ const PhoneInput: React.FC<props> = ({ errorMessage, flag, valueCode, valueNumbe
                         error={errorMessage}
                         isEditable={isEditable}
                         onBlur={onBlur}
+                        autoFocus={autoFocus}
                         onPressEdit={onPressEditNumber}
                     />
                 </View>

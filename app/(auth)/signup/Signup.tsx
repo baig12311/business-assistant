@@ -50,7 +50,7 @@ const Signup = () => {
             return;
         }
 
-        const redirectTo = Linking.createURL('auth/callback');
+        const redirectTo = Linking.createURL('callback');
         console.log('Redirect URL:', redirectTo);
         
 
@@ -148,7 +148,7 @@ const Signup = () => {
                     />
                     <Input
                         title='Email*'
-                        placeholder='someone@gmail.com'
+                        placeholder='someone@example.com'
                         value={email}
                         onChangeText={(text: string) => {
                             setEmail(text),

@@ -325,6 +325,7 @@ const BusinessSetup = () => {
                         iconName='phone-portrait-outline'
                         iconType='Ionicons'
                         selected={businessType==='online'}
+                        isEdit={true}
                         onPress={()=>{setBusinessType('online'), setBusinessTypeError('')}}
                         />
                         <BusinessType
@@ -332,6 +333,7 @@ const BusinessSetup = () => {
                         subText='Counter Sales'
                         iconName='storefront-outline'
                         iconType='Ionicons'
+                        isEdit={true}
                         selected={businessType==='physical'}
                         onPress={()=>{setBusinessType('physical'), setBusinessTypeError('')}}
                         />
@@ -340,6 +342,7 @@ const BusinessSetup = () => {
                         subText='Online & Physical orders'
                         iconName='bag-outline'
                         iconType='Ionicons'
+                        isEdit={true}
                         selected={businessType==='both'}
                         onPress={()=>{setBusinessType('both'), setBusinessTypeError('')}}
                         />

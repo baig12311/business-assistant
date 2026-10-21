@@ -29,16 +29,26 @@ const Input: React.FC<props> = ({ autoFocus, onBlur, isOrderInput, max, value, o
     error, iconName, iconType, keyboard, isEditable = true, onPressEdit }) => {
     const [show, setShow] = useState(false)
     const inputRef = useRef<TextInput>(null);
+    const isPasswordField = title === 'Password*' || title === 'Confirm Password*'
+    || title === 'Password' || title === 'Confirm Password'
+    // useEffect(() => {
+    //     if (!isEditable) return;
 
+    //     const timer = setTimeout(() => {
+    //         inputRef.current?.focus();
+    //     }, 100);
+
+    //     return () => clearTimeout(timer);
+    // }, [isEditable]);
     useEffect(() => {
-        if (!isEditable) return;
+    if (!autoFocus || !isEditable) return;
 
-        const timer = setTimeout(() => {
-            inputRef.current?.focus();
-        }, 100);
+    const timer = setTimeout(() => {
+        inputRef.current?.focus();
+    }, 100);
 
-        return () => clearTimeout(timer);
-    }, [isEditable]);
+    return () => clearTimeout(timer);
+}, [autoFocus, isEditable]);
     return (
         <View style={!isOrderInput && { marginBottom: hp(2) }}>
             {
@@ -72,7 +82,7 @@ const Input: React.FC<props> = ({ autoFocus, onBlur, isOrderInput, max, value, o
                     secureTextEntry={(title === 'Password*' || title === 'Confirm Password*') && !show}
                 />
                 {
-                    (title === 'Password*' || title === 'Confirm Password*') && (
+                    (isPasswordField) && (
                         <TouchableOpacity
                             activeOpacity={0.7}
                             onPress={() => setShow(!show)}

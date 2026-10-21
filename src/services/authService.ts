@@ -1,4 +1,6 @@
 import { supabase } from '../lib/supabase';
+import * as Linking from 'expo-linking';
+
 import { router } from 'expo-router';
 export const logout = async () => {
     const { error } = await supabase.auth.signOut({
@@ -41,4 +43,29 @@ export const getCurrentUser = async () => {
     }
 
     return user;
+};
+
+
+// forgot password 
+
+
+export const sendPasswordResetEmail = async (email: string) => {
+    const redirectTo = Linking.createURL('callback', {
+        queryParams: {
+            flow: 'recovery',
+        },
+    });
+
+    console.log('Password reset redirect:', redirectTo);
+
+    const { data, error } =
+        await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo,
+        });
+
+    if (error) {
+        throw error;
+    }
+
+    return data;
 };

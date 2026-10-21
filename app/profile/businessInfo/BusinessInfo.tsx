@@ -331,6 +331,7 @@ const BusinessSetup = () => {
                             placeholder='John Traders'
                             // iconName='storefront-outline'
                             // iconType='Ionicons'
+                            autoFocus={showName}
                             value={businessName}
                             isEditable={showName}
                             onPressEdit={() => { closeAllEditModes(), setShowName(true) }}
@@ -399,7 +400,7 @@ const BusinessSetup = () => {
                                     }}
                                     errorMessage={errors.number}
                                     isEditable={showNumber}
-
+                                    autoFocus={showNumber}
                                     //onPressEditNumber={() => {setShowNumber(true), closeAllEditModes}}
                                     onBlur={() => setShowNumber(false)}
                                 />

@@ -3,14 +3,15 @@ import { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
-import { supabase } from '../../src/lib/supabase';
-import Colors from '../../src/constants/colors';
+import { supabase } from '../src/lib/supabase';
+import Colors from '../src/constants/colors';
 const AuthCallback = () => {
-    const { code, error, error_description } =
+    const { code, error, error_description, flow } =
         useLocalSearchParams<{
             code?: string;
             error?: string;
             error_description?: string;
+            flow?: string
         }>();
 
     const [message, setMessage] = useState('Verifying your email...');
@@ -34,7 +35,9 @@ const AuthCallback = () => {
                 if (isActive) {
                     setHasError(true);
                     setMessage(
-                        'Verification code not found. Please open the latest verification email.'
+                        flow === 'recovery'
+                            ? 'Your password reset link is invalid or has expired. Please request a new one.'
+                            : 'Your verification link is invalid or has expired. Please request a new verification email.'
                     );
                 }
                 return;
@@ -42,6 +45,7 @@ const AuthCallback = () => {
 
             const { error: sessionError } =
                 await supabase.auth.exchangeCodeForSession(code);
+
 
             if (sessionError) {
                 if (isActive) {
@@ -51,9 +55,15 @@ const AuthCallback = () => {
                 return;
             }
 
-            if (isActive) {
+            if (flow === 'recovery') {
+                router.replace('(auth)/resetPassword/ResetPassword');
+            } else {
                 router.replace('/businessSetup/BusinessSetup');
             }
+
+            // if (isActive) {
+            //     router.replace('/businessSetup/BusinessSetup');
+            // }
         };
 
         verifyEmail();
@@ -61,7 +71,7 @@ const AuthCallback = () => {
         return () => {
             isActive = false;
         };
-    }, [code, error, error_description]);
+    }, [code, error, error_description, flow]);
 
     return (
         <SafeAreaView style={styles.container}>

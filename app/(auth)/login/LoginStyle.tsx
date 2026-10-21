@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
         marginBottom:hp(4)
     },
     forgotText:{
-        fontFamily:fonts.regular,
+        fontFamily:fonts.medium,
         fontSize:fontSize.smallText,
         color:Colors.primary,
         marginBottom:hp(4),
