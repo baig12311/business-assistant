@@ -44,7 +44,7 @@ const CustomerCard: React.FC<props> = ({ name, phone, onPress, order, currency, 
                 <View style={styles.amountRow}>
 
                     {
-                        order && order > 0 && <Text style={styles.textData}>{order} {order > 1 ? 'Orders' : 'Order'}</Text>
+                        order && Number(order) > 0 && <Text style={styles.textData}>{order} {order > 1 ? 'Orders' : 'Order'}</Text>
                     }
 
                     {

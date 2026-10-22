@@ -78,7 +78,8 @@ const Customers = () => {
     if(isLoading)
     {
         <SafeAreaView style={styles.container}>
-            <Header title='Customers' onPress={() => router.back()} />
+            <Header title='Customers' 
+            onPress={() => router.back()} />
             <Input
                 placeholder='Search customers...'
                 value={searchText}

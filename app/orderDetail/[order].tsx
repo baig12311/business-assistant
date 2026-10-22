@@ -31,9 +31,13 @@ const OrderDetail = () => {
     const {mutateAsync: updateStatusMutation, isPending: updatingStatus} = useUpdateOrderStatus({
         orderId:order?.id, businessId: business?.id
     })
-    const orderStatus = businessType === 'online' || (
-        businessType === 'both' && order?.order_source === 'online'
-    ) && order?.status
+    const orderStatus =
+    (
+        (businessType === 'online' || businessType === 'both') &&
+        order?.order_source === 'online'
+    )
+        ? order?.status
+        : null;
     const orderItems = order?.order_items ?? [];
     const paidAmount = order?.paid_amount
     const total = order?.total_amount
@@ -134,8 +138,7 @@ const OrderDetail = () => {
                 />
 
                 {
-                    (businessType === 'online') || (
-                        businessType === 'both' && order?.order_source === 'online') && (<>
+                    orderStatus && (<>
                         <Text style={styles.sectionTitle}>Order Status</Text>
                         <View style={styles.orderTrackcontainer}>
 

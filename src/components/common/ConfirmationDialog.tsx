@@ -89,15 +89,15 @@ const styles = StyleSheet.create({
         fontSize: fontSize.subHeading,
         color: Colors.text,
         fontFamily: fonts.bold,
-        textAlign: 'center'
-        //marginBottom: hp(0)
+        textAlign: 'center',
+        marginBottom: hp(2)
     },
     msg: {
         fontSize: fontSize.text,
         color: Colors.textSecondary,
         fontFamily: fonts.medium,
         textAlign: 'center',
-        marginBottom: hp(2)
+        marginBottom: hp(4)
     },
     txt: {
         fontSize: fontSize.text,

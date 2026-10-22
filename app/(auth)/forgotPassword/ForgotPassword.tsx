@@ -40,7 +40,17 @@ const ForgotPassword = () => {
 
         try {
             setLoading(true)
-            await sendPasswordResetEmail(email)
+            const result=await sendPasswordResetEmail(email)
+            if(result)
+            {
+                router.push({
+                    pathname: '/verifyEmail/VerifyEmail',
+                    params:{
+                        email: email,
+                        flow:'recovery'
+                    }
+                })
+            }
         } catch (error) {
             
         }

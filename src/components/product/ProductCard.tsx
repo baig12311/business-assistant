@@ -39,9 +39,9 @@ const ProductCard: React.FC<props> = ({ name, stock, price, lowStock, currency,
                 ) : (
                     <View style={styles.placeholder}>
                         <Icon
-                            name='package-variant-closed'
-                            type='MaterialDesignIcons'
-                            size={wp(9)}
+                            name='cube-outline'
+                            type='Ionicons'
+                            size={wp(7)}
                             color={Colors.primary}
                         />
                     </View>
@@ -94,7 +94,7 @@ const ProductCard: React.FC<props> = ({ name, stock, price, lowStock, currency,
                             <Text style={[styles.rowText, { color: Colors.primary }]}>Edit</Text>
 
                         </TouchableOpacity>
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             style={styles.row}
                             activeOpacity={0.7}
                             onPress={onPressDelete}
@@ -107,7 +107,7 @@ const ProductCard: React.FC<props> = ({ name, stock, price, lowStock, currency,
                             />
                             <Text style={[styles.rowText, { color: Colors.error }]}>Delete</Text>
 
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
 
                     </View>
                 )
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: wp(2),
         borderColor: Colors.textMuted,
-        backgroundColor: Colors.textMuted
+        backgroundColor: Colors.background
         //overflow: 'hidden'
     },
     content: {
@@ -187,7 +187,8 @@ const styles = StyleSheet.create({
         right: 5,
         top: 35,
         backgroundColor: Colors.background,
-        padding: wp(3),
+        paddingHorizontal: wp(4),
+        paddingVertical: hp(0.5),
         elevation: 3,
         borderRadius: wp(2),
         zIndex: 999

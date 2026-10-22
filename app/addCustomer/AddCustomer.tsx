@@ -315,25 +315,7 @@ const AddCustomer = () => {
                             }}
                             error={errors.name}
                         />
-                        {/* <Input
-                        title='Phone*'
-                        placeholder='+92XXXXXXXXXX'
-                        iconName='call-outline'
-                        iconType='Ionicons'
-                        keyboard='phone-pad'
-                        value={customer.phone}
-                        onChangeText={(t: string) => {
-                            setCustomer({
-                                ...customer,
-                                phone: t
-                            })
-                            setErrors({
-                                ...errors,
-                                phone: undefined,
-                            });
-                        }}
-                        error={errors.phone}
-                    /> */}
+                       
                         <PhoneInput
                             onChangeCode={() => {
                                 setShowSheet(true),
@@ -361,7 +343,7 @@ const AddCustomer = () => {
                         />
                         <Input
                             title='Email (optional)'
-                            placeholder='someone@gmail.com'
+                            placeholder='someone@example.com'
                             iconName='mail-outline'
                             iconType='Ionicons'
                             keyboard='email-address'

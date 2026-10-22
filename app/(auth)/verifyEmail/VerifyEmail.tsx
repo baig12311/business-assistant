@@ -20,36 +20,57 @@ import Icon from '../../../src/components/common/Icon';
 
 
 const VerifyEmail = () => {
-    const { email } = useLocalSearchParams<{ email: string }>();
-
+    const { email, flow} = useLocalSearchParams<{ email: string, flow?:string}>();
+    const isRecovery = flow === 'recovery'
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
 
-    const handleResendEmail = async () => {
-        if (!email || loading) return;
+   
+const handleResendEmail = async () => {
+    if (!email || loading) return;
 
-        setLoading(true);
-        setMessage('');
+    setLoading(true);
+    setMessage('');
 
-        const { error } = await supabase.auth.resend({
-            type: 'signup',
-            email,
-            options: {
-                emailRedirectTo: Linking.createURL('auth/callback'),
-            },
-        });
+    try {
+        const { error } = isRecovery
+            ? await supabase.auth.resetPasswordForEmail(email, {
+                  redirectTo: Linking.createURL('callback', {
+                      queryParams: { flow: 'recovery' },
+                  }),
+              })
+            : await supabase.auth.resend({
+                  type: 'signup',
+                  email,
+                  options: {
+                      emailRedirectTo: Linking.createURL('callback'),
+                  },
+              });
 
         if (error) {
             setIsError(true);
-            setMessage(error.message);
+            setMessage(
+                isRecovery
+                    ? 'Unable to send the reset email. Please try again.'
+                    : error.message
+            );
         } else {
             setIsError(false);
-            setMessage('Verification email sent. Please check your inbox.');
+            setMessage(
+                isRecovery
+                    ? 'Password reset email sent. Please check your inbox.'
+                    : 'Verification email sent. Please check your inbox.'
+            );
         }
-
+    } catch {
+        setIsError(true);
+        setMessage('Something went wrong. Please try again.');
+    } finally {
         setLoading(false);
-    };
+    }
+};
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -63,15 +84,18 @@ const VerifyEmail = () => {
                     />
                 </View>
 
-                <Text style={styles.title}>Verify your email</Text>
+                <Text style={styles.title}>{isRecovery ? 'Reset your password' : 'Verify your email'}</Text>
 
                 <Text style={styles.description}>
-                    We've sent a verification link to your email address.
-                    Please verify your email to continue setting up your business.
+                    {isRecovery
+        ? 'We have sent a password reset link to your email address. Open the link to reset your password.'
+        : "We've sent a verification link to your email address. Please verify your email to continue setting up your business."}
                 </Text>
 
                 <View style={styles.emailCard}>
-                    <Text style={styles.emailLabel}>Verification email sent to</Text>
+                    <Text style={styles.emailLabel}>
+                        {isRecovery ? 'Password reset email sent to' : 'Verification email sent to'}
+                        </Text>
                     <Text style={styles.emailText}>{email || 'Your email address'}</Text>
                 </View>
 
@@ -87,7 +111,7 @@ const VerifyEmail = () => {
                 ) : null}
                 <View style={styles.button}>
                      <Button
-                title='Resend verification email'
+                title={isRecovery ? 'Resend reset email' : 'Resend verification email'}
                 disabled={loading}
                 onPress={handleResendEmail}
                 />

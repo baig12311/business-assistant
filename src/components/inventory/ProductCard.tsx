@@ -34,9 +34,9 @@ const ProductCard: React.FC<props> = ({onPress, title, stock, imageurl, lowStock
                 />) : (
                     <View style={styles.placeholder}>
                         <Icon
-                            name='package-variant-closed'
-                            type='MaterialDesignIcons'
-                            size={wp(6)}
+                            name='cube-outline'
+                            type='Ionicons'
+                            size={wp(5)}
                             color={Colors.primary}
                         />
                     </View>
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: wp(2),
         borderColor: Colors.textMuted,
-        backgroundColor: Colors.textMuted
+        backgroundColor: Colors.background
         //overflow: 'hidden'
     },
     textContainer: {

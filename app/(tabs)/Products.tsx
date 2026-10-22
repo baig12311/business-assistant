@@ -1,12 +1,13 @@
 import { View, Text, StyleSheet, Pressable, FlatList } from 'react-native';
 import Colors from '../../src/constants/colors';
 
+
 import { useUser } from '../../src/hooks/useUser';
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
-import { router } from 'expo-router';
+import { router, useFocusEffect} from 'expo-router';
 import fonts, { fontSize } from '../../src/constants/typography';
 import ConfirmationDialog from '../../src/components/common/ConfirmationDialog';
 import Header from '../../src/components/common/Header';
@@ -22,7 +23,7 @@ import ProductSkeleton from '../../src/components/skeleton/ProductSkeleton';
 import ActionCard from '../../src/components/home/ActionCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DashboardCard from '../../src/components/home/DashboardCard';
-import { useState } from 'react';
+import { useState, useCallback} from 'react';
 const Products = () => {
     const { data, isLoading:userLoading, error:userError} = useUser()
     const userId = data?.id
@@ -30,6 +31,11 @@ const Products = () => {
     const { data: products, isLoading:productsLoading, error:productsError } = useProducts(business?.id)
     const [searchText, setSearchText] = useState('')
     const [menuIndex, setMenuIndex] = useState<number | null>(null)
+    useFocusEffect(
+    useCallback(() => {
+        setMenuIndex(null);
+    }, [])
+);
     const [showDialog, setShowDialog] = useState(false)
     const [deleteId, setDeleteId] = useState('')
     const { mutate: deleteProduct, isPending, error} = useDeleteProduct(

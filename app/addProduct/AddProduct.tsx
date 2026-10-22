@@ -312,13 +312,13 @@ const AddProduct = () => {
                                 )
                             }
                             {
-                                (!productId && !image) && (
+                                (!image) && (
                                     <Text style={styles.text}>Upload product image</Text>
 
                                 )
                             }
                             {
-                                (productId || image) && (
+                                (image) && (
                                     <TouchableOpacity
                                         style={styles.row}
                                         activeOpacity={0.7}
@@ -469,8 +469,9 @@ const AddProduct = () => {
                 showSheet && (
                     <ImageSheet
                         bottomSheetRef={sheetRef}
-                        isEdit={sheetEdit}
+                        isEdit={image?true: false}
                         onAction={handleImageAction}
+                        
                     />
                 )
             }

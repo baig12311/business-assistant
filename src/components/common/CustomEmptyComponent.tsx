@@ -45,12 +45,12 @@ const styles = StyleSheet.create({
 
   emptyTitle: {
     fontSize: fontSize.subHeading,
-    fontFamily: fonts.semiBold,
+    fontFamily: fonts.extraBold,
     marginBottom: hp(1.5)
   },
 
   emptyText: {
-    fontSize: fontSize.smallText,
+    fontSize: fontSize.text,
     fontFamily: fonts.medium,
     color: Colors.textSecondary,
     textAlign: 'center',

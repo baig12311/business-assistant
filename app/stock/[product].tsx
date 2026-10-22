@@ -122,7 +122,7 @@ const ProductDetail = () => {
         const date = formatDate(item.created_at)
         return (
             <StockCard
-                isLast={inventory && (index === inventoryLength - 1)}
+                isLast={inventory && (index === (inventoryLength ?? 0) - 1)}
                 type={item.type}
                 quantity={item.quantity}
                 reason={item.reason}
@@ -217,8 +217,8 @@ const ProductDetail = () => {
                         ) : (
                             <View style={styles.placeholder}>
                                 <Icon
-                                    name='package-variant-closed'
-                                    type='MaterialDesignIcons'
+                                    name='cube-outline'
+                                    type='Ionicons'
                                     size={wp(10)}
                                     color={Colors.primary}
                                 />

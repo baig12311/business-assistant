@@ -5,18 +5,21 @@ import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
+import Icon from './Icon';
 interface props {
     title: string
     onPress?: () => void
     isLoading?: boolean
     disabled?: boolean
+    isDelete?:boolean
 }
-const Button: React.FC<props> = ({ title, onPress, isLoading, disabled }) => {
+const Button: React.FC<props> = ({ title, onPress, isLoading, disabled, isDelete}) => {
     return (
         <TouchableOpacity
             style={[styles.container,
             isLoading && { backgroundColor: Colors.textMuted },
-            disabled && { backgroundColor: Colors.textMuted }
+            disabled && { backgroundColor: Colors.textMuted },
+            (isDelete && !disabled) && {backgroundColor: Colors.error}
             ]}
             activeOpacity={0.7}
             onPress={onPress}
@@ -24,9 +27,21 @@ const Button: React.FC<props> = ({ title, onPress, isLoading, disabled }) => {
         >
             {
                 isLoading ? (<ActivityIndicator size='small' color={Colors.primary} />) : (
+                    <>
+                    {
+                        title === 'Add Items' && (
+                            <Icon
+                            name='plus'
+                            type='Entypo'
+                            size={wp(5)}
+                            color={Colors.surface}
+                            />
+                        )
+                    }
                     <Text style={[styles.text,
                     disabled && { color: Colors.textSecondary }
                     ]}>{title}</Text>
+                    </>
 
                 )
             }
@@ -41,7 +56,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: Colors.primary,
-        elevation: 2
+        flexDirection: 'row',
+        gap: 10,
+        elevation: 1
     },
     text: {
         fontFamily: fonts.semiBold,

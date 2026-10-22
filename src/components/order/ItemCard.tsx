@@ -28,12 +28,26 @@ const ItemCard: React.FC<props> = ({ isLast, onIcrease, onDecrease, onPressRemov
         !isLast && { borderBottomWidth: 0.3 }
         ]}
         >
+            {
+                imageurl ? (
+                    <Image
+                        style={styles.image}
+                        source={{ uri: imageurl }}
+                        contentFit='cover'
+                    />
+                ) : (
+                    <View style={styles.placeholder}>
+                        <Icon
+                            name='cube-outline'
+                            type='Ionicons'
+                            size={wp(6)}
+                            color={Colors.primary}
+                        />
+                    </View>
+                )
+            }
 
-            <Image
-                style={styles.image}
-                source={{ uri: imageurl }}
-                contentFit='cover'
-            />
+
             <View style={styles.content}>
 
                 <Text style={styles.name} numberOfLines={2}>{name}</Text>
@@ -45,7 +59,7 @@ const ItemCard: React.FC<props> = ({ isLast, onIcrease, onDecrease, onPressRemov
                 </Text>
 
             </View>
-            <View style={{ gap:5, marginLeft: wp(2), flexDirection: 'row'}}>
+            <View style={{ gap: 5, marginLeft: wp(2), flexDirection: 'row' }}>
 
                 <View style={styles.quantityControls}>
                     <TouchableOpacity
@@ -83,18 +97,18 @@ const ItemCard: React.FC<props> = ({ isLast, onIcrease, onDecrease, onPressRemov
 
                 </View>
                 <TouchableOpacity
-                activeOpacity={0.7}
-                style={{padding: wp(2)}}
-                onPress={onPressRemove}
+                    activeOpacity={0.7}
+                    style={{ padding: wp(2) }}
+                    onPress={onPressRemove}
                 >
                     <Icon
-                    name="trash-outline"
-                    type="Ionicons"
-                    size={wp(5)}
-                    color={Colors.error}
-                />
+                        name="trash-outline"
+                        type="Ionicons"
+                        size={wp(4)}
+                        color={Colors.error}
+                    />
                 </TouchableOpacity>
-                
+
             </View>
 
         </View>
@@ -118,6 +132,17 @@ const styles = StyleSheet.create({
         borderRadius: wp(2),
         borderColor: Colors.textMuted,
         overflow: 'hidden'
+    },
+    placeholder: {
+        borderWidth: 0.3,
+        width: wp(12),
+        height: wp(12),
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: wp(2),
+        borderColor: Colors.textMuted,
+        backgroundColor: Colors.background
+        //overflow: 'hidden'
     },
     content: {
         marginLeft: wp(3),

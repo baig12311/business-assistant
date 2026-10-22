@@ -269,7 +269,9 @@ const styles = StyleSheet.create({
     textView:{
         borderRadius: wp(2),
         padding: wp(3),
-        backgroundColor: Colors.border,
+        backgroundColor: Colors.surface,
+        borderWidth:1,
+        borderColor:Colors.border,
         marginBottom:hp(3)
     },
     textRow: {

@@ -40,7 +40,7 @@ const DropdownInput:React.FC<props> = ({onChange, value, onPress, error, open}) 
                     name='chevron-small-down'
                     type='Entypo'
                     size={wp(7)}
-                    color={Colors.text}
+                    color={Colors.textSecondary}
                 />
             </TouchableOpacity>
             {
@@ -80,14 +80,14 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
         flexDirection: 'row',
-        borderWidth: 0.5,
+        borderWidth: 1,
         borderRadius: wp(2),
-        borderColor: Colors.textMuted,
+        borderColor: Colors.border,
         height: hp(5.5),
         paddingHorizontal: wp(2),
         alignItems: 'center',
         backgroundColor: Colors.surface,
-        elevation: 1,
+        //elevation: 1,
     },
     input: {
         flex: 1,

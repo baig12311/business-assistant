@@ -5,14 +5,28 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { supabase } from '../src/lib/supabase';
 import Colors from '../src/constants/colors';
+import Icon from '../src/components/common/Icon';
+import {
+    widthPercentageToDP as wp,
+    heightPercentageToDP as hp
+} from 'react-native-responsive-screen';
+import fonts, { fontSize } from '../src/constants/typography';
 const AuthCallback = () => {
-    const { code, error, error_description, flow } =
+    const { code, error, error_description, flow, email } =
         useLocalSearchParams<{
             code?: string;
             error?: string;
             error_description?: string;
-            flow?: string
+            flow?: string,
+            email?: string
         }>();
+
+    console.log('AUTH CALLBACK PARAMS:', {
+        code,
+        error,
+        error_description,
+        flow,
+    });
 
     const [message, setMessage] = useState('Verifying your email...');
     const [hasError, setHasError] = useState(false);
@@ -24,10 +38,18 @@ const AuthCallback = () => {
             if (error) {
                 if (isActive) {
                     setHasError(true);
-                    setMessage(
-                        error_description ?? 'Email verification failed. Please try again.'
-                    );
+
+                    if (error === 'access_denied') {
+                        setMessage(
+                            'We couldn’t verify your email. Your link may have expired or already been used. Please request a new verification email.'
+                        );
+                    } else {
+                        setMessage(
+                            'Something went wrong while verifying your email. Please try again.'
+                        );
+                    }
                 }
+
                 return;
             }
 
@@ -77,13 +99,18 @@ const AuthCallback = () => {
         <SafeAreaView style={styles.container}>
             <View style={styles.content}>
                 {hasError ? (
-                    <Text style={styles.errorIcon}>!</Text>
+                    <Icon
+                        name='alert-circle'
+                        type='Ionicons'
+                        size={wp(15)}
+                        color={Colors.error}
+                    />
                 ) : (
                     <ActivityIndicator size="large" color={Colors.primary} />
                 )}
 
                 <Text style={styles.title}>
-                    {hasError ? 'Verification failed' : 'Verifying your email'}
+                    {hasError ? 'Verification Failed' : 'Verifying your email'}
                 </Text>
 
                 <Text style={styles.description}>{message}</Text>
@@ -91,7 +118,15 @@ const AuthCallback = () => {
                 {hasError && (
                     <Text
                         style={styles.link}
-                        onPress={() => router.replace('/verifyEmail/VerifyEmail')}
+                        onPress={() =>
+                            router.replace({
+                                pathname: '/verifyEmail/VerifyEmail',
+                                params: {
+                                    ...(email ? { email } : {}),
+                                    ...(flow ? { flow } : {}),
+                                },
+                            })
+                        }
                     >
                         Return to verification screen
                     </Text>
@@ -106,45 +141,33 @@ export default AuthCallback;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FAF9F6',
+        backgroundColor: Colors.background,
+        padding: wp(3),
     },
     content: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 28,
-    },
-    errorIcon: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: '#FCE8E6',
-        color: '#D92D20',
-        fontSize: 30,
-        fontWeight: '700',
-        textAlign: 'center',
-        lineHeight: 48,
-        overflow: 'hidden',
-        marginBottom: 20,
+        //paddingHorizontal: 28,
     },
     title: {
-        fontSize: 23,
-        fontWeight: '700',
-        color: '#17231B',
+        fontSize: fontSize.largeHeading,
+        fontFamily: fonts.extraBold,
         textAlign: 'center',
-        marginTop: 22,
-        marginBottom: 10,
+        color: Colors.text,
+        marginVertical: hp(1)
     },
     description: {
-        fontSize: 14,
-        lineHeight: 21,
-        color: '#68736B',
-        textAlign: 'center',
+        fontFamily: fonts.medium,
+        fontSize: fontSize.text,
+        color: Colors.textSecondary,
+        marginBottom: hp(3),
+        textAlign: 'center'
     },
     link: {
         color: Colors.primary,
-        fontSize: 14,
-        fontWeight: '600',
-        marginTop: 24,
+        fontSize: fontSize.text,
+        fontFamily: fonts.semiBold,
+        //marginTop: 24,
     },
 });

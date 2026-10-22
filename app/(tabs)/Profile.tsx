@@ -30,7 +30,7 @@ const Profile = () => {
     const email = data?.email || 'No Email'
     return (
         <SafeAreaView style={styles.container}>
-            <Header title='Profile' onPress={() => router.back} />
+            <Header title='Profile' onPress={() => router.back}/>
                 {
                     showDialog && (
                         <ConfirmationDialog
@@ -82,6 +82,7 @@ const Profile = () => {
                         iconName='lock'
                         iconType='SimpleLineIcons'
                         paddingVertical={hp(1)}
+                        onPress={()=>router.push('/profile/updatePassword/UpdatePassword')}
                     />
                 </View>
 
@@ -128,7 +129,8 @@ const Profile = () => {
                         iconName='trash-outline'
                         iconType='Ionicons'
                         paddingVertical={hp(1)}
-                        onPress={()=>setShowAccountDialog(true)}
+                        onPress={()=>router.push('/profile/deleteAccount/DeleteAccount')}
+                        //onPress={()=>setShowAccountDialog(true)}
                     />
                 </View>
 

@@ -24,9 +24,9 @@ const StockAlert:React.FC<props> = ({bgColor, iconBgColor, badge, color, iconNam
     ]}>
             <View style={[styles.icon, {backgroundColor: iconBgColor}]}>
                 <Icon
-                name='package-variant-closed'
-                type='MaterialDesignIcons'
-                size={wp(8)}
+                name='cube-outline'
+                type='Ionicons'
+                size={wp(6)}
                 color={color}
                 />
             </View>

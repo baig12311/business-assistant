@@ -40,8 +40,8 @@ const styles = StyleSheet.create({
         height: wp(20),
         borderRadius: wp(2),
         borderWidth: 0.3,
-        borderColor: Colors.textSecondary,
-        backgroundColor: Colors.textMuted,
+        borderColor: Colors.border,
+        backgroundColor: Colors.background,
         justifyContent: 'center',
         alignItems: 'center'
     },

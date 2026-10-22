@@ -133,8 +133,8 @@ const BusinessSetup = () => {
         number.trim() !== '' &&
         number !== originalNumber;
 
-        const typeChanged =
-        businessType.trim()!== '' &&
+    const typeChanged =
+        businessType.trim() !== '' &&
         businessType !== originalType
 
     const hasChanges =
@@ -324,7 +324,30 @@ const BusinessSetup = () => {
                                 </TouchableOpacity>)
 
                             }
-                            <Text style={styles.uploadText}>{image ? 'Change Logo' : 'upload business logo'}</Text>
+                            {
+                                image ? (
+                                    <TouchableOpacity
+                                        style={styles.row}
+                                        activeOpacity={0.7}
+                                        onPress={() => {
+                                            setShowImageSheet(true),
+                                                imageSheetRef.current?.snapToIndex(0)
+                                        }}
+                                    >
+                                        <Icon
+                                            name='edit'
+                                            type='Feather'
+                                            size={wp(5)}
+                                            color={Colors.primary}
+                                        />
+
+                                        <Text style={[styles.rowText, { color: Colors.primary }]}>Change logo</Text>
+
+                                    </TouchableOpacity>
+                                ) : (
+                                    <Text style={styles.uploadText}>Upload business logo</Text>
+                                )
+                            }
                         </View>
                         <Input
                             title='Business Name'
@@ -411,55 +434,7 @@ const BusinessSetup = () => {
                                 isEditable={showNumber}
                             />)
                         }
-                        {/* <PhoneInput
-                            onChangeCode={() => {
-                                setShowSheet(true),
-                                    openSheet(
-                                        'Select Country Code',
-                                        countries,
-                                        selectedCountry,
-                                        ['flag', 'name', 'dialCode'],
-                                        'code by country name'
 
-                                    )
-                            }}
-                            valueCode={selectedCountry.dialCode}
-                            flag={selectedCountry?.flag}
-                            valueNumber={number}
-                            onChangeNumber={(t: string) => {
-                                setNumber(t)
-                                setErrors({
-                                    ...errors,
-                                    number: undefined,
-                                });
-                            }}
-                            errorMessage={errors.number}
-                            isEditable={showNumber}
-
-                            onPressEditNumber={() => setShowNumber(true)}
-                            onBlur={() => setShowNumber(false)}
-                        /> */}
-                        {/* <SelectInput
-                            title='Currency*'
-                            placeholder='Select Currency'
-                            // iconName='currency-usd'
-                            // iconType='MaterialDesignIcons'
-                            iconName='cash-outline'
-                            iconType='Ionicons'
-                            value={currency?.code}
-                            error={errors.currency}
-                            onPress={() => {
-                                setShowSheet(true)
-                                openSheet(
-                                    'Select Currency',
-                                    currencies,
-                                    currency,
-                                    ['flag', 'name', 'code'],
-                                    'currency by name'
-
-                                )
-                            }}
-                        /> */}
                         <Text style={styles.title}>Business Type</Text>
                         {/* business type */}
 
@@ -549,6 +524,7 @@ const BusinessSetup = () => {
                     <ImageSheet
                         bottomSheetRef={imageSheetRef}
                         onAction={handleImageAction}
+                        isEdit={image ? true : false}
                     //value=
                     />
                 )

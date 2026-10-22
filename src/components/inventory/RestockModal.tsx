@@ -155,14 +155,14 @@ const styles = StyleSheet.create({
         fontFamily: fonts.medium,
         color: Colors.text,
         marginBottom: hp(2),
-        borderWidth: 0.3,
+        borderWidth: 1,
         paddingLeft: wp(3),
         //textAlign: 'center',
         //alignSelf: 'center',
         width: wp(50),
         paddingVertical: wp(2),
         borderRadius: wp(2),
-        borderColor: Colors.textSecondary
+        borderColor: Colors.border
     },
     button: {
         marginTop: hp(1)

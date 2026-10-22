@@ -46,9 +46,9 @@ const NewOrder = () => {
     const [displayKeys, setDisplayKeys] = useState<string[]>([])
     const [placeholder, setPlaceholder] = useState('')
     const [remainingAmount, setRemainingAmount] = useState('')
-    const [selectedCustomer, setSelectedCustomer] = useState('')
+    const [selectedCustomer, setSelectedCustomer] = useState<any>(null)
     const [selectedCustomerData, setSelectedCustomerData] = useState<any>(null)
-    const [selectedProduct, setSelectedProduct] = useState()
+    const [selectedProduct, setSelectedProduct] = useState<any>(null)
     const [showSheet, setShowSheet] = useState(false);
     const [sheetTitle, setSheetTitle] = useState('');
     const [sheetOptions, setSheetOptions] = useState<any[]>([]);
@@ -56,17 +56,17 @@ const NewOrder = () => {
     const [selectedOrderSource, setSelectedOrderSource] = useState('online')
     //type OrderSource = 'online' | 'physical';
 
-// const [selectedOrderSource, setSelectedOrderSource] =
-//     useState<OrderSource | null>(null);
+    // const [selectedOrderSource, setSelectedOrderSource] =
+    //     useState<OrderSource | null>(null);
 
-// const orderSource: OrderSource | null =
-//     business?.business_type === 'online'
-//         ? 'online'
-//         : business?.business_type === 'physical'
-//             ? 'physical'
-//             : business?.business_type === 'both'
-//                 ? selectedOrderSource
-//                 : null;
+    // const orderSource: OrderSource | null =
+    //     business?.business_type === 'online'
+    //         ? 'online'
+    //         : business?.business_type === 'physical'
+    //             ? 'physical'
+    //             : business?.business_type === 'both'
+    //                 ? selectedOrderSource
+    //                 : null;
 
     const subtotal = orderItems.reduce(
         (sum: any, item: any) => sum + item.price * item.quantity,
@@ -74,17 +74,12 @@ const NewOrder = () => {
     );
     const totalAmount = subtotal - Number(discount);
     const remaining = totalAmount - Number(amountPaid);
-    const customerNames = customers?.map(
-        (item: any) => item.name
-    ) ?? []
-    const productNames = products?.map(
-        (item: any) => item.name
-    ) ?? []
+    
 
     // handle customer select
-    const handleCustomerSelect = (selectedCustomer: string) => {
+    const handleCustomerSelect = (selectedCustomer: any) => {
         const selectedCustomerData = customers?.find(
-            item => item.name === selectedCustomer
+            item => item.id === selectedCustomer.id
         )
         if (!selectedCustomerData) return;
         setSelectedCustomerData(selectedCustomerData)
@@ -215,14 +210,14 @@ const NewOrder = () => {
     };
 
     // Creat order
-    const orderSource : any=
-    business?.business_type === 'online'
-        ? 'online'
-        : business?.business_type === 'physical'
-            ? 'physical'
-            : business?.business_type === 'both'
-                ? selectedOrderSource
-                : null;
+    const orderSource: any =
+        business?.business_type === 'online'
+            ? 'online'
+            : business?.business_type === 'physical'
+                ? 'physical'
+                : business?.business_type === 'both'
+                    ? selectedOrderSource
+                    : null;
     const createOrder = async () => {
         try {
             const result = await createOrderMutation({
@@ -231,13 +226,14 @@ const NewOrder = () => {
                 totalAmount,
                 paidAmount: Number(amountPaid),
                 items: orderItems,
-                orderSource:orderSource!
+                orderSource: orderSource!
             });
-            console.log('creatd', result);
+            
             setToastType('success')
             setToastTitle('Order Processed')
-            setToastMessage('Order Deatails processed successfully.')
+            setToastMessage('Order Details processed successfully.')
             setShowToast(true)
+            
             setTimeout(() => {
                 router.push({
                     pathname: '/receipt/Receipt',
@@ -245,7 +241,12 @@ const NewOrder = () => {
                         orderId: result,
                     }
                 })
-            }, 3100)
+            }, 500)
+            setSelectedCustomer(null)
+            setSelectedCustomerData(null)
+            setSelectedProduct(null)
+            setOrderItems([])
+            
 
         }
         catch (error: any) {
@@ -273,17 +274,17 @@ const NewOrder = () => {
                 >
 
                     {/* select order type  */}
-{
-    business?.business_type === 'both' && (
-        <>
-        <Text style={styles.title}>Order Source</Text>
-<OrderSourceSelector
-onSelect={(value)=>setSelectedOrderSource(value)}
-value={selectedOrderSource}
-/>
-</>
-    )
-}
+                    {
+                        business?.business_type === 'both' && (
+                            <>
+                                <Text style={styles.title}>Order Source</Text>
+                                <OrderSourceSelector
+                                    onSelect={(value) => setSelectedOrderSource(value)}
+                                    value={selectedOrderSource}
+                                />
+                            </>
+                        )
+                    }
 
                     {/* Select Customer */}
                     <View style={styles.slectCustomer}>
@@ -292,14 +293,14 @@ value={selectedOrderSource}
                             placeholder='Select customer'
                             iconName='person-outline'
                             iconType='Ionicons'
-                            value={selectedCustomer}
+                            value={selectedCustomer?.name}
                             onPress={() => {
                                 setShowSheet(true)
                                 openSheet(
                                     'Select Customer',
-                                    customerNames,
+                                    customers ?? [],
                                     selectedCustomer,
-                                    [],
+                                    ['name', 'phone'],
                                     'customers',
                                     'No Customers Yet',
                                     'Add customers first to create order'
@@ -307,7 +308,7 @@ value={selectedOrderSource}
                             }}
                         />
                         <AddRow
-                            text='Add Customer'
+                            text='Add New Customer'
                             onPress={() => router.push('/addCustomer/AddCustomer')}
                         />
                     </View>
@@ -328,7 +329,7 @@ value={selectedOrderSource}
                                 )
                             }}
                     /> */}
-                    <View style={styles.searchRow}>
+                    {/* <View style={styles.searchRow}>
                         <View style={{ flex: 1 }}>
                             <Input
                                 placeholder='Search products...'
@@ -364,14 +365,29 @@ value={selectedOrderSource}
                                 color={Colors.surface}
                             />
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
+                    <Button
+                    title='Add Items'
+                    onPress={() => {
+                                setShowSheet(true)
+                                openSheet(
+                                    'Select Product',
+                                    products ?? [],
+                                    selectedProduct,
+                                    ['name', 'price', 'stock_quantity'],
+                                    'products',
+                                    'No Products Yet',
+                                    'Add products first to create order'
+                                )
+                            }}
+                        />
 
 
 
 
                     {
-                        orderItems.length > 0 && (
-                            <View>
+                        orderItems.length > 0 ? (
+                            <View style={styles.itemContainer}>
                                 <Text style={styles.titleText}>Order Items ({orderItems.length})</Text>
                                 <View style={styles.summaryContainer}>
                                     {
@@ -393,7 +409,12 @@ value={selectedOrderSource}
                                     }
                                 </View>
                             </View>
-                        )
+                        ):(<View style={styles.orderEmpty}>
+                            <Text style={styles.orderEmptyText}>
+                                Your order summary will appear here
+                                </Text>
+
+                        </View>)
                     }
 
 

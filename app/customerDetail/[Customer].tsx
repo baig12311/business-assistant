@@ -357,7 +357,12 @@ const CustomerDetail = () => {
                             }
 
                             <View style={styles.sectionrRow}>
-                                <Text style={styles.sectionTitle}>Recent Payments</Text>
+                                {
+                                    customerPayment && (customerPayment.length) > 0 && (
+                                                <Text style={styles.sectionTitle}>Recent Payments</Text>
+
+                                    )
+                                }
                                 {
                                     customerPayment && (customerPayment.length) > 3 && (
                                         <Text style={styles.textView}

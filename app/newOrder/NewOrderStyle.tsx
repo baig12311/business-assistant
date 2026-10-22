@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
         elevation: 1,
         padding: wp(2),
         backgroundColor: Colors.surface,
-        marginBottom:hp(2)
+        marginBottom:hp(2),
     },
     customerText:{
         fontFamily: fonts.medium,
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     textButton:{
         color:Colors.primary,
         fontSize: fontSize.text,
-        fontFamily: fonts.medium,
+        fontFamily: fonts.semiBold,
         marginLeft: wp(2)
     },
     summaryRow:{
@@ -112,5 +112,18 @@ const styles = StyleSheet.create({
         marginBottom: hp(0.5),
         color: Colors.textSecondary
     },
+    itemContainer:{
+        marginTop: hp(2)
+    },
+    orderEmpty:{
+        flex:1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    orderEmptyText:{
+        fontFamily:fonts.semiBold,
+        fontSize: fontSize.text,
+        color:Colors.textSecondary
+    }
 });
 export default styles

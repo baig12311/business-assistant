@@ -89,6 +89,12 @@ const CustomBottomSheet: React.FC<Props> = ({emptyMessage, emptyTitle, currency,
                                 </Text>
                             )}
 
+                            {displayKeys.includes('phone') && (
+                                <Text style={styles.options}>
+                                    {option.phone}
+                                </Text>
+                            )}
+
                             {displayKeys.includes('stock_quantity') && (
                                 <Text style={styles.options}>
                                     {`Stock: ${option.stock_quantity}`}

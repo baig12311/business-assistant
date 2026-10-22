@@ -23,39 +23,40 @@ interface props {
     isEditable?: boolean
     onPressEdit?: () => void
     autoFocus?: boolean
-    onBlur?:()=>void
+    onBlur?: () => void
 }
 const Input: React.FC<props> = ({ autoFocus, onBlur, isOrderInput, max, value, onChangeText, title, placeholder,
     error, iconName, iconType, keyboard, isEditable = true, onPressEdit }) => {
+    const [isFocused, setIsFocused] = useState(false);
     const [show, setShow] = useState(false)
     const inputRef = useRef<TextInput>(null);
     const isPasswordField = title === 'Password*' || title === 'Confirm Password*'
-    || title === 'Password' || title === 'Confirm Password'
-    // useEffect(() => {
-    //     if (!isEditable) return;
+        || title === 'Password' || title === 'Confirm Password'
+        || title === 'Current Password' || title === 'New Password' || title === 'Confirm New Password'
 
-    //     const timer = setTimeout(() => {
-    //         inputRef.current?.focus();
-    //     }, 100);
-
-    //     return () => clearTimeout(timer);
-    // }, [isEditable]);
     useEffect(() => {
-    if (!autoFocus || !isEditable) return;
+        if (!autoFocus || !isEditable) return;
 
-    const timer = setTimeout(() => {
-        inputRef.current?.focus();
-    }, 100);
+        const timer = setTimeout(() => {
+            inputRef.current?.focus();
+        }, 100);
 
-    return () => clearTimeout(timer);
-}, [autoFocus, isEditable]);
+        return () => clearTimeout(timer);
+    }, [autoFocus, isEditable]);
     return (
         <View style={!isOrderInput && { marginBottom: hp(2) }}>
             {
                 title && (<Text style={styles.title}>{title}</Text>
                 )
             }
-            <View style={styles.inputContainer}>
+            <View style={[styles.inputContainer,
+            {
+                borderColor: error
+                    ? Colors.error
+                    : isFocused
+                        ? Colors.primary
+                        : Colors.border
+            }]}>
                 {
                     iconName && iconType && (
                         <Icon
@@ -78,8 +79,13 @@ const Input: React.FC<props> = ({ autoFocus, onBlur, isOrderInput, max, value, o
                     style={styles.input}
                     editable={isEditable}
                     autoFocus={autoFocus}
-                    onBlur={onBlur}
-                    secureTextEntry={(title === 'Password*' || title === 'Confirm Password*') && !show}
+                    onFocus={() => setIsFocused(true)}
+                    //onBlur={onBlur}
+                    onBlur={() => {
+                        setIsFocused(false);
+                        onBlur?.();
+                    }}
+                    secureTextEntry={(isPasswordField) && !show}
                 />
                 {
                     (isPasswordField) && (
@@ -90,7 +96,7 @@ const Input: React.FC<props> = ({ autoFocus, onBlur, isOrderInput, max, value, o
                             <Icon
                                 name={show ? 'eye-outline' : 'eye-off-outline'}
                                 type='Ionicons'
-                                size={wp(6)}
+                                size={wp(5.5)}
                                 color={Colors.textSecondary}
                             />
                         </TouchableOpacity>
@@ -125,18 +131,17 @@ const Input: React.FC<props> = ({ autoFocus, onBlur, isOrderInput, max, value, o
 
 const styles = StyleSheet.create({
     container: {
-
     },
     inputContainer: {
         flexDirection: 'row',
-        borderWidth: 0.1,
+        borderWidth: 1,
         borderRadius: wp(2),
-        borderColor: Colors.textMuted,
+        borderColor: Colors.border,
         height: hp(5.5),
         paddingHorizontal: wp(2),
         alignItems: 'center',
         backgroundColor: Colors.surface,
-        elevation: 1,
+        //elevation: 1,
     },
     input: {
         flex: 1,

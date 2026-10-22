@@ -70,7 +70,16 @@ const styles = StyleSheet.create({
         fontSize: fontSize.smallText,
         marginBottom: hp(0.5),
         color: Colors.error
-    }
+    },
+     row: {
+        flexDirection: 'row',
+        marginVertical: hp(1)
+    },
+    rowText: {
+        fontFamily: fonts.medium,
+        fontSize: fontSize.smallText,
+        marginLeft: wp(2)
+    },
 
 })
 export default styles

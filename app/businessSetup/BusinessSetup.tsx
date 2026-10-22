@@ -236,7 +236,33 @@ const BusinessSetup = () => {
                                 </TouchableOpacity>)
 
                             }
-                            <Text style={styles.uploadText}>{image ? 'selected logo' : 'upload business logo'}</Text>
+                            {
+                                image ? (
+                                    <TouchableOpacity
+                                        style={styles.row}
+                                        activeOpacity={0.7}
+                                        onPress={() => {
+                                            setShowImageSheet(true),
+                                                imageSheetRef.current?.snapToIndex(0)
+                                        }}
+                                    >
+                                        <Icon
+                                            name='edit'
+                                            type='Feather'
+                                            size={wp(5)}
+                                            color={Colors.primary}
+                                        />
+
+                                        <Text style={[styles.rowText, { color: Colors.primary }]}>Change logo</Text>
+
+                                    </TouchableOpacity>
+                                ) : (
+                                    <Text style={styles.uploadText}>Upload business logo</Text>
+                                )
+                            }
+                            
+                            
+                            {/* <Text style={styles.uploadText}>{image ? 'selected logo' : 'upload business logo'}</Text> */}
                         </View>
                         <Input
                             title='Business Name*'
@@ -382,6 +408,7 @@ const BusinessSetup = () => {
                     <ImageSheet
                         bottomSheetRef={imageSheetRef}
                         onAction={handleImageAction}
+                        isEdit={image ? true : false}
                     //value=
                     />
                 )
