@@ -5,6 +5,8 @@ import { formatDate } from '../../src/services/formatDate';
 import Button from '../../src/components/common/Button';
 import Header from '../../src/components/common/Header';
 import Colors from '../../src/constants/colors';
+import Icon from '../../src/components/common/Icon';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import OutlineButton from '../../src/components/common/OutlineButton';
 import { useUser } from '../../src/hooks/useUser';
 import { useBusiness } from '../../src/hooks/useBusiness';
@@ -18,26 +20,30 @@ import OrderStatusModal from '../../src/components/sales/ChangeStatusModal';
 import OrderTracking from '../../src/components/sales/OrderTracking';
 import { useLocalSearchParams } from 'expo-router';
 import { useOrderById } from '../../src/hooks/useOrderById';
+import { useToast } from '../../src/context/ToastContext';
 // import { OrderStatusType } from '../../src/components/sales/ChangeStatusModal';
 import styles from './orderStyle';
+import ConfirmationDialog from '../../src/components/common/ConfirmationDialog';
 const OrderDetail = () => {
+    const {showToast} = useToast()
     const { orderId } = useLocalSearchParams<{ orderId: string }>()
     const [showModal, setShowModal] = useState(false)
+    const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
     const { data: user, isLoading: userLoading } = useUser()
     const { data: business, isLoading: businessLoading } = useBusiness(user?.id)
     const businessType = business?.business_type
     const { data: order, isLoading } = useOrderById(orderId)
 
-    const {mutateAsync: updateStatusMutation, isPending: updatingStatus} = useUpdateOrderStatus({
-        orderId:order?.id, businessId: business?.id
+    const { mutateAsync: updateStatusMutation, isPending: updatingStatus } = useUpdateOrderStatus({
+        orderId: order?.id, businessId: business?.id
     })
     const orderStatus =
-    (
-        (businessType === 'online' || businessType === 'both') &&
-        order?.order_source === 'online'
-    )
-        ? order?.status
-        : null;
+        (
+            (businessType === 'online' || businessType === 'both') &&
+            order?.order_source === 'online'
+        )
+            ? order?.status
+            : null;
     const orderItems = order?.order_items ?? [];
     const paidAmount = order?.paid_amount
     const total = order?.total_amount
@@ -67,26 +73,28 @@ const OrderDetail = () => {
 
     // handle Update status
     const handleUpdateStatus = async (
-    status: 'Pending' | 'Confirmed' | 'Shipped'
-) => {
-    try {
-        await updateStatusMutation(status);
+        status: 'Pending' | 'Confirmed' | 'Shipped' | 'Cancelled'
+    ) => {
+        try {
+            await updateStatusMutation(status);
 
-        setShowModal(false);
-
-        // setToastMessage({
-        //     type: 'success',
-        //     message: 'Order status updated successfully.',
-        // });
-    } catch (error) {
-        // setToastMessage({
-        //     type: 'error',
-        //     message: error instanceof Error
-        //         ? error.message
-        //         : 'Failed to update order status.',
-        // });
-    }
-};
+            setShowModal(false);
+            setShowConfirmationDialog(false)
+            showToast(
+                'success',
+                status==='Cancelled' ? 'Order Cancelled' : 'Status Updated',
+                status === 'Cancelled' ? 'Order has been cancelled.' : 
+                'Order status has been updated successfully.'
+            )
+        } catch (error) {
+            showToast(
+                'error',
+                status === 'Cancelled' ? 'Unable to Cancel Order' : 'Unable to Update Status',
+                status === 'Cancelled' ? "We couldn't cancel order. Please try again." : 
+                "We couldn't update order status. Please try again."
+            )
+        }
+    };
     if (isLoading) {
         return (
             <SafeAreaView style={styles.container}>
@@ -109,6 +117,22 @@ const OrderDetail = () => {
                     />
                 )
             }
+
+            {
+                showConfirmationDialog && (
+                    <ConfirmationDialog
+                        title='Cancel Order?'
+                        msg={`Are your sure you want to cancel order #${order?.order_number}?`}
+                        iconName='alert-circle-outline'
+                        txtButton='Cancel Order'
+                        txtCancel='Keep Order'
+                        modalVisible={showConfirmationDialog}
+                        onPressCancel={() => setShowConfirmationDialog(false)}
+                        onPressDelete={() => handleUpdateStatus('Cancelled')}
+
+                    />
+                )
+            }
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
@@ -120,9 +144,9 @@ const OrderDetail = () => {
                     orderDate={formatDate(order?.created_at)}
                     amount={order?.total_amount}
                     paidAmount={order?.paid_amount}
-                    
-                    orderStatus={orderStatus}              
-                    />
+
+                    orderStatus={orderStatus}
+                />
                 <Text style={styles.sectionTitle}>Order Items</Text>
                 <OrderItems
                     orderItem={order?.order_items}
@@ -140,19 +164,44 @@ const OrderDetail = () => {
                 {
                     orderStatus && (<>
                         <Text style={styles.sectionTitle}>Order Status</Text>
-                        <View style={styles.orderTrackcontainer}>
+                        {
+                            orderStatus !== 'Cancelled' ? (
+                                <View style={styles.orderTrackcontainer}>
 
-                            <OrderTracking
-                                status={order?.status} />
-                                <View style={styles.buttonOutline}>
-                                    <OutlineButton
-                                title='Change status'
-                                onPress={() => setShowModal(true)}
-                            />
+                                    <OrderTracking
+                                        status={order?.status} />
+                                    <View style={styles.statusButtonContainer}>
+                                        <View style={{ flex: 1 }}>
+                                            <OutlineButton
+                                                title='Cancel Order'
+                                                onPress={() => setShowConfirmationDialog(true)}
+                                            />
+                                        </View>
+                                        <View style={{ flex: 1 }}>
+                                            <Button
+                                                title='Change status'
+                                                onPress={() => setShowModal(true)}
+                                            />
+                                        </View>
+                                    </View>
+
+
+
                                 </View>
-                            
+                            ) : (
+                                <View style={styles.cancelContainer}>
+                                    <Icon
+                                        name='close-circle-outline'
+                                        type='Ionicons'
+                                        size={wp(5)}
+                                        color={Colors.error}
+                                    />
+                                    <Text style={styles.cancelText}>Order Cancelled</Text>
+                                </View>
 
-                        </View>
+                            )
+                        }
+
                     </>
 
 
@@ -161,17 +210,22 @@ const OrderDetail = () => {
                 }
 
             </ScrollView>
-            <View style={styles.buttonContainer}>
-                <Button
-                    title='View Invoice'
-                    onPress={() => router.push({
-                        pathname: '/receipt/Receipt',
-                        params: {
-                            orderId: order.id
-                        }
-                    })}
-                />
-            </View>
+            {
+                orderStatus !== 'Cancelled' && (
+                    <View style={styles.buttonContainer}>
+                        <Button
+                            title='View Invoice'
+                            onPress={() => router.push({
+                                pathname: '/receipt/Receipt',
+                                params: {
+                                    orderId: order.id
+                                }
+                            })}
+                        />
+                    </View>
+                )
+            }
+
 
 
         </SafeAreaView>

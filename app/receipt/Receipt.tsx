@@ -1,6 +1,3 @@
-
-
-
 import { useRef } from 'react';
 import { captureRef } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';

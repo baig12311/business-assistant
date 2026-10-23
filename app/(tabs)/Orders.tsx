@@ -49,7 +49,7 @@ const Orders = () => {
         const matchesSource =
             businessType !== 'both' ||
             selectedSource === 'all' ||
-            item.order_source === selectedSource;
+            item?.order_source === selectedSource;
 
         const matchesStatus =
             businessType !== 'online' &&

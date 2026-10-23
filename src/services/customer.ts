@@ -8,7 +8,8 @@ export const getCustomers = async (businessId: string) => {
             orders (
                 id,
                 total_amount,
-                paid_amount
+                paid_amount,
+                status
             )
         `)
         .eq('business_id', businessId)

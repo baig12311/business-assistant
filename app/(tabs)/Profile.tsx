@@ -37,23 +37,11 @@ const Profile = () => {
                         iconName='log-out-outline'
                         modalVisible={showDialog}
                         txtButton='Log Out'
+                        txtCancel='Stay Logged In'
                         title='Log Out?'
                         msg='Are you sure you want to log out to your account?'
                         onPressDelete={logout}
                         onPressCancel={()=>setShowDialog(false)}
-                        />
-                    )
-                }
-                {
-                    showAccountDialog && (
-                        <ConfirmationDialog
-                        iconName='trash-outline'
-                        modalVisible={showAccountDialog}
-                        txtButton='Delete Account'
-                        title='Delete Account?'
-                        msg='Are you sure you want to permanently delete your account?'
-                        //onPressDelete={logout}
-                        onPressCancel={()=>setShowAccountDialog(false)}
                         />
                     )
                 }
@@ -116,7 +104,7 @@ const Profile = () => {
                 <View style={styles.section}>
                     <CustomSectionRow
                         mainText='Log Out'
-                        subText='Log out to your account'
+                        subText='Log out of your account'
                         iconName='log-out-outline'
                         iconType='Ionicons'
                         paddingVertical={hp(1)}

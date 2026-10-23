@@ -14,6 +14,7 @@ interface props {
     isDelete?:boolean
 }
 const Button: React.FC<props> = ({ title, onPress, isLoading, disabled, isDelete}) => {
+    const isStatus = title === 'Change status'
     return (
         <TouchableOpacity
             style={[styles.container,
@@ -39,7 +40,8 @@ const Button: React.FC<props> = ({ title, onPress, isLoading, disabled, isDelete
                         )
                     }
                     <Text style={[styles.text,
-                    disabled && { color: Colors.textSecondary }
+                    disabled && { color: Colors.textSecondary },
+                    isStatus && {fontSize: fontSize.text}
                     ]}>{title}</Text>
                     </>
 

@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
         fontSize: fontSize.text,
     },
     badge: {
-        fontFamily: fonts.regular,
+        fontFamily: fonts.medium,
         fontSize: fontSize.extraSmallText,
         borderRadius: wp(50),
         paddingHorizontal: wp(2)

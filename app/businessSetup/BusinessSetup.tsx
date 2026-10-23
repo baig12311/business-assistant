@@ -25,6 +25,7 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import { currencies } from '../../src/services/data/currencies';
 import { businessCategories } from '../../src/services/data/categories';
 import { Image } from 'expo-image';
+import { useToast } from '../../src/context/ToastContext';
 type currency = {
     code: string
     name: string
@@ -38,6 +39,7 @@ type selected ={
     code:CountryCode
 }
 const BusinessSetup = () => {
+    const {showToast} = useToast()
     const { data: user, isLoading, error } = useUser()
     const [loading, setLoading] = useState(false)
     const [businessType, setBusinessType] = useState('')
@@ -119,8 +121,10 @@ const BusinessSetup = () => {
     }
 
     // Hande Create Business
-    const createBusiness = async () => {
-        setLoading(true)
+ const createBusiness = async () => {
+    setLoading(true);
+
+    try {
         const result = businessSchema.safeParse({
             businessName,
             category,
@@ -135,64 +139,91 @@ const BusinessSetup = () => {
                 businessName: fieldErrors.businessName?.[0],
                 category: fieldErrors.category?.[0],
                 currency: fieldErrors.currency?.[0],
-                number: fieldErrors.number?.[0]
-            })
-            setLoading(false);
+                number: fieldErrors.number?.[0],
+            });
+
             return;
         }
+
         if (!user) {
-            console.log('No authenticated user');
-            setLoading(false)
+            showToast(
+                'error',
+                'Session Expired',
+                'Please log in again to set up your business.'
+            );
             return;
         }
-        let imageUrl
-        if (image) {
-            imageUrl = await uploadImage(image,
-                'business-logos',
-                user?.id
-            )
-        }
+
         const phoneNumber = parsePhoneNumberFromString(
-        number,
-        selectedCountry.code
-    );
+            number,
+            selectedCountry.code
+        );
 
-    if (!phoneNumber?.isValid()) {
-        setErrors({
-            ...errors,
-            number: '*Please enter a valid phone number',
-        });
-        setLoading(false)
-        return;
-    }
-    if(!businessType){
-        setBusinessTypeError('*Please select business type')
-        setLoading(false)
-        return
-    }
+        if (!phoneNumber?.isValid()) {
+            setErrors({
+                ...errors,
+                number: '*Please enter a valid phone number',
+            });
+            return;
+        }
 
-    const formattedPhone = phoneNumber.number;
-        const { data, error } = await supabase
+        if (!businessType) {
+            setBusinessTypeError('*Please select business type');
+            return;
+        }
+
+        let imageUrl;
+
+        if (image) {
+            imageUrl = await uploadImage(
+                image,
+                'business-logos',
+                user.id
+            );
+        }
+
+        const formattedPhone = phoneNumber.number;
+
+        const { error } = await supabase
             .from('businesses')
             .insert({
                 owner_id: user.id,
                 name: businessName,
-                category: category,
+                category,
                 currency: currency?.code,
                 whatsapp_number: formattedPhone,
                 logo_url: imageUrl,
-                business_type: businessType
-            })
-            .select()
-            .single();
+                business_type: businessType,
+            });
+
         if (error) {
-            console.log('Create Business Error:', error.message);
-            setLoading(false)
+
+            showToast(
+                'error',
+                'Setup Failed',
+                "We couldn't set up your business. Please try again."
+            );
             return;
         }
-        router.replace('/Home')
-        setLoading(false)
-    };
+
+        showToast(
+            'success',
+            'Business Created',
+            'Your business has been set up successfully.'
+        );
+
+        router.replace('/Home');
+    } catch (error) {
+
+        showToast(
+            'error',
+            'Setup Failed',
+            "We couldn't set up your business. Please check your connection and try again."
+        );
+    } finally {
+        setLoading(false);
+    }
+};
 
     return (
         <View style={{ flex: 1 }}>

@@ -37,16 +37,16 @@ const OutlineButton: React.FC<props> = ({ title, onPress, isLoading, disabled })
 const styles = StyleSheet.create({
     container: {
         borderRadius: wp(2),
-        height: hp(5.5),
+        height: hp(5),
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: Colors.primary
+        borderColor: Colors.error
     },
     text: {
         fontFamily: fonts.semiBold,
-        fontSize: fontSize.subHeading,
-        color: Colors.primary
+        fontSize: fontSize.text,
+        color: Colors.error
     }
 });
 

@@ -9,10 +9,11 @@ interface Props {
     onPressDelete?: () => void,
     msg?: string,
     txtButton?: string,
+    txtCancel?:string
     title?: string
     iconName:string
 }
-const ConfirmationDialog: React.FC<Props> = ({ iconName,title, modalVisible, onPressCancel, onPressDelete, msg, txtButton }) => {
+const ConfirmationDialog: React.FC<Props> = ({ txtCancel, iconName,title, modalVisible, onPressCancel, onPressDelete, msg, txtButton }) => {
     return (
         <Modal visible={modalVisible} transparent={true} animationType='fade'>
             <View style={styles.modalView}>
@@ -34,7 +35,7 @@ const ConfirmationDialog: React.FC<Props> = ({ iconName,title, modalVisible, onP
                             style={styles.cancelButton}
                         >
                             <Text style={[styles.txt, styles.txtCancel]}>
-                                Cancel
+                                {txtCancel}
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity

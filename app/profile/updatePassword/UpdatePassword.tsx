@@ -16,8 +16,7 @@ import Input from '../../../src/components/common/Input';
 import Button from '../../../src/components/common/Button';
 import Header from '../../../src/components/common/Header';
 import PasswordRequirements from '../../../src/components/auth/PasswrodCheck';
-import CustomToast from '../../../src/components/common/CustomToast';
-
+import { useToast } from '../../../src/context/ToastContext';
 const updatePasswordSchema = z
     .object({
         currentPassword: z
@@ -48,6 +47,7 @@ const updatePasswordSchema = z
     );
 
 const UpdatePassword = () => {
+    const { showToast } = useToast()
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
@@ -60,28 +60,14 @@ const UpdatePassword = () => {
         confirmNewPassword: '',
     });
 
-    const [toastVisible, setToastVisible] = useState(false);
-    const [toastTitle, setToastTitle] = useState('');
-    const [toastDescription, setToastDescription] = useState('');
-    const [toastType, setToastType] = useState<'success' | 'error'>(
-        'success'
-    );
+
 
     const isDisabled =
         !currentPassword.trim() ||
         !newPassword ||
         !confirmNewPassword;
 
-    const showToast = (
-        title: string,
-        description: string,
-        type: 'success' | 'error'
-    ) => {
-        setToastTitle(title);
-        setToastDescription(description);
-        setToastType(type);
-        setToastVisible(true);
-    };
+
 
     const handleSave = async () => {
         if (updating) return;
@@ -123,9 +109,9 @@ const UpdatePassword = () => {
 
             if (error) {
                 showToast(
-                    'Update Failed',
-                    error.message,
-                    'error'
+                    'error',
+                    'Unable to Change Password',
+                    "We couldn't change password. Please try again."
                 );
                 return;
             }
@@ -141,15 +127,16 @@ const UpdatePassword = () => {
             });
 
             showToast(
+                'success',
                 'Password Updated',
-                'Your password has been changed successfully.',
-                'success'
+                'Password has been changed successfully.',
+
             );
         } catch {
             showToast(
-                'Something Went Wrong',
-                'Unable to update your password. Please try again.',
-                'error'
+                'error',
+                'Unable to Change Password',
+                "We couldn't change password. Please try again."
             );
         } finally {
             setUpdating(false);
@@ -172,9 +159,9 @@ const UpdatePassword = () => {
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
                 >
-                 <Text style={styles.heading}>
-                       Choose a New Password
-                    </Text>   
+                    <Text style={styles.heading}>
+                        Choose a New Password
+                    </Text>
                     <Text style={styles.subHeading}>
                         Change your password to keep your accout secure.
                     </Text>
@@ -183,7 +170,7 @@ const UpdatePassword = () => {
                         title="Current Password"
                         placeholder="********"
                         value={currentPassword}
-                        onChangeText={(value : string) => {
+                        onChangeText={(value: string) => {
                             setCurrentPassword(value);
                             if (errors.currentPassword) {
                                 setErrors((prev) => ({
@@ -221,7 +208,7 @@ const UpdatePassword = () => {
                         title="Confirm New Password"
                         placeholder="********"
                         value={confirmNewPassword}
-                        onChangeText={(value:string) => {
+                        onChangeText={(value: string) => {
                             setConfirmNewPassword(value);
                             if (errors.confirmNewPassword) {
                                 setErrors((prev) => ({
@@ -246,13 +233,7 @@ const UpdatePassword = () => {
                 />
             </View>
 
-            <CustomToast
-                visible={toastVisible}
-                messageTitle={toastTitle}
-                messageDescription={toastDescription}
-                type={toastType}
-                onHide={() => setToastVisible(false)}
-            />
+
         </SafeAreaView>
     );
 };

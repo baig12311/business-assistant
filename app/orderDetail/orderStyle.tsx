@@ -12,13 +12,13 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.background,
         padding: wp(3)
     },
-    sectionTitle:{
+    sectionTitle: {
         fontFamily: fonts.bold,
         fontSize: fontSize.subHeading,
-        color:Colors.text,
+        color: Colors.text,
         marginBottom: hp(0.5)
     },
-    buttonContainer:{
+    buttonContainer: {
         paddingVertical: hp(2)
     },
     orderTrackcontainer: {
@@ -30,12 +30,26 @@ const styles = StyleSheet.create({
         borderColor: Colors.surface,
         elevation: 1,
     },
-    buttonOutline:{
-        width: wp(45),
-        alignSelf: 'center',
-
+    statusButtonContainer: {
+        flexDirection: 'row',
+        gap: 10
+    },
+    cancelText: {
+        fontFamily: fonts.semiBold,
+        color: Colors.error,
+        fontSize: fontSize.text,
+    },
+    cancelContainer: {
+        flexDirection: 'row',
+        gap: 10,
+        borderWidth:1,
+        borderColor:Colors.error,
+        padding: wp(3),
+        borderRadius: wp(2),
+        backgroundColor: Colors.errorLight,
+        alignItems: 'center'
     }
-    
+
 });
 
 export default styles;

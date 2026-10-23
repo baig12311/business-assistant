@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Linking, Alert, Platform} from 'react-native';
 import styles from './CustomerStyle';
 import { router } from 'expo-router';
 import { useLocalSearchParams } from 'expo-router';
@@ -14,6 +14,7 @@ import Row from '../../src/components/customers/Row';
 import OnlineOrderCard from '../../src/components/sales/OnlineOrderCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DashboardCard from '../../src/components/home/DashboardCard';
+import { useToast } from '../../src/context/ToastContext';
 import CustomerOrderCard from '../../src/components/customers/CustomerOrderCard';
 import Icon from '../../src/components/common/Icon';
 import PaymentModal from '../../src/components/customers/PaymentModal';
@@ -25,7 +26,9 @@ import PendingCard from '../../src/components/customers/PendingCard';
 import { formatDate } from '../../src/services/formatDate';
 import { useReceiveCustomerPayment } from '../../src/hooks/useReceiveCustmerPayment';
 import { FlatList } from 'react-native-gesture-handler';
+import ActionButton from '../../src/components/customers/ActionButton';
 const CustomerDetail = () => {
+    const {showToast} = useToast()
     const [showMenu, setShowMenu] = useState(false)
     const [showSuccess, setShowSuccess] = useState(false)
     const [previousDue, setPreviousDue] = useState(0);
@@ -44,10 +47,19 @@ const CustomerDetail = () => {
     const { mutateAsync: receivePaymentMutation, isPending, error } = useReceiveCustomerPayment()
     const businessType = businessData?.business_type
     const isLoading = userLoading || businessLoading || customerLoading || orderLoading
-    const totalOrdersAmount = customerOrder?.reduce(
-        (sum: number, order: any) => sum + Number(order.total_amount),
-        0
-    ) ?? 0;
+    
+const activeCustomerOrders = (customerOrder ?? []).filter(
+    (order: any) =>
+        !['cancelled', 'canceled'].includes(
+            String(order.status ?? '').trim().toLowerCase()
+        )
+);
+
+    const totalOrdersAmount = activeCustomerOrders.reduce(
+    (sum: number, order: any) =>
+        sum + Number(order.total_amount ?? 0),
+    0
+);
     const initials = customer?.name
         ?.trim()
         .split(' ')
@@ -68,22 +80,22 @@ const CustomerDetail = () => {
     }
 
     // values
-    const totalPurchases = customerOrder?.reduce(
-        (sum: number, order: any) =>
-            sum + Number(order.total_amount ?? 0),
-        0
-    );
+   const totalPurchases = activeCustomerOrders.reduce(
+    (sum: number, order: any) =>
+        sum + Number(order.total_amount ?? 0),
+    0
+);
 
-    const outstandingBalance = customerOrder?.reduce(
-        (sum: number, order: any) => {
-            const due =
-                Number(order.total_amount ?? 0) -
-                Number(order.paid_amount ?? 0);
+    const outstandingBalance = activeCustomerOrders.reduce(
+    (sum: number, order: any) => {
+        const due =
+            Number(order.total_amount ?? 0) -
+            Number(order.paid_amount ?? 0);
 
-            return sum + Math.max(0, due);
-        },
-        0
-    );
+        return sum + Math.max(0, due);
+    },
+    0
+);
 
     // receive Payment 
     const handleReceivePayment = async () => {
@@ -127,14 +139,68 @@ const CustomerDetail = () => {
 
             //Alert.alert('Payment Recorded', 'Customer payment has been recorded successfully.');
         } catch (error) {
-            const message =
-                error instanceof Error
-                    ? error.message
-                    : 'Unable to record payment. Please try again.';
+                    setShowModal(false)
+                    showToast(
+                        'error',
+                        'Payment Failed',
+                        'Unable to record payment. Please try again.'
+                    )
+
 
             //Alert.alert('Payment Failed', message);
         }
     };
+
+    
+const handleCall = async () => {
+    const phone = customer?.phone?.trim();
+
+    if (!phone) {
+        Alert.alert('Phone Number Missing', 'This customer has no phone number saved.');
+        return;
+    }
+
+    const phoneUrl = `tel:${phone.replace(/[^\d+]/g, '')}`;
+
+    try {
+        const supported = await Linking.canOpenURL(phoneUrl);
+
+        if (!supported) {
+            Alert.alert('Unable to Call', 'Calling is not supported on this device.');
+            return;
+        }
+
+        await Linking.openURL(phoneUrl);
+    } catch {
+        Alert.alert('Error', 'Unable to open the phone dialer.');
+    }
+};
+
+const handleWhatsApp = async () => {
+    const phone = customer?.phone?.trim();
+
+    if (!phone) {
+        Alert.alert('Phone Number Missing', 'This customer has no phone number saved.');
+        return;
+    }
+
+    // WhatsApp expects an international number without +, spaces or dashes.
+    // Example: +92 300 1234567 -> 923001234567
+    const phoneNumber = phone.replace(/\D/g, '');
+
+    if (!phoneNumber) {
+        Alert.alert('Invalid Phone Number', 'Please update this customer’s phone number.');
+        return;
+    }
+
+    const whatsappUrl = `https://wa.me/${phoneNumber}`;
+
+    try {
+        await Linking.openURL(whatsappUrl);
+    } catch {
+        Alert.alert('Unable to Open WhatsApp', 'Please check whether a browser is available on your device.');
+    }
+};
 
 
     if (isLoading) {
@@ -251,10 +317,45 @@ const CustomerDetail = () => {
                             />
                         )}
 
-
+                        <View style={styles.actionContainer}>
+                    <View style={{ flex: 1 }}>
+                        <ActionButton
+                            text='Call'
+                            iconName='call-outline'
+                            onPress={handleCall}
+                        />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <ActionButton
+                            text='Whatsapp'
+                            iconName='logo-whatsapp'
+                            onPress={handleWhatsApp}
+                        />
                     </View>
 
+
                 </View>
+
+                    </View>
+                </View>
+
+                {/* action */}
+                {/* <View style={styles.actionContainer}>
+                    <View style={{ flex: 1 }}>
+                        <ActionButton
+                            text='Call'
+                            iconName='call-outline'
+                        />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <ActionButton
+                            text='Whatsapp'
+                            iconName='logo-whatsapp'
+                        />
+                    </View>
+
+
+                </View> */}
                 {
                     customerOrder && (customerOrder?.length > 0) ? (
                         <>
@@ -302,20 +403,20 @@ const CustomerDetail = () => {
                             <View style={styles.sectionrRow}>
                                 <Text style={styles.sectionTitle}>Recent Orders</Text>
                                 {
-                                    customerOrder && (customerOrder.length > 3) &&(
+                                    customerOrder && (customerOrder.length > 3) && (
                                         <Text style={styles.textView}
-                                    onPress={() => router.push({
-                                        pathname: '/customerOrders/CustomerOrders',
-                                        params: {
+                                            onPress={() => router.push({
+                                                pathname: '/customerOrders/CustomerOrders',
+                                                params: {
 
-                                            businessId: businessData?.id,
-                                            customerId: customerId
-                                        }
-                                    })}
-                                >View All →</Text>
+                                                    businessId: businessData?.id,
+                                                    customerId: customerId
+                                                }
+                                            })}
+                                        >View All →</Text>
                                     )
                                 }
-                                
+
                             </View>
                             {
                                 customerOrder.slice(0, 3).map((item, index) => {
@@ -359,25 +460,25 @@ const CustomerDetail = () => {
                             <View style={styles.sectionrRow}>
                                 {
                                     customerPayment && (customerPayment.length) > 0 && (
-                                                <Text style={styles.sectionTitle}>Recent Payments</Text>
+                                        <Text style={styles.sectionTitle}>Recent Payments</Text>
 
                                     )
                                 }
                                 {
                                     customerPayment && (customerPayment.length) > 3 && (
                                         <Text style={styles.textView}
-                                    onPress={() => router.push({
-                                        pathname: '/customerPayment/CustomerPayment',
-                                        params: {
+                                            onPress={() => router.push({
+                                                pathname: '/customerPayment/CustomerPayment',
+                                                params: {
 
-                                            businessId: businessData?.id,
-                                            customerId: customerId
-                                        }
-                                    })}
-                                >View All →</Text>
+                                                    businessId: businessData?.id,
+                                                    customerId: customerId
+                                                }
+                                            })}
+                                        >View All →</Text>
                                     )
                                 }
-                                
+
                             </View>
                             {
                                 customerPayment?.slice(0, 3).map((item, index) => {

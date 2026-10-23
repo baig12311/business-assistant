@@ -14,7 +14,7 @@ interface Props {
     onHide: () => void
 }
 const CustomToast: React.FC<Props> = ({ messageDescription, messageTitle, visible, onHide, type }) => {
-    const toastColor = type === 'success' ? '#2E7D5B' : Colors.error
+    const toastColor = type === 'success' ? Colors.primary : Colors.error
     // : type === 'warn' ? '#D97706' : '#7C6A9B'
     const icon = type === 'success' ? { name: 'check-circle', type: 'Feather' } : { name: 'error-outline', type: 'MaterialIcons' }
     // type === 'warn' ?

@@ -8,16 +8,14 @@ import { getBusiness } from '../../../src/services/business';
 import { useBusiness } from '../../../src/hooks/useBusiness';
 import Input from '../../../src/components/common/Input';
 import { loginSchema } from '../../../src/services/schema/loginSchema';
-import CustomToast from '../../../src/components/common/CustomToast';
+import { useToast } from '../../../src/context/ToastContext';
 import Button from '../../../src/components/common/Button';
 import { tr } from 'zod/v4/locales';
 const Login = () => {
+    const { showToast } = useToast();
     const [loading, setLoading] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [toastMessage, setToastMessage] = useState('')
-    const [showToast, setShowToast] = useState(false)
-    const [toastType, setToastType] = useState<'success' | 'error'>('error')
     const [errors, setErrors] = useState<{
         email?: string;
         password?: string;
@@ -44,9 +42,13 @@ const Login = () => {
             password,
         });
         if (error) {
-            setShowToast(true)
-            setToastType('error')
-            setToastMessage(error?.message.includes('Invalid') ? error.message : 'Something went wrong. Try again')
+            showToast(
+                'error',
+                'Login Failed',
+                error?.message.includes('Invalid') ? error.message : 'Something went wrong. Try again'
+
+            )
+
             setLoading(false)
             setPassword('')
             return;
@@ -60,33 +62,22 @@ const Login = () => {
             router.replace('/businessSetup/BusinessSetup');
             return;
         }
-
-        setToastType('success')
-        setToastMessage('You are now logged in to your account.')
         setLoading(false)
         setEmail('')
         setPassword('')
-        setShowToast(true)
-        setTimeout(() => {
-            router.replace('/(tabs)/Home');
-        }, 3100)
+        showToast(
+            'success',
+            'Login Successful',
+            'You are now logged in to your account'
+        )
+        router.replace('/(tabs)/Home');
+
 
 
     }
 
     return (
         <SafeAreaView style={styles.container}>
-            {
-                showToast && (
-                    <CustomToast
-                        type={toastType}
-                        messageTitle={toastType === 'success' ? 'Login Successful' : 'Login Failed'}
-                        messageDescription={toastMessage}
-                        visible={showToast}
-                        onHide={() => setShowToast(false)}
-                    />
-                )
-            }
             <Text style={styles.heading}>Welcome Back</Text>
             <Text style={styles.subHeading}>Login to your Business Assistant account</Text>
             <Input
@@ -121,10 +112,10 @@ const Login = () => {
                 iconType='SimpleLineIcons'
                 keyboard='default'
             />
-            <Text style={styles.forgotText} onPress={()=>router.push('/forgotPassword/ForgotPassword')}>
+            <Text style={styles.forgotText} onPress={() => router.push('/forgotPassword/ForgotPassword')}>
                 Forgot password?
-                </Text>
-                
+            </Text>
+
             <Button
                 title='Log in'
                 onPress={handleSignin}

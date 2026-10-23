@@ -3,4 +3,5 @@ export const orderStatus =[
     'Pending',
     'Confirmed',
     'Shipped',
+    'Cancelled',
 ]

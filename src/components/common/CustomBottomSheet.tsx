@@ -77,7 +77,7 @@ const CustomBottomSheet: React.FC<Props> = ({emptyMessage, emptyTitle, currency,
 
                                 {displayKeys.includes('price') && (
                                     <Text style={styles.options}>
-                                        {`${currency} ${option.price}`}
+                                        {`${currency} ${option.price.toLocaleString()}`}
                                     </Text>
                                 )}
                             </View>

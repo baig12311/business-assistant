@@ -8,25 +8,20 @@ import Header from '../../../src/components/common/Header';
 import styles from './personalStyle';
 import Input from '../../../src/components/common/Input';
 import Button from '../../../src/components/common/Button';
-import CustomToast from '../../../src/components/common/CustomToast';
+import { useToast } from '../../../src/context/ToastContext';
 const PersonalInfo = () => {
+    const {showToast} = useToast()
     const { data, isLoading } = useUser()
     const { mutateAsync: updateMutation, isPending: updating } = useUpdateUserName()
     const userName = data?.user_metadata?.name
     const email = data?.email || 'No Email'
     const [showInput1, setShowInput1] = useState(false)
-    const [showInput2, setShowInput2] = useState(false)
     const [newName, setNewName] = useState('')
-    const [newEmail, setNewEmail] = useState('')
-    const [showToast, setShowToast] = useState(false)
-    const [toatsType, setToastType] = useState<'error' | 'success'>('error')
-    const [title, setTitle] = useState('')
-    const [description, setDescription] = useState('')
+    
 
     useEffect(() => {
         if (data) {
             setNewName(userName ?? '')
-            setNewEmail(email ?? '')
         }
     }, [data])
     const isNameChanged = newName.trim() !== (userName ?? '').trim()
@@ -35,33 +30,23 @@ const PersonalInfo = () => {
         const Name = newName.trim()
         try {
             await updateMutation(Name)
-            setToastType('success')
-            setTitle('Details Updated')
-            setDescription('Your personal details have been updated successfully.')
-            setShowToast(true)
-            setTimeout(()=>{
-                router.back()
-            }, 2500)
+            showToast(
+                'success',
+                'Details Updated',
+                'Personal details have been updated successfully.'
+            )
+            router.back()
+           
         } catch (error) {
-            setToastType('error')
-            setTitle('Unable to update profile')
-            setDescription('Something went wrong! Please try again.')
-            setShowToast(true)
+            showToast(
+                'error',
+                'Unable to Update',
+                "We couldn't update personal details. Please try again."
+            )
         }
     }
     return (
         <SafeAreaView style={styles.container}>
-            {
-                showToast && (
-                    <CustomToast
-                    type={toatsType}
-                    messageTitle={title}
-                    messageDescription={description}
-                    visible={showToast}
-                    onHide={()=>setShowToast(false)}
-                    />
-                )
-            }
             <Header title='Personal Information' onPress={() => router.back()} />
             <View style={{ flex: 1 }}>
                 <Text style={styles.subHeading}>Manage you personal details</Text>
@@ -75,16 +60,6 @@ const PersonalInfo = () => {
                     autoFocus={showInput1}
                     onBlur={() => setShowInput1(false)}
                 />
-                {/* <Input
-                    title='Email'
-                    placeholder=''
-                    value={newEmail}
-                    // onChangeText={setNewEmail}
-                    isEditable={showInput2}
-                    // onPressEdit={() => setShowInput2(true)}
-                    // autoFocus={showInput2}
-                    // onBlur={()=>setShowInput2(false)}
-                /> */}
             </View>
             {
                 isNameChanged && (

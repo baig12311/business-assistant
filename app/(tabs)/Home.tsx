@@ -30,7 +30,7 @@ const Home = () => {
     const [salesPeriod, setSalesPeriod] = useState<'Today' | 'Yesterday' | 'Week' | 'Month'>('Today');
     const { data, error, isLoading: userLoading } = useUser()
     console.log(error);
-    
+
     const userId = data?.id
     const { data: business, error: bError, isLoading: bLoading } = useBusiness(userId)
 
@@ -42,12 +42,21 @@ const Home = () => {
     const isLoading = userLoading || bLoading || orderLoading
         || productLoading || customerLoading
 
+    // Filter out cancelled orders
+    const activeOrders = (orders ?? []).filter(
+        order =>
+            !['cancelled', 'canceled'].includes(
+                String(order.status ?? '').trim().toLowerCase()
+            )
+    );
+
     // filter products low stock
     const lowStockProducts = products?.filter(
         product => product.stock_quantity <= product.low_stock_threshold
     ) ?? []
+
     // filter order by period
-    const filteredOrders = orders?.filter(order => {
+    const filteredOrders = activeOrders.filter(order => {
         const date = new Date(order.created_at);
         const now = new Date();
 
@@ -87,7 +96,6 @@ const Home = () => {
                 date.getFullYear() === now.getFullYear()
             );
         }
-
 
         return false;
     }) ?? [];
@@ -221,12 +229,12 @@ const Home = () => {
 
         return `${start.toLocaleDateString('en-US', options)} – ${end.toLocaleDateString('en-US', options)}`;
     };
+
     // sales
     const totalSales = filteredOrders.reduce(
         (sum, order) => sum + Number(order.total_amount),
         0
     );
-
 
     if (isLoading) {
         return (
@@ -299,7 +307,6 @@ const Home = () => {
                     }
                 </View>
 
-
                 <View style={styles.infoContainer}>
 
                     <DashboardCard
@@ -324,7 +331,7 @@ const Home = () => {
 
                     <DashboardCard
                         title="Orders"
-                        info={orders?.length}
+                        info={activeOrders.length}
                         iconName='receipt'
                         iconType='Ionicons'
                         bgColor={Colors.yellowExtraLight}
@@ -381,9 +388,11 @@ const Home = () => {
 
                     <View style={styles.chartContainer}>
                         {
-                            orders && orders.length > 0 && (<Text style={styles.textSwipe}>Scroll to Left</Text>)
+                            activeOrders.length > 0 && (
+                                <Text style={styles.textSwipe}>Scroll to Left</Text>
+                            )
                         }
-                        
+
                         {
                             totalSales ? (
                                 <LineChart
@@ -422,19 +431,18 @@ const Home = () => {
                             )
                         }
 
-
                     </View>
 
                 </View>
 
                 {/* recent order */}
                 {
-                    orders && orders.length > 0 && (
+                    activeOrders.length > 0 && (
                         <View style={styles.lowContainer}>
                             <Text style={styles.sectionTitle}>Recent Sale</Text>
                             <View style={styles.productContainer}>
                                 {
-                                    orders?.slice(0, 3).map((item: any, index) => {
+                                    activeOrders.slice(0, 3).map((item: any, index) => {
                                         const customer = item?.customer?.name
                                         return (
                                             <RecentOrder
@@ -465,7 +473,6 @@ const Home = () => {
                         </View>
                     )
                 }
-
 
                 {/* low stock products */}
                 {
@@ -502,9 +509,6 @@ const Home = () => {
                         </View>
                     )
                 }
-
-
-
 
             </ScrollView>
 
@@ -595,12 +599,6 @@ const styles = StyleSheet.create({
         color: Colors.textSecondary
     },
 
-    currency: {
-        fontSize: fontSize.smallText,
-        fontFamily: fonts.medium,
-        color: Colors.textSecondary
-    },
-
     chartContainer: {
         backgroundColor: Colors.surface,
         elevation: 1,
@@ -650,7 +648,12 @@ const styles = StyleSheet.create({
         color: Colors.textSecondary,
         textAlign: 'right',
         marginRight: wp(2)
-    }
+    },
+    currency: {
+        fontSize: fontSize.smallText,
+        fontFamily: fonts.medium,
+        color: Colors.textSecondary
+    },
 });
 
 export default Home;

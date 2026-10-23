@@ -16,7 +16,8 @@ interface Props {
     currency?:string
 }
 const PriceSummaryCard: React.FC<Props> = ({currency, subTotal, total, paid, discount, change }) => {
-
+    const PaidAmount = (Number(paid) >= Number(total)) ? total : paid
+    const dueAmount = Number(total) - Number(PaidAmount)
     return (
         <View style={styles.container}>
             <Row
@@ -31,6 +32,7 @@ const PriceSummaryCard: React.FC<Props> = ({currency, subTotal, total, paid, dis
                 fontWeight={fonts.medium}
                 fsize={fontSize.text}
                 currency={currency}
+                isBorder={true}
             />
             <Row
                 title='Total'
@@ -45,7 +47,20 @@ const PriceSummaryCard: React.FC<Props> = ({currency, subTotal, total, paid, dis
                 fontWeight={fonts.medium}
                 fsize={fontSize.text}
                 currency={currency}
+                isBorder={Number(dueAmount) > 0 ? true: false}
             />
+            {
+                dueAmount > 0 && (
+                    <Row
+                title='Due Amount'
+                info={dueAmount.toLocaleString()}
+                fontWeight={fonts.medium}
+                fsize={fontSize.text}
+                currency={currency}
+            />
+                )
+            }
+            
 
         </View>
     );
@@ -56,11 +71,12 @@ interface props {
     fontWeight?:string
     fsize?:number
     currency?:string
+    isBorder?:boolean
 }
-const Row: React.FC<props> = ({ currency, title, info, fontWeight, fsize}) => {
+const Row: React.FC<props> = ({ currency, title, info, fontWeight, fsize, isBorder}) => {
     
     return (
-        <View style={styles.row}>
+        <View style={[styles.row, isBorder && {borderBottomWidth: 0.3}]}>
             <Text style={{fontFamily: fontWeight, fontSize:fsize}}>{title}</Text>
             <Text  style={{fontFamily: fontWeight, fontSize:fsize}}>{currency} {info}</Text>
         </View>
@@ -78,9 +94,9 @@ const styles = StyleSheet.create({
     },
     row: {
         flexDirection: 'row',
-        paddingVertical: hp(0.5),
+        paddingVertical: hp(0.7),
         borderColor: Colors.textSecondary,
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
     },
     
 });

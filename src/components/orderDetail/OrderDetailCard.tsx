@@ -68,14 +68,18 @@ const OrderDetailCard: React.FC<props> = ({ orderStatus, cName, orderDate, phone
                 </View>
                  )   
                 }
-                
-                <View>
+                {
+                    orderStatus!=='Cancelled' && (
+                        <View>
                     <Text style={[styles.name, { color: Colors.text }]}>Payment Status</Text>
                     <Text style={[styles.badge, {
                         backgroundColor: badgeColor.bg,
                         color: badgeColor.color
                     }]}>{badgeText}</Text>
                 </View>
+                    )
+                }
+                
             </View>
 
         </View>

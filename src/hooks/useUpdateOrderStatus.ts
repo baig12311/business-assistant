@@ -2,7 +2,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateOrderStatus } from '../services/updateOrderStatus';
 
-type OrderStatus = 'Pending' | 'Confirmed' | 'Shipped';
+type OrderStatus = 'Pending' | 'Confirmed' | 'Shipped' | 'Cancelled';
 
 interface Params {
     orderId: string;
@@ -32,8 +32,14 @@ export const useUpdateOrderStatus = ({
                     queryKey: ['order', orderId],
                 }),
                 queryClient.invalidateQueries({
+            queryKey: ['products', businessId],
+        }),
+                queryClient.invalidateQueries({
                     queryKey: ['customerOrders', businessId],
                 }),
+                queryClient.invalidateQueries({
+            queryKey: ['customers', businessId],
+        }),
             ]);
         },
     });

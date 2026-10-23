@@ -40,7 +40,8 @@ const styles = StyleSheet.create({
         letterSpacing:2
     },
     infoTextContainer:{
-        marginLeft: wp(5)
+        marginLeft: wp(5),
+        flex:1
     },
     menu:{
         position: 'absolute',
@@ -106,6 +107,12 @@ const styles = StyleSheet.create({
         fontSize: fontSize.smallText,
         color: Colors.primary,
         padding:wp(1)
+    },
+    actionContainer:{
+        flexDirection: 'row',
+        marginBottom: hp(2),
+        gap:30,
+        marginTop: hp(2)
     }
 });
 export default styles

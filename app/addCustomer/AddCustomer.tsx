@@ -6,7 +6,7 @@ import { useCustomers, useCustomerById } from '../../src/hooks/useCustomer';
 import { router, useLocalSearchParams } from 'expo-router';
 import { countries } from '../../src/services/data/countries';
 import CustomBottomSheet from '../../src/components/common/CustomBottomSheet';
-import CustomToast from '../../src/components/common/CustomToast';
+import { useToast } from '../../src/context/ToastContext';
 import { customerSchema } from '../../src/services/schema/customerSchema';
 import { useUser } from '../../src/hooks/useUser';
 import { useBusiness } from '../../src/hooks/useBusiness';
@@ -26,12 +26,9 @@ type selected = {
     code: CountryCode
 }
 const AddCustomer = () => {
+    const { showToast } = useToast()
     const [showSheet, setShowSheet] = useState(false)
     const [sheetTitle, setSheetTitle] = useState('');
-    const [toastMessage, setToastMessage] = useState('')
-    const [toastTitle, setToastTitle] = useState('')
-    const [showToast, setShowToast] = useState(false)
-    const [toastType, setToastType] = useState<'success' | 'error'>('error')
     const [sheetOptions, setSheetOptions] = useState<any[]>([]);
     const [sheetValue, setSheetValue] = useState('');
     const [selectedCountry, setSelectedCountry] = useState<selected>(countries[0])
@@ -173,10 +170,6 @@ const AddCustomer = () => {
                 address: customer.address.trim(),
                 city: customer.city.trim(),
             });
-            setToastType('success')
-            setToastTitle('Updated Successfully')
-            setToastMessage('Customer details have been updated successfully')
-            setShowToast(true)
             setCustomer({
                 name: '',
                 phone: '',
@@ -184,16 +177,21 @@ const AddCustomer = () => {
                 address: '',
                 city: '',
             })
-            setTimeout(() => {
-                router.back()
-            }, 3100)
+            showToast(
+                'success',
+                'Customer details updated',
+                "Customer details have been updated successfully."
+            )
+
+
+            router.back()
 
         } catch (error) {
-            setToastType('error')
-            setToastTitle('Unable to update customer')
-
-            setToastMessage("We couldn’t update this customer data. Please try again.")
-            setShowToast(true)
+            showToast(
+                'error',
+                'Unable to update customer',
+                "We couldn’t update customer details. Please try again."
+            )
         }
     }
 
@@ -231,11 +229,6 @@ const AddCustomer = () => {
                 address: customer.address.trim(),
                 city: customer.city.trim(),
             });
-
-            setToastType('success')
-            setToastTitle('Addedd Successfully')
-            setToastMessage('Customer details have been added successfully')
-            setShowToast(true)
             setCustomer({
                 name: '',
                 phone: '',
@@ -243,16 +236,22 @@ const AddCustomer = () => {
                 address: '',
                 city: '',
             })
-            setTimeout(() => {
-                router.back()
-            }, 3100)
+            showToast(
+                'success',
+                'Customer Added',
+                "Customer has been added successfully."
+            )
+
+
+            router.back()
+
 
         } catch (error) {
-            setToastType('error')
-            setToastTitle('Unable to add customer')
-
-            setToastMessage("We couldn’t add this customer data. Please try again.")
-            setShowToast(true)
+            showToast(
+                'error',
+                'Unable to add customer',
+                "We couldn’t add customer. Please try again."
+            )
         }
     }
 
@@ -274,13 +273,6 @@ const AddCustomer = () => {
 
 
             <SafeAreaView style={styles.container}>
-                <CustomToast
-                    visible={showToast}
-                    onHide={() => setShowToast(false)}
-                    type={toastType}
-                    messageTitle={toastTitle}
-                    messageDescription={toastMessage}
-                />
                 <Header title={customerId ? 'Edit Customer' : 'Add Customer'} onPress={() => router.back()} />
                 <KeyboardAvoidingView
                     style={{ flex: 1 }}
@@ -315,7 +307,7 @@ const AddCustomer = () => {
                             }}
                             error={errors.name}
                         />
-                       
+
                         <PhoneInput
                             onChangeCode={() => {
                                 setShowSheet(true),

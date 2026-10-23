@@ -24,8 +24,10 @@ import StockAlert from '../../src/components/inventory/StockAlert';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { success } from 'zod';
 import { Image } from 'expo-image';
+import { useToast } from '../../src/context/ToastContext';
 import Row from '../../src/components/inventory/Row';
 const ProductDetail = () => {
+    const {showToast} = useToast()
     const { productId } = useLocalSearchParams<{ productId: string }>()
     const { data: user, isLoading: userLoading } = useUser()
     const { data: business, isLoading: businessLoading } = useBusiness(user?.id)
@@ -80,9 +82,18 @@ const ProductDetail = () => {
             })
             setShowRestock(false)
             setRestock('')
+            showToast(
+                'success',
+                'Stock Updated',
+                'Stock has been restocked successfully.'
+            )
 
         } catch (error) {
-            console.log('restock error', error);
+            showToast(
+                'error',
+                'Unable to Restock Product',
+                "We couldn't update stock. Please try again."
+            )
 
         }
     }
@@ -112,8 +123,17 @@ const ProductDetail = () => {
             setShowAdjustStock(false)
             setAdjustStock('')
             setReason('')
+            showToast(
+                'success',
+                'Stock Adjusted',
+                'Stock quantity has been adjusted successfully.'
+            )
         } catch (error) {
-
+            showToast(
+                'error',
+                'Unable to Adjust Stock',
+                "We couldn't adjust stock. Please try again."
+            )
         }
     }
 

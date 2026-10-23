@@ -11,7 +11,6 @@ import Input from '../../src/components/common/Input';
 import Button from '../../src/components/common/Button';
 import { useUser } from '../../src/hooks/useUser';
 import { useBusiness } from '../../src/hooks/useBusiness';
-import { supabase } from '../../src/lib/supabase';
 import { useLocalSearchParams } from 'expo-router';
 import Header from '../../src/components/common/Header';
 import { useAddProduct } from '../../src/hooks/useAddProduct';
@@ -22,10 +21,10 @@ import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { productSchema } from '../../src/services/schema/productSchema';
 import styles from './AddProductStyle';
 import { uploadImage } from '../../src/services/convertImage';
-import { readonly } from 'zod';
 import BottomSheet from '@gorhom/bottom-sheet';
-import CustomToast from '../../src/components/common/CustomToast';
+import { useToast } from '../../src/context/ToastContext';
 const AddProduct = () => {
+    const { showToast } = useToast()
     const { productId } = useLocalSearchParams<{
         productId: string;
     }>();
@@ -33,10 +32,6 @@ const AddProduct = () => {
     const [existingImage, setExistingImage] = useState<string | null>(null);
     const [showSheet, setShowSheet] = useState(false)
     const [sheetEdit, setSheetEdit] = useState(false)
-    const [toastTitle, setToastTitle] = useState('')
-    const [toastMessage, setToastMessage] = useState('')
-    const [showToast, setShowToast] = useState(false)
-    const [toastType, setToastType] = useState<'success' | 'error'>('error')
     const sheetRef = useRef<BottomSheet>(null)
     const { data: user } = useUser()
     const { data: business } = useBusiness(user?.id)
@@ -176,12 +171,14 @@ const AddProduct = () => {
     const AddProduct = async () => {
         try {
             if (productId) {
+
                 await updateProducts()
 
-                setToastType('success')
-                setToastTitle('Updated Successfully')
-                setToastMessage('Product details have been updated successfully')
-                setShowToast(true)
+                showToast(
+                    'success',
+                    'Product Updated',
+                    'Product details have been updated successfully.'
+                )
                 setProduct({
                     productName: '',
                     description: '',
@@ -190,9 +187,7 @@ const AddProduct = () => {
                     stockQuantity: '',
                     lowStockThreshold: ''
                 })
-                setTimeout(() => {
-                    router.back()
-                }, 3100)
+                router.back()
 
             }
             else {
@@ -217,11 +212,12 @@ const AddProduct = () => {
                     lowStockThreshold: Number(product.lowStockThreshold),
                     imageUrl,
                 });
+                showToast(
+                    'success',
+                    'Product Added',
+                    'Product has been added successfully.'
+                )
 
-                setToastType('success')
-                setToastTitle('Added Successfully')
-                setToastMessage('Product details have been added successfully')
-                setShowToast(true)
                 setProduct({
                     productName: '',
                     description: '',
@@ -230,9 +226,7 @@ const AddProduct = () => {
                     stockQuantity: '',
                     lowStockThreshold: ''
                 })
-                setTimeout(() => {
-                    router.back()
-                }, 3100)
+                router.back()
 
 
             }
@@ -240,16 +234,14 @@ const AddProduct = () => {
         }
         catch (error) {
 
-            setToastType('error')
-            if (productId) {
-                setToastTitle('Unable to add product')
-            }
-            else {
-                setToastTitle('Unable to update product')
-            }
+            showToast(
+                'error',
+                productId ? 'Unable to update product details' : 'Unable to add product',
+                productId ? "We couldn't update product. Please try again." :
+                    "We couldn't add product. Please try again.",
 
-            setToastMessage("We couldn’t save this product. Please try again.")
-            setShowToast(true)
+            )
+
         }
     }
 
@@ -258,13 +250,6 @@ const AddProduct = () => {
     return (
         <View style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>
-                <CustomToast
-                    visible={showToast}
-                    onHide={() => setShowToast(false)}
-                    type={toastType}
-                    messageTitle={toastTitle}
-                    messageDescription={toastMessage}
-                />
                 <Header title={productId ? 'Edit Product' : 'Add Product'}
                     onPress={() => router.back()}
                 />
@@ -469,9 +454,9 @@ const AddProduct = () => {
                 showSheet && (
                     <ImageSheet
                         bottomSheetRef={sheetRef}
-                        isEdit={image?true: false}
+                        isEdit={image ? true : false}
                         onAction={handleImageAction}
-                        
+
                     />
                 )
             }

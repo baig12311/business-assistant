@@ -9,7 +9,7 @@ import Icon from '../../src/components/common/Icon';
 import SelectInput from '../../src/components/common/SelectInput';
 import Input from '../../src/components/common/Input';
 import InputRow from '../../src/components/order/InputRow';
-import CustomToast from '../../src/components/common/CustomToast';
+import { useToast } from '../../src/context/ToastContext';
 import { useUser } from '../../src/hooks/useUser';
 import { useBusiness } from '../../src/hooks/useBusiness';
 import { useCustomers } from '../../src/hooks/useCustomer';
@@ -25,6 +25,7 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import { OrderSource } from '../../src/services/createOrder';
 
 const NewOrder = () => {
+    const {showToast} = useToast()
     const { data: user } = useUser()
     const { data: business } = useBusiness(user?.id)
     const { data: customers } = useCustomers(business?.id)
@@ -35,10 +36,7 @@ const NewOrder = () => {
         mutateAsync: createOrderMutation,
         isPending,
     } = useCreateOrder(business?.id);
-    const [toastTitle, setToastTitle] = useState('')
-    const [toastMessage, setToastMessage] = useState('')
-    const [showToast, setShowToast] = useState(false)
-    const [toastType, setToastType] = useState<'success' | 'error'>('error')
+    
     const sheetRef = useRef<BottomSheet>(null)
     const [orderItems, setOrderItems] = useState<any>([])
     const [discount, setDiscount] = useState('')
@@ -97,10 +95,11 @@ const NewOrder = () => {
             (item: any) => item.product_id === selectedProduct?.id
         )
         if (selectedProduct.stock_quantity <= 0) {
-            setToastType('error')
-            setToastTitle('Out of stock')
-            setToastMessage('This item is out of stock. This cannot be added')
-            setShowToast(true)
+            showToast(
+                'error',
+                'Out of Stock',
+                'This item is out of stock. This cannot be added'
+            )
             return;
         }
 
@@ -128,10 +127,12 @@ const NewOrder = () => {
             ])
         }
         else {
-            setToastType('error')
-            setToastTitle('Duplicate Selection')
-            setToastMessage('This item is already added to your orders list.')
-            setShowToast(true)
+            showToast(
+                'error',
+                'Duplicate Selection',
+                'This item is already added to your items'
+            )
+
             return;
         }
 
@@ -229,44 +230,41 @@ const NewOrder = () => {
                 orderSource: orderSource!
             });
             
-            setToastType('success')
-            setToastTitle('Order Processed')
-            setToastMessage('Order Details processed successfully.')
-            setShowToast(true)
             
-            setTimeout(() => {
-                router.push({
+            showToast(
+                'success',
+                'Order Processed',
+                'Order details have been processed successfully.'
+            )
+            
+            router.push({
                     pathname: '/receipt/Receipt',
                     params: {
                         orderId: result,
                     }
                 })
-            }, 500)
+          
             setSelectedCustomer(null)
             setSelectedCustomerData(null)
             setSelectedProduct(null)
             setOrderItems([])
+            setAmountPaid('')
+            setDiscount('')
             
 
         }
         catch (error: any) {
-            console.log(error?.message)
-            setToastType('error')
-            setToastTitle('Unable to create order')
-            setToastMessage('Order details could not be processed at the moment.')
-            setShowToast(true)
+            showToast(
+                'error',
+                'Unable to create order',
+                'Order details could not be processed at the moment. Please try again.'
+            )
         }
     }
     return (
         <View style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>
-                <CustomToast
-                    messageTitle={toastTitle}
-                    messageDescription={toastMessage}
-                    type={toastType}
-                    visible={showToast}
-                    onHide={() => setShowToast(false)}
-                />
+                
                 <Header title='Create Order' onPress={() => router.back()} />
                 <ScrollView
                     contentContainerStyle={styles.scrollContainer}

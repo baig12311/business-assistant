@@ -54,6 +54,14 @@ const OrderStatusModal: React.FC<Props> = ({
     const [selectedStatus, setSelectedStatus] =
         useState<OrderStatusType>(currentStatus);
 
+        const statusAsset = currentStatus === 'Pending' ? {bg: Colors.warningLight, icon: Colors.warning,
+            iconName: 'clock', iconType: 'SimpleLineIcons' } : currentStatus === 'Confirmed' ? {bg: Colors.blueLight, 
+                icon: Colors.blue, iconName: 'checkmark-done-outline', iconType: 'Ionicons' } : 
+                currentStatus === 'Shipped' ? {bg: Colors.successLight, 
+                icon: Colors.primary, iconName: 'truck', iconType: 'AntDesign' } :
+                {bg: Colors.errorLight, 
+                icon: Colors.error, iconName: 'close-circle-outline', iconType: 'Ionicons' }
+
     const progress = useSharedValue(0);
 
     useEffect(() => {
@@ -114,12 +122,13 @@ const OrderStatusModal: React.FC<Props> = ({
 
                     {/* Current Status */}
                     <View style={styles.currentStatusContainer}>
-                        <View style={styles.statusIcon}>
+                        <View style={[styles.statusIcon, 
+                            {backgroundColor: statusAsset.bg}]}>
                             <Icon
-                                name="clipboard-outline"
-                                type="Ionicons"
-                                size={wp(6)}
-                                color={Colors.primary}
+                                name={statusAsset.iconName}
+                                type={statusAsset.iconType}
+                                size={wp(5)}
+                                color={statusAsset.icon}
                             />
                         </View>
 
@@ -213,7 +222,7 @@ const OrderStatusModal: React.FC<Props> = ({
                     </View>
 
                     {/* Cancellation Option */}
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         style={[
                             styles.cancelOrderOption,
                             isCancelled &&
@@ -252,7 +261,7 @@ const OrderStatusModal: React.FC<Props> = ({
                             size={wp(5)}
                             color="#C0392B"
                         />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
                     {/* Actions */}
                     <View style={styles.buttonContainer}>
@@ -335,7 +344,7 @@ const styles = StyleSheet.create({
         width: wp(11),
         height: wp(11),
         borderRadius: wp(6),
-        backgroundColor: Colors.successLight,
+       // backgroundColor: Colors.successLight,
         justifyContent: 'center',
         alignItems: 'center',
     },

@@ -23,11 +23,12 @@ import BusinessType from '../../../src/components/common/BusinessType';
 import { countries } from '../../../src/services/data/countries';
 import { businessSchema } from '../../../src/services/schema/businessSchema';
 import CustomBottomSheet from '../../../src/components/common/CustomBottomSheet';
+import { useToast } from '../../../src/context/ToastContext';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { currencies } from '../../../src/services/data/currencies';
 import { businessCategories } from '../../../src/services/data/categories';
 import { Image } from 'expo-image';
-import { ca } from 'zod/v4/locales';
+
 type currency = {
     code: string
     name: string
@@ -41,6 +42,7 @@ type selected = {
     code: CountryCode
 }
 const BusinessSetup = () => {
+    const {showToast} = useToast()
     const queryClient = useQueryClient();
 
     const { data: user, isLoading, error } = useUser()
@@ -274,10 +276,20 @@ const BusinessSetup = () => {
             await queryClient.invalidateQueries({
                 queryKey: ['business', user.id],
             });
+            showToast(
+                'success',
+                'Business Updated',
+                'Business details have been updated successfully.'
+            )
             closeAllEditModes()
 
         } catch (error) {
-            console.log('Update Business Error:', error);
+
+            showToast(
+                'error',
+                'Unable to Update',
+                "We couldn't update business details. Please try again."
+            )
         } finally {
             setLoading(false);
         }

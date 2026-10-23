@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, KeyboardAvoidingView, ScrollView, Platform } fr
 import { supabase } from '../../../src/lib/supabase';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from './SignupStyle';
-import CustomToast from '../../../src/components/common/CustomToast';
+import { useToast } from '../../../src/context/ToastContext';
 import { router } from 'expo-router';
 import PasswordRequirements from '../../../src/components/auth/PasswrodCheck';
 import { signupSchema } from '../../../src/services/schema/signupSchema';
@@ -11,14 +11,12 @@ import Input from '../../../src/components/common/Input';
 import Button from '../../../src/components/common/Button';
 import * as Linking from 'expo-linking';
 const Signup = () => {
+    const{showToast} =useToast()
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const [confirmPassword, setConfirmPassword] = useState('')
-    const [toastMessage, setToastMessage] = useState('')
-    const [showToast, setShowToast] = useState(false)
-    const [toastType, setToastType] = useState<'success' | 'error'>('error')
     const [errors, setErrors] = useState<{
         name?: string;
         email?: string;
@@ -51,7 +49,6 @@ const Signup = () => {
         }
 
         const redirectTo = Linking.createURL('callback');
-        console.log('Redirect URL:', redirectTo);
         
 
         const { data, error } = await supabase.auth.signUp({
@@ -67,11 +64,11 @@ const Signup = () => {
             }
         });
         if (error) {
-            setShowToast(true)
-            setToastType('error')
-            setToastMessage('Something went wrong. Try again')
-            console.log(error.message);
-            
+            showToast(
+                'error',
+                'Signup Failed',
+                "We couldn't create your account. Please try again."
+            )
             setLoading(false)
             return;
         }
@@ -86,21 +83,6 @@ const Signup = () => {
             setLoading(false)
             return
         }
-
-        // setTimeout(() => {
-        //     router.push({
-        //         pathname: '/businessSetup/BusinessSetup',
-        //         params: {
-        //             userId: data.user?.id,
-        //         },
-        //     });
-        // }, 3100)
-
-
-
-        setToastType('success')
-        setToastMessage('Your account has been created succesfully. Now set up your business')
-        setShowToast(true)
         setLoading(false)
         setName('')
         setEmail('')
@@ -109,17 +91,6 @@ const Signup = () => {
     }
     return (
         <SafeAreaView style={styles.container}>
-            {
-                showToast && (
-                    <CustomToast
-                        type={toastType}
-                        messageTitle={toastType === 'success' ? 'Account created' : 'Unable to create account'}
-                        messageDescription={toastMessage}
-                        visible={showToast}
-                        onHide={() => setShowToast(false)}
-                    />
-                )
-            }
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

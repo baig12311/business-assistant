@@ -35,13 +35,14 @@ const Status:React.FC<props> = ({title, isSelected, onPress}) => {
 const styles = StyleSheet.create({
     container: {
         //backgroundColor: Colors.border,
-        paddingHorizontal: wp(4),
+        paddingHorizontal: wp(2.5),
         paddingVertical: wp(0.5),
         borderRadius: wp(50),
     },
     text:{
         
         fontSize: fontSize.smallText,
+        
         //fontFamily: fonts.medium,
     }
 });

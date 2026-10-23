@@ -52,10 +52,14 @@ const OnlineOrderCard: React.FC<props> = ({ orderSource, status, customer, onPre
                     <Text style={[styles.badgeText,
                     { backgroundColor: badgeColor.bg, color: badgeColor.color }
                     ]}>{status}</Text>
+                    {
+                        status !== 'Cancelled' && (
+                            <Text style={[styles.badgeText,
+                            { backgroundColor: amountBadgeColor.bg, color: amountBadgeColor.color }
+                            ]}>{badgeText}</Text>
+                        )
+                    }
 
-                    <Text style={[styles.badgeText,
-                    { backgroundColor: amountBadgeColor.bg, color: amountBadgeColor.color }
-                    ]}>{badgeText}</Text>
                 </View>
 
 
@@ -68,7 +72,7 @@ const OnlineOrderCard: React.FC<props> = ({ orderSource, status, customer, onPre
 
                             customer && (<Text style={styles.customer}>{customer}</Text>)}
 
-                        {orderSource && <Text style={[styles.customer, {color: Colors.textSecondary}]}>{orderSource} order</Text>}
+                        {orderSource && <Text style={[styles.customer, { color: Colors.textSecondary }]}>{orderSource} order</Text>}
 
                     </View>
                 )
@@ -76,23 +80,27 @@ const OnlineOrderCard: React.FC<props> = ({ orderSource, status, customer, onPre
 
 
             <Text style={styles.date}>{date}</Text>
+            {
+                status !== 'Cancelled' && (
+                    <View style={styles.amountRow}>
+                        <Text style={styles.date}>Total: <Text style={{ color: Colors.text }}>{currency} {amount.toLocaleString()}</Text></Text>
+                        <View style={styles.divider} />
+                        <Text style={styles.date}>Paid: <Text style={{ color: Colors.primary }}>{currency} {totalPaid.toLocaleString()}</Text></Text>
 
-            <View style={styles.amountRow}>
-                <Text style={styles.date}>Total: <Text style={{ color: Colors.text }}>{currency} {amount.toLocaleString()}</Text></Text>
-                <View style={styles.divider} />
-                <Text style={styles.date}>Paid: <Text style={{ color: Colors.primary }}>{currency} {totalPaid.toLocaleString()}</Text></Text>
-
-                {
-                    due < 0 && (
-                        <>
-                            <View style={styles.divider} />
-                            <Text style={styles.date}>Due: <Text style={{ color: Colors.error }}>{currency} {due.toLocaleString()}</Text></Text>
-                        </>
+                        {
+                            due < 0 && (
+                                <>
+                                    <View style={styles.divider} />
+                                    <Text style={styles.date}>Due: <Text style={{ color: Colors.error }}>{currency} {due.toLocaleString()}</Text></Text>
+                                </>
 
 
-                    )
-                }
-            </View>
+                            )
+                        }
+                    </View>
+                )
+            }
+
 
 
         </TouchableOpacity>

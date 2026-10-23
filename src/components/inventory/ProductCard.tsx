@@ -99,7 +99,9 @@ const styles = StyleSheet.create({
     image: {
         width: wp(10),
         height: wp(10),
-        borderRadius: wp(2)
+        borderRadius: wp(2),
+        borderWidth: 0.3,
+        borderColor: Colors.border
     },
     placeholder:{
         borderWidth: 0.3,

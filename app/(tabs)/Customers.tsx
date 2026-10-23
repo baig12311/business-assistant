@@ -35,8 +35,14 @@ const Customers = () => {
 
     // render customer
     const CustomerItem = ({ item }: any) => {
-        const orders = item.orders ?? []
-         const totalPurchases = orders.reduce(
+        const orders = (item.orders ?? []).filter(
+        (order: any) =>
+            !['cancelled', 'canceled'].includes(
+                String(order.status ?? '').trim().toLowerCase()
+            )
+    );
+
+    const totalPurchases = orders.reduce(
         (sum: number, order: any) =>
             sum + Number(order.total_amount ?? 0),
         0
@@ -52,6 +58,7 @@ const Customers = () => {
         },
         0
     );
+
         return (
             <CustomerCard
                 name={item.name}
