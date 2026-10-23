@@ -37,10 +37,10 @@ const AnimatedLoader = () => {
 const styles = StyleSheet.create({
     container: {
         marginTop: hp(6),
-        backgroundColor: Colors.textMuted,
-        //elevation:3,
-        width: wp(30),
-        height: wp(1),
+        backgroundColor: Colors.border,
+        width: wp(35),
+        height: hp(1),
+
         borderRadius: wp(10),
         overflow: 'hidden'
     },

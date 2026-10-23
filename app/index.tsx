@@ -3,93 +3,98 @@
 
 
 import { useEffect } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '../src/lib/supabase';
+import {
+    widthPercentageToDP as wp,
+    heightPercentageToDP as hp
+} from 'react-native-responsive-screen';
 import Colors from '../src/constants/colors';
 import fonts, { fontSize } from '../src/constants/typography';
-import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import AnimatedLoader from '../src/components/common/AnimatedLoader';
+import { LinearGradient } from 'expo-linear-gradient';
+
 
 const Index = () => {
-    useEffect(() => {
-        let isActive = true;
+    // useEffect(() => {
+    //     let isActive = true;
 
-        const checkUser = async () => {
-            try {
-                const {
-                    data: { session },
-                    error: sessionError,
-                } = await supabase.auth.getSession();
+    //     const checkUser = async () => {
+    //         try {
+    //             const {
+    //                 data: { session },
+    //                 error: sessionError,
+    //             } = await supabase.auth.getSession();
 
-                if (sessionError) {
-                    throw sessionError;
-                }
+    //             if (sessionError) {
+    //                 throw sessionError;
+    //             }
 
-                if (!session) {
-                    if (isActive) {
-                        router.replace('/OnBoard');
-                    }
-                    return;
-                }
+    //             if (!session) {
+    //                 if (isActive) {
+    //                     router.replace('/OnBoard');
+    //                 }
+    //                 return;
+    //             }
 
-                // Verify that the session's user is still valid.
-                const {
-                    data: { user },
-                    error: userError,
-                } = await supabase.auth.getUser();
+    //             // Verify that the session's user is still valid.
+    //             const {
+    //                 data: { user },
+    //                 error: userError,
+    //             } = await supabase.auth.getUser();
 
-                if (userError || !user) {
-                    await supabase.auth.signOut({ scope: 'local' });
+    //             if (userError || !user) {
+    //                 await supabase.auth.signOut({ scope: 'local' });
 
-                    if (isActive) {
-                        router.replace('/OnBoard');
-                    }
-                    return;
-                }
-
-
-                const { data: business, error: businessError } =
-                    await supabase
-                        .from('businesses')
-                        .select('id')
-                        .eq('owner_id', user.id)
-                        .limit(1)
-                        .maybeSingle();
+    //                 if (isActive) {
+    //                     router.replace('/OnBoard');
+    //                 }
+    //                 return;
+    //             }
 
 
+    //             const { data: business, error: businessError } =
+    //                 await supabase
+    //                     .from('businesses')
+    //                     .select('id')
+    //                     .eq('owner_id', user.id)
+    //                     .limit(1)
+    //                     .maybeSingle();
 
-                if (businessError) {
-                    console.log(
-                        'Business check error:',
-                        businessError.message
-                    );
-                    return;
-                }
 
-                if (!isActive) return;
 
-                if (!business) {
-                    router.replace('/businessSetup/BusinessSetup');
-                    return;
-                }
+    //             if (businessError) {
+    //                 console.log(
+    //                     'Business check error:',
+    //                     businessError.message
+    //                 );
+    //                 return;
+    //             }
 
-                router.replace('/(tabs)/Home');
-            } catch (error) {
-                console.log('Startup auth error:', error);
+    //             if (!isActive) return;
 
-                if (isActive) {
-                    router.replace('/OnBoard');
-                }
-            }
-        };
+    //             if (!business) {
+    //                 router.replace('/businessSetup/BusinessSetup');
+    //                 return;
+    //             }
 
-        checkUser();
+    //             router.replace('/(tabs)/Home');
+    //         } catch (error) {
+    //             console.log('Startup auth error:', error);
 
-        return () => {
-            isActive = false;
-        };
-    }, []);
+    //             if (isActive) {
+    //                 router.replace('/OnBoard');
+    //             }
+    //         }
+    //     };
+
+    //     checkUser();
+
+    //     return () => {
+    //         isActive = false;
+    //     };
+    // }, []);
 
     return (
         <View
@@ -97,22 +102,87 @@ const Index = () => {
                 flex: 1,
                 justifyContent: 'center',
                 alignItems: 'center',
+                backgroundColor: Colors.background
             }}
         >
-            <Text
-                style={{
-                    fontFamily: fonts.bold,
-                    fontSize: fontSize.heading,
-                    color: Colors.primary,
-                    marginTop: hp(2),
-                }}
-            >
-                Business Assistant
-            </Text>
+            <Text style={styles.text1}>SHOP</Text>
+            <Text style={styles.text2}>TOWN</Text>
+            <Text style={styles.textSecondary}>
+                MANAGE YOUR BUSINESS SMARTER
+                </Text>
 
             <AnimatedLoader />
+
+
+            {/* top */}
+            <View style={[styles.outerContainer,
+            { left: -150, top: -150, }
+            ]}>
+                <LinearGradient
+                    colors={['#E5F5E8', '#A8D8B0', '#4DA96A']}
+                    locations={[0, 0.55, 1]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.innerContainer}
+                />
+                {/* <View style={[styles.innerContainer]}/> */}
+            </View>
+
+            {/* bottom */}
+            <View style={[styles.outerContainer,
+            { right: -150, bottom: -150, }
+            ]}>
+                <LinearGradient
+                    colors={['#4DA96A','#A8D8B0', '#E5F5E8' ]}
+                    locations={[0, 0.55, 1]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.innerContainer}
+                />
+                {/* <View style={[styles.innerContainer]}/> */}
+            </View>
         </View>
     );
 };
 
 export default Index;
+
+
+const styles = StyleSheet.create({
+    text1: {
+        fontFamily: fonts.extraBold,
+        fontSize: wp(15),
+        color: Colors.primaryDark,
+        letterSpacing: -3,
+        lineHeight: wp(15),
+    },
+    text2: {
+        fontFamily: fonts.extraBold,
+        fontSize: wp(12),
+        color: Colors.success,
+        letterSpacing: -3,
+        lineHeight: wp(15),
+    },
+    textSecondary: {
+        fontFamily: fonts.semiBold,
+        fontSize: wp(4),
+        color: Colors.textSecondary,
+        marginTop: hp(4)
+    },
+    innerContainer: {
+        //borderWidth:1,
+        width: wp(70),
+        height: wp(70),
+        borderRadius: wp(100),
+    },
+    outerContainer: {
+        width: wp(90),
+        height: wp(90),
+        borderRadius: wp(50),
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+        backgroundColor: 'transparent',
+        overflow: 'hidden',
+    }
+})
