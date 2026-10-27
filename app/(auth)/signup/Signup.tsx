@@ -10,6 +10,7 @@ import { signupSchema } from '../../../src/services/schema/signupSchema';
 import Input from '../../../src/components/common/Input';
 import Button from '../../../src/components/common/Button';
 import * as Linking from 'expo-linking';
+import Logo from '../../../src/components/common/Logo';
 const Signup = () => {
     const{showToast} =useToast()
     const [name, setName] = useState('')
@@ -95,13 +96,15 @@ const Signup = () => {
                 style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             >
+
                 <ScrollView
                     contentContainerStyle={styles.scrollContainer}
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
                 >
+                    <Logo/>
                     <Text style={styles.heading}>Create your account</Text>
-                    <Text style={styles.subHeading}>Join business assistant and grow your business</Text>
+                    <Text style={styles.subHeading}>Join ShopSphere and grow your business</Text>
                     <Input
                         title='Full Name*'
                         placeholder='John Doe'

@@ -63,7 +63,7 @@ const Customers = () => {
             <CustomerCard
                 name={item.name}
                 phone={item.phone}
-                order={item?.orders?.length ?? 0}
+                order={orders?.length ?? 0}
                 balance={outstandingBalance}
                 currency = {business?.currency}
                 totalPurchase={totalPurchases}

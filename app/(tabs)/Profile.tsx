@@ -121,7 +121,15 @@ const Profile = () => {
                         //onPress={()=>setShowAccountDialog(true)}
                     />
                 </View>
-
+                <View style={{marginTop: hp(4)}}>
+                    <Text style={styles.version}>
+                    ShopSphere
+                </Text>
+                <Text style={styles.version}>
+                    Version 1.0.0
+                </Text>
+                </View>
+                
                 {/* <SignOut
                 onPress={logout}
             /> */}
@@ -164,8 +172,14 @@ const styles = StyleSheet.create({
     scroll: {
         paddingBottom: hp(3),
         flexGrow: 1
-    }
+    },
 
+    version:{
+        fontFamily: fonts.medium,
+        fontSize: fontSize.smallText,
+        color:Colors.textSecondary,
+        textAlign: 'center',
+    }
 });
 
 //make this component available to the app

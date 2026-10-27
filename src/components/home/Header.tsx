@@ -31,17 +31,12 @@ const Header: React.FC<props> = ({ userName, business, imageurl }) => {
                 }}>{userName}</Text></Text>
                 <Text style={[styles.text, { fontFamily: fonts.extraBold, color: Colors.text }]}>{business}</Text>
             </View>
-            <TouchableOpacity
-                activeOpacity={0.7}
-                style={styles.icon}
-            >
-                <Icon
-                    name='notifications-outline'
-                    type='Ionicons'
-                    size={wp(6)}
-                    color={Colors.text}
-                />
-            </TouchableOpacity>
+
+            <Image
+                source={require('../../../assets/appAssets/logo.png')}
+                style={styles.logo}
+            />
+
 
 
         </View>
@@ -77,7 +72,8 @@ const styles = StyleSheet.create({
         width: wp(14),
         height: wp(14),
         borderRadius: wp(7)
-    }
+    },
+
 });
 
 //make this component available to the app

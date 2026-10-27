@@ -18,6 +18,7 @@ import {
 import { formatDate } from '../../src/services/formatDate';
 import Colors from '../../src/constants/colors';
 import { orderStatus } from '../../src/services/data/orderStatus';
+import { OrderSource } from '../../src/services/createOrder';
 import Status from '../../src/components/sales/Status';
 import OrderCard from '../../src/components/sales/OrderCard';
 import OrderSourceSelector from '../../src/components/common/OrderSourceSelector';
@@ -60,6 +61,11 @@ const Orders = () => {
 
         return matchesSearch && matchesSource && matchesStatus;
     });
+
+    const hasActiveFilter =
+    searchText.trim() !== '' ||
+    selectedSource !== 'all' ||
+    selectedStatus !== 'All';
     // render order
     const renderOrder = ({ item }: any) => {
         const date = formatDate(item?.created_at)
@@ -102,6 +108,7 @@ const Orders = () => {
                 />
             )
         }
+        return null
 
     }
 
@@ -166,10 +173,20 @@ const Orders = () => {
 
             <FlatList
                 data={filterOrders ?? []}
-                renderItem={({ item }) => renderOrder({ item })}
+                renderItem={renderOrder}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{ flexGrow: 1, paddingBottom: hp(6) }}
                 showsVerticalScrollIndicator={false}
+                ListEmptyComponent={
+        <CustomEmptyComponent
+            mainText={hasActiveFilter ? 'No orders found' : 'No orders yet'}
+            subText={
+                hasActiveFilter
+                    ? 'Try a different search or filter'
+                    : 'Your orders will appear here'
+            }
+        />
+    }
             />
 
 

@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import Header from '../../src/components/common/Header';
 import Input from '../../src/components/common/Input';
+import OrderStatusSkeleton from '../../src/components/skeleton/CustomerOrderSkeleton';
 import OnlineOrderCard from '../../src/components/sales/OnlineOrderCard';
 import CustomerOrderCard from '../../src/components/customers/CustomerOrderCard';
 import { formatDate } from '../../src/services/formatDate';
@@ -21,7 +22,7 @@ const CustomerPayment = () => {
     const { data: business, isLoading: businessLoading } = useBusiness(user?.id)
     const businessType = business?.business_type
     const { data: customerOrder, isLoading: orderLoading } = useCustomerOrders(businessId, customerId)
-
+    const isLoading = userLoading || businessLoading || orderLoading
      //filter orders
     const filterOrders = customerOrder?.filter(item =>
         item.order_number.toString().
@@ -61,6 +62,23 @@ const CustomerPayment = () => {
         return null
 
     }
+
+    if (isLoading) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Header title='Orders' onPress={() => router.back()} />
+                <Input
+                    placeholder='Search by order number...'
+                    value={searchText}
+                    onChangeText={setSearchText}
+                    iconName='search-outline'
+                    iconType='Ionicons'
+                    keyboard='numeric'
+                />
+                <OrderStatusSkeleton/>
+            </SafeAreaView>
+        )
+    }
     return (
         <SafeAreaView style={styles.container}>
             <Header title='Customer Orders' onPress={() => router.back()} />
@@ -79,6 +97,7 @@ const CustomerPayment = () => {
                 contentContainerStyle={{ flexGrow: 1, paddingVertical: 20 }}
                 showsVerticalScrollIndicator={false}
             />
+            
         </SafeAreaView>
     );
 };

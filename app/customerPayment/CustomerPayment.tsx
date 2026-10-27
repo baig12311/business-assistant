@@ -10,26 +10,39 @@ import { formatDate } from '../../src/services/formatDate';
 import { useCustomerPayments } from '../../src/hooks/useCustomerPayment';
 import { useBusiness } from '../../src/hooks/useBusiness';
 import { useUser } from '../../src/hooks/useUser';
+import PaymentSkeleton from '../../src/components/skeleton/PaymentSkeleton';
 const CustomerPayment = () => {
     const { businessId, customerId } = useLocalSearchParams<{
         businessId: string,
         customerId: string
     }>()
     const [searchText, setSearchText] = useState('')
-    const {data: user, isLoading: userLoading} = useUser()
+    const { data: user, isLoading: userLoading } = useUser()
     const { data: business, isLoading: businessLoading } = useBusiness(user?.id)
-    
+
     const { data: customerPayment, isLoading: paymentLoading } = useCustomerPayments(businessId, customerId)
-    // search payment
-    const filterPayments = (customerPayment ?? []).filter(payment =>
-  payment.customer_payment_allocations?.some(allocation =>
-    allocation.orders?.order_number
-      ?.toString()
-      .includes(searchText.trim())
-  )
-);
+    const isLoading = userLoading || businessLoading || paymentLoading
+
+    const query = searchText.trim().toLowerCase();
+
+    const filterPayments = (customerPayment ?? []).filter((payment: any) => {
+        if (!query) return true;
+
+        // date se match
+        const dateText = String(formatDate(payment.created_at) ?? '').toLowerCase();
+        if (dateText.includes(query)) return true;
+
+        // order number se match
+        return payment.customer_payment_allocations?.some((allocation: any) => {
+            const order = Array.isArray(allocation.orders)
+                ? allocation.orders[0]
+                : allocation.orders;
+
+            return String(order?.order_number ?? '').includes(query);
+        });
+    });
     const renderPayment = ({ item }: any) => {
-        
+
         return (
             <PaymentCard
                 amount={item.amount}
@@ -39,16 +52,35 @@ const CustomerPayment = () => {
             />
         )
     }
+
+
+    if (isLoading) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Header title='Orders' onPress={() => router.back()} />
+                <Input
+                    placeholder='Search by order number or date...'
+                    value={searchText}
+                    onChangeText={setSearchText}
+                    iconName='search-outline'
+                    iconType='Ionicons'
+                    keyboard='numeric'
+                />
+                <PaymentSkeleton />
+            </SafeAreaView>
+        )
+    }
     return (
         <SafeAreaView style={styles.container}>
             <Header title='Customer Payments' onPress={() => router.back()} />
             <Input
-                placeholder='Search payment by order number...'
-                // value={searchText}
-                // onChangeText={setSearchText}
+                placeholder='Search by order number or date...'
+                value={searchText}
+                onChangeText={setSearchText}
                 iconName='search-outline'
                 iconType='Ionicons'
             />
+
             <FlatList
                 data={filterPayments}
                 renderItem={renderPayment}

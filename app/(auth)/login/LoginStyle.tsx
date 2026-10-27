@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: Colors.background,
         padding: wp(3),
-        justifyContent: 'center'
+        //justifyContent: 'center'
     },
     heading:{
         fontFamily:fonts.extraBold,

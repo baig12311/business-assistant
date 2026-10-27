@@ -11,6 +11,7 @@ import { loginSchema } from '../../../src/services/schema/loginSchema';
 import { useToast } from '../../../src/context/ToastContext';
 import Button from '../../../src/components/common/Button';
 import { tr } from 'zod/v4/locales';
+import Logo from '../../../src/components/common/Logo';
 const Login = () => {
     const { showToast } = useToast();
     const [loading, setLoading] = useState(false)
@@ -78,8 +79,9 @@ const Login = () => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <Logo/>
             <Text style={styles.heading}>Welcome Back</Text>
-            <Text style={styles.subHeading}>Login to your Business Assistant account</Text>
+            <Text style={styles.subHeading}>Login to your ShopSphere account</Text>
             <Input
                 title='Email*'
                 placeholder='someone@example.com'

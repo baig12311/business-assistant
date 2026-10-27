@@ -7,6 +7,7 @@ import {
     KeyboardAvoidingView,
     Platform,
 } from 'react-native';
+import Logo from '../../../src/components/common/Logo';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';

@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '../src/lib/supabase';
+import { Image } from 'expo-image';
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
@@ -17,99 +18,100 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 
 const Index = () => {
-    // useEffect(() => {
-    //     let isActive = true;
+    useEffect(() => {
+        let isActive = true;
 
-    //     const checkUser = async () => {
-    //         try {
-    //             const {
-    //                 data: { session },
-    //                 error: sessionError,
-    //             } = await supabase.auth.getSession();
+        const checkUser = async () => {
+            try {
+                const {
+                    data: { session },
+                    error: sessionError,
+                } = await supabase.auth.getSession();
 
-    //             if (sessionError) {
-    //                 throw sessionError;
-    //             }
+                if (sessionError) {
+                    throw sessionError;
+                }
 
-    //             if (!session) {
-    //                 if (isActive) {
-    //                     router.replace('/OnBoard');
-    //                 }
-    //                 return;
-    //             }
+                if (!session) {
+                    if (isActive) {
+                        router.replace('/OnBoard');
+                    }
+                    return;
+                }
 
-    //             // Verify that the session's user is still valid.
-    //             const {
-    //                 data: { user },
-    //                 error: userError,
-    //             } = await supabase.auth.getUser();
+                // Verify that the session's user is still valid.
+                const {
+                    data: { user },
+                    error: userError,
+                } = await supabase.auth.getUser();
 
-    //             if (userError || !user) {
-    //                 await supabase.auth.signOut({ scope: 'local' });
+                if (userError || !user) {
+                    await supabase.auth.signOut({ scope: 'local' });
 
-    //                 if (isActive) {
-    //                     router.replace('/OnBoard');
-    //                 }
-    //                 return;
-    //             }
-
-
-    //             const { data: business, error: businessError } =
-    //                 await supabase
-    //                     .from('businesses')
-    //                     .select('id')
-    //                     .eq('owner_id', user.id)
-    //                     .limit(1)
-    //                     .maybeSingle();
+                    if (isActive) {
+                        router.replace('/OnBoard');
+                    }
+                    return;
+                }
 
 
+                const { data: business, error: businessError } =
+                    await supabase
+                        .from('businesses')
+                        .select('id')
+                        .eq('owner_id', user.id)
+                        .limit(1)
+                        .maybeSingle();
 
-    //             if (businessError) {
-    //                 console.log(
-    //                     'Business check error:',
-    //                     businessError.message
-    //                 );
-    //                 return;
-    //             }
 
-    //             if (!isActive) return;
 
-    //             if (!business) {
-    //                 router.replace('/businessSetup/BusinessSetup');
-    //                 return;
-    //             }
+                if (businessError) {
+                    console.log(
+                        'Business check error:',
+                        businessError.message
+                    );
+                    return;
+                }
 
-    //             router.replace('/(tabs)/Home');
-    //         } catch (error) {
-    //             console.log('Startup auth error:', error);
+                if (!isActive) return;
 
-    //             if (isActive) {
-    //                 router.replace('/OnBoard');
-    //             }
-    //         }
-    //     };
+                if (!business) {
+                    router.replace('/businessSetup/BusinessSetup');
+                    return;
+                }
 
-    //     checkUser();
+                router.replace('/(tabs)/Home');
+            } catch (error) {
+                console.log('Startup auth error:', error);
 
-    //     return () => {
-    //         isActive = false;
-    //     };
-    // }, []);
+                if (isActive) {
+                    router.replace('/OnBoard');
+                }
+            }
+        };
+
+        checkUser();
+
+        return () => {
+            isActive = false;
+        };
+    }, []);
 
     return (
         <View
-            style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: Colors.background
-            }}
+            style={styles.container}
         >
-            <Text style={styles.text1}>SHOP</Text>
-            <Text style={styles.text2}>TOWN</Text>
+            <Image
+                style={styles.logo}
+                source={require('../assets/appAssets/logo.png')}
+            />
+            <Text style={styles.text1}>Shop
+                <Text style={{ color: Colors.success }}>Sphere</Text>
+            </Text>
+
             <Text style={styles.textSecondary}>
-                MANAGE YOUR BUSINESS SMARTER
-                </Text>
+                SALES  •  STOCK  •  ORDERS  •  CUSTOMERS  •  PAYMENTS
+            </Text>
 
             <AnimatedLoader />
 
@@ -133,7 +135,7 @@ const Index = () => {
             { right: -150, bottom: -150, }
             ]}>
                 <LinearGradient
-                    colors={['#4DA96A','#A8D8B0', '#E5F5E8' ]}
+                    colors={['#4DA96A', '#A8D8B0', '#E5F5E8']}
                     locations={[0, 0.55, 1]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
@@ -149,28 +151,28 @@ export default Index;
 
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: Colors.background,
+        padding: wp(3)
+    },
     text1: {
         fontFamily: fonts.extraBold,
-        fontSize: wp(15),
-        color: Colors.primaryDark,
-        letterSpacing: -3,
-        lineHeight: wp(15),
-    },
-    text2: {
-        fontFamily: fonts.extraBold,
         fontSize: wp(12),
-        color: Colors.success,
-        letterSpacing: -3,
-        lineHeight: wp(15),
+        color: Colors.primaryDark,
+        letterSpacing: -2,
+        includeFontPadding: false,
+        lineHeight: wp(16),
     },
     textSecondary: {
         fontFamily: fonts.semiBold,
-        fontSize: wp(4),
+        fontSize: fontSize.smallText,
         color: Colors.textSecondary,
-        marginTop: hp(4)
+        marginTop: hp(1)
     },
     innerContainer: {
-        //borderWidth:1,
         width: wp(70),
         height: wp(70),
         borderRadius: wp(100),
@@ -184,5 +186,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         backgroundColor: 'transparent',
         overflow: 'hidden',
+    },
+    logo: {
+        width: wp(40),
+        height: wp(40),
     }
 })

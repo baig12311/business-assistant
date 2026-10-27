@@ -1,3 +1,4 @@
+import { OrderSource } from "../services/createOrder";
 export type OrderStatus =
     | 'Pending'
     | 'Confirmed'
@@ -15,6 +16,7 @@ export type Order = {
     total_amount: number;
     paid_amount: number;
     created_at: string;
+    order_source:OrderSource
 };
 
 export type OrderItem = {
