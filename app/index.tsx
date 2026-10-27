@@ -3,10 +3,9 @@
 
 
 import { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image} from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '../src/lib/supabase';
-import { Image } from 'expo-image';
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
@@ -104,6 +103,7 @@ const Index = () => {
             <Image
                 style={styles.logo}
                 source={require('../assets/appAssets/logo.png')}
+                resizeMode='contain'
             />
             <Text style={styles.text1}>Shop
                 <Text style={{ color: Colors.success }}>Sphere</Text>
@@ -159,6 +159,7 @@ const styles = StyleSheet.create({
         padding: wp(3)
     },
     text1: {
+        marginTop: hp(1),
         fontFamily: fonts.extraBold,
         fontSize: wp(12),
         color: Colors.primaryDark,
@@ -188,7 +189,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     logo: {
-        width: wp(40),
-        height: wp(40),
+        width: wp(30),
+        height: wp(30),
     }
 })

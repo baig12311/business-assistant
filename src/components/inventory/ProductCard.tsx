@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, Touchable, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Touchable, TouchableOpacity, Image} from 'react-native';
 import Colors from '../../constants/colors';
-import { Image } from 'expo-image';
+
 import fonts, { fontSize } from '../../constants/typography';
 import Icon from '../common/Icon';
 import {

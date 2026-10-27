@@ -1,6 +1,5 @@
 
-import { View, Text, StyleSheet } from 'react-native';
-import { Image } from 'expo-image';
+import { View, Text, StyleSheet, Image} from 'react-native';
 import Colors from '../../constants/colors';
 import fonts, {fontSize} from '../../constants/typography';
 import { widthPercentageToDP as wp,
@@ -12,6 +11,7 @@ const Logo = () => {
             <Image
         style={styles.logo}
         source={require('../../../assets/appAssets/logo.png')}
+        resizeMode='contain'
         />
         <Text style={styles.text}>Shop
             <Text style={{color: Colors.success}}>Sphere</Text>
@@ -27,8 +27,8 @@ const styles = StyleSheet.create({
         marginBottom: hp(3),
     },
     logo: {
-        width: wp(30),
-        height: wp(30),
+        width: wp(25),
+        height: wp(25),
         alignSelf: 'center',
     },
     text:{
@@ -36,7 +36,6 @@ const styles = StyleSheet.create({
         fontFamily: fonts.extraBold,
         color: Colors.primaryDark,
         textAlign: 'center',
-        marginTop: hp(-1),
     }
 });
 export default Logo;

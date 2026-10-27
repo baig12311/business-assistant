@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity, Image} from 'react-native';
 import styles from './BusinessInfoStyle';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Input from '../../../src/components/common/Input';
@@ -27,7 +27,6 @@ import { useToast } from '../../../src/context/ToastContext';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { currencies } from '../../../src/services/data/currencies';
 import { businessCategories } from '../../../src/services/data/categories';
-import { Image } from 'expo-image';
 
 type currency = {
     code: string

@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform} from 'react-native';
 import styles from './NewOrderStyle';
 import Header from '../../src/components/common/Header';
 import { router } from 'expo-router';
@@ -266,10 +266,16 @@ const NewOrder = () => {
             <SafeAreaView style={styles.container}>
                 
                 <Header title='Create Order' onPress={() => router.back()} />
-                <ScrollView
-                    contentContainerStyle={styles.scrollContainer}
-                    showsVerticalScrollIndicator={false}
-                >
+                     <KeyboardAvoidingView
+                                        style={{ flex: 1 }}
+                                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                                    >
+                                        <ScrollView
+                                            contentContainerStyle={styles.scrollContainer}
+                                            keyboardShouldPersistTaps="handled"
+                                            showsVerticalScrollIndicator={false}
+                                        >
+                
 
                     {/* select order type  */}
                     {
@@ -500,6 +506,7 @@ const NewOrder = () => {
                     }
 
                 </ScrollView>
+                </KeyboardAvoidingView>
                 <View style={styles.button}>
                     <Button
                         title='Confirm order & continue'

@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { captureRef } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, Image} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as Print from 'expo-print';
@@ -20,7 +20,6 @@ import styles from './ReceiptStyle';
 import Header from '../../src/components/common/Header';
 import InvoiceRow from '../../src/components/invoice/InvoiceRow';
 
-import { Image } from 'expo-image';
 
 const Receipt = () => {
     const receiptRef = useRef<View | null>(null);
@@ -105,7 +104,7 @@ const Receipt = () => {
     // handle print
 
 
-    const escapeHtml = (value: unknown) =>
+        const escapeHtml = (value: unknown) =>
         String(value ?? '')
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
@@ -113,214 +112,213 @@ const Receipt = () => {
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
 
-    const handlePrint = async () => {
-        try {
-            if (!order || !business) {
-                console.warn('Receipt data is not ready yet.');
-                return;
-            }
+    const buildReceiptHtml = () => {
+        if (!order || !business) return null;
 
-            const currency = escapeHtml(business.currency || '');
-            const businessName = escapeHtml(business.name || 'Business');
-            const invoiceNumber = escapeHtml(order.order_number ?? '');
-            const customerName = escapeHtml(
-                order.customer?.name ?? 'Walk-in Customer'
-            );
-            const customerPhone = escapeHtml(
-                order.customer?.phone ?? ''
-            );
-            const dateTime = escapeHtml(
-                `${formattedDate} ${formattedTime}`.trim()
-            );
+        const currency = escapeHtml(business.currency || '');
+        const businessName = escapeHtml(business.name || 'Business');
+        const invoiceNumber = escapeHtml(order.order_number ?? '');
+        const customerName = escapeHtml(
+            order.customer?.name ?? 'Walk-in Customer'
+        );
+        const customerPhone = escapeHtml(order.customer?.phone ?? '');
+        const dateTime = escapeHtml(
+            `${formattedDate} ${formattedTime}`.trim()
+        );
 
-            const logoHtml = businessLogo
-                ? `<img class="logo" src="${escapeHtml(businessLogo)}" />`
-                : `<div class="logo-placeholder">${escapeHtml(
-                    busineesInitials || 'B'
-                )}</div>`;
+        const logoHtml = businessLogo
+            ? `<img class="logo" src="${escapeHtml(businessLogo)}" />`
+            : `<div class="logo-placeholder">${escapeHtml(
+                busineesInitials || 'B'
+            )}</div>`;
 
-            const itemRows = orderItems.map((item: any) => {
-                const quantity = Number(item.quantity) || 0;
-                const unitPrice = Number(item.unit_price) || 0;
-                const lineTotal = quantity * unitPrice;
-                const productName = escapeHtml(
-                    item.product?.name || 'Product'
-                );
+        const itemRows = orderItems.map((item: any) => {
+            const quantity = Number(item.quantity) || 0;
+            const unitPrice = Number(item.unit_price) || 0;
+            const lineTotal = quantity * unitPrice;
+            const productName = escapeHtml(item.product?.name || 'Product');
 
-                return `
-                    <tr>
-                        <td class="product">${productName}</td>
-                        <td class="qty">${quantity}</td>
-                        <td class="price">${unitPrice.toLocaleString()}</td>
-                        <td class="total">${lineTotal.toLocaleString()}</td>
-                    </tr>
-                `;
-            }).join('');
-
-            const summaryRow = (
-                title: string,
-                amount: number,
-                strong = false
-            ) => `
-                <div class="summary-row ${strong ? 'strong' : ''}">
-                    <span>${escapeHtml(title)}</span>
-                    <span>${currency} ${amount.toLocaleString()}</span>
-                </div>
+            return `
+                <tr>
+                    <td class="product">${productName}</td>
+                    <td class="qty">${quantity}</td>
+                    <td class="price">${unitPrice.toLocaleString()}</td>
+                    <td class="total">${lineTotal.toLocaleString()}</td>
+                </tr>
             `;
+        }).join('');
 
-            const html = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="utf-8" />
-                    <meta name="viewport"
-                        content="width=device-width, initial-scale=1" />
+        const summaryRow = (
+            title: string,
+            amount: number,
+            strong = false
+        ) => `
+            <div class="summary-row ${strong ? 'strong' : ''}">
+                <span>${escapeHtml(title)}</span>
+                <span>${currency} ${amount.toLocaleString()}</span>
+            </div>
+        `;
 
-                    <style>
-                        @page {
-                            size: 80mm auto;
-                            margin: 3mm;
-                        }
+        const html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8" />
+                <meta name="viewport"
+                    content="width=device-width, initial-scale=1" />
 
-                        * {
-                            box-sizing: border-box;
-                        }
+                <style>
+                    @page {
+                        margin: 0;
+                    }
 
-                        html, body {
-                            margin: 0;
-                            padding: 0;
-                            width: 100%;
-                            font-family: Arial, Helvetica, sans-serif;
-                            font-size: 11px;
-                            color: #222;
-                            overflow-wrap: anywhere;
-                        }
+                    * {
+                        box-sizing: border-box;
+                    }
 
-                        .receipt {
-                            width: 100%;
-                            margin: 0 auto;
-                        }
+                    html, body {
+                        margin: 0;
+                        padding: 0;
+                        width: 100%;
+                        font-family: Arial, Helvetica, sans-serif;
+                        font-size: 11px;
+                        color: #222;
+                        overflow-wrap: anywhere;
+                    }
 
-                        .header {
-                            text-align: center;
-                            padding-bottom: 10px;
-                            border-bottom: 1px dashed #777;
-                        }
+                    .page {
+                        width: 100%;
+                        display: flex;
+                        justify-content: center;
+                    }
 
-                        .logo {
-                            display: block;
-                            width: 56px;
-                            height: 56px;
-                            object-fit: contain;
-                            margin: 0 auto 8px;
-                        }
+                    .receipt {
+                        width: 100%;
+                        max-width: 72mm;
+                        padding: 8px;
+                    }
 
-                        .logo-placeholder {
-                            width: 48px;
-                            height: 48px;
-                            border-radius: 24px;
-                            margin: 0 auto 8px;
-                            background: #e8f3ed;
-                            color: #0e4d3a;
-                            font-size: 18px;
-                            font-weight: bold;
-                            line-height: 48px;
-                            text-align: center;
-                        }
+                    .header {
+                        text-align: center;
+                        padding-bottom: 10px;
+                        border-bottom: 1px dashed #777;
+                    }
 
-                        .business-name {
-                            font-size: 17px;
-                            font-weight: bold;
-                            margin-bottom: 6px;
-                        }
+                    .logo {
+                        display: block;
+                        width: 56px;
+                        height: 56px;
+                        object-fit: contain;
+                        margin: 0 auto 8px;
+                    }
 
-                        .invoice-number {
-                            font-weight: bold;
-                            margin-top: 8px;
-                        }
+                    .logo-placeholder {
+                        width: 48px;
+                        height: 48px;
+                        border-radius: 24px;
+                        margin: 0 auto 8px;
+                        background: #e8f3ed;
+                        color: #0e4d3a;
+                        font-size: 18px;
+                        font-weight: bold;
+                        line-height: 48px;
+                        text-align: center;
+                    }
 
-                        .muted {
-                            color: #555;
-                            margin-top: 5px;
-                        }
+                    .business-name {
+                        font-size: 17px;
+                        font-weight: bold;
+                        margin-bottom: 6px;
+                    }
 
-                        .customer-details {
-                            padding: 9px 0;
-                            line-height: 1.6;
-                            border-bottom: 1px dashed #777;
-                        }
+                    .invoice-number {
+                        font-weight: bold;
+                        margin-top: 8px;
+                    }
 
-                        table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            table-layout: fixed;
-                            margin-top: 10px;
-                        }
+                    .muted {
+                        color: #555;
+                        margin-top: 5px;
+                    }
 
-                        th, td {
-                            padding: 6px 2px;
-                            text-align: right;
-                            vertical-align: top;
-                            border-bottom: 1px solid #e5e5e5;
-                            overflow-wrap: anywhere;
-                        }
+                    .customer-details {
+                        padding: 9px 0;
+                        line-height: 1.6;
+                        border-bottom: 1px dashed #777;
+                    }
 
-                        th {
-                            font-size: 9px;
-                            border-bottom: 1px solid #777;
-                        }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        table-layout: fixed;
+                        margin-top: 10px;
+                    }
 
-                        th:first-child, td.product {
-                            text-align: left;
-                            width: 40%;
-                        }
+                    th, td {
+                        padding: 6px 2px;
+                        text-align: right;
+                        vertical-align: top;
+                        border-bottom: 1px solid #e5e5e5;
+                        overflow-wrap: anywhere;
+                    }
 
-                        th:nth-child(2), td.qty {
-                            width: 12%;
-                        }
+                    th {
+                        font-size: 9px;
+                        border-bottom: 1px solid #777;
+                    }
 
-                        th:nth-child(3), td.price {
-                            width: 22%;
-                        }
+                    th:first-child, td.product {
+                        text-align: left;
+                        width: 40%;
+                    }
 
-                        th:nth-child(4), td.total {
-                            width: 26%;
-                        }
+                    th:nth-child(2), td.qty {
+                        width: 12%;
+                    }
 
-                        .summary {
-                            padding-top: 8px;
-                        }
+                    th:nth-child(3), td.price {
+                        width: 22%;
+                    }
 
-                        .summary-row {
-                            display: flex;
-                            justify-content: space-between;
-                            gap: 8px;
-                            padding: 5px 0;
-                        }
+                    th:nth-child(4), td.total {
+                        width: 26%;
+                    }
 
-                        .summary-row span:last-child {
-                            text-align: right;
-                        }
+                    .summary {
+                        padding-top: 8px;
+                    }
 
-                        .strong {
-                            font-weight: bold;
-                            font-size: 12px;
-                            border-top: 1px solid #777;
-                            padding-top: 8px;
-                        }
+                    .summary-row {
+                        display: flex;
+                        justify-content: space-between;
+                        gap: 8px;
+                        padding: 5px 0;
+                    }
 
-                        .footer {
-                            text-align: center;
-                            border-top: 1px dashed #777;
-                            margin-top: 10px;
-                            padding-top: 12px;
-                            line-height: 1.6;
-                            font-weight: bold;
-                        }
-                    </style>
-                </head>
+                    .summary-row span:last-child {
+                        text-align: right;
+                    }
 
-                <body>
+                    .strong {
+                        font-weight: bold;
+                        font-size: 12px;
+                        border-top: 1px solid #777;
+                        padding-top: 8px;
+                    }
+
+                    .footer {
+                        text-align: center;
+                        border-top: 1px dashed #777;
+                        margin-top: 10px;
+                        padding-top: 12px;
+                        line-height: 1.6;
+                        font-weight: bold;
+                    }
+                </style>
+            </head>
+
+            <body>
+                <div class="page">
                     <main class="receipt">
                         <header class="header">
                             ${logoHtml}
@@ -334,8 +332,8 @@ const Receipt = () => {
                         <section class="customer-details">
                             <div>Customer: ${customerName}</div>
                             ${customerPhone
-                    ? `<div>Phone: ${customerPhone}</div>`
-                    : ''}
+                                ? `<div>Phone: ${customerPhone}</div>`
+                                : ''}
                         </section>
 
                         <table>
@@ -358,8 +356,8 @@ const Receipt = () => {
                             ${summaryRow('Total', totalAmount, true)}
                             ${summaryRow('Amount Paid', amountPaid)}
                             ${returnAmount > 0
-                    ? summaryRow('Change', returnAmount)
-                    : ''}
+                                ? summaryRow('Change', returnAmount)
+                                : ''}
                         </section>
 
                         <footer class="footer">
@@ -367,19 +365,40 @@ const Receipt = () => {
                             <div>Visit Again</div>
                         </footer>
                     </main>
-                </body>
-                </html>
-            `;
+                </div>
+            </body>
+            </html>
+        `;
 
-            // await Print.printAsync({ html });
+        return html;
+    };
+
+    // Seedha print dialog
+    const handlePrint = async () => {
+        try {
+            const html = buildReceiptHtml();
+            if (!html) return;
+
+            await Print.printAsync({ html });
+        } catch (error) {
+            console.error('Print receipt error:', error);
+        }
+    };
+
+    // PDF share
+    const handleSharePdf = async () => {
+        try {
+            const html = buildReceiptHtml();
+            if (!html) return;
+
             const pageHeight = Math.max(450, 380 + orderItems.length * 34);
+
             const { uri } = await Print.printToFileAsync({
                 html,
                 width: 226,
                 height: pageHeight,
             });
 
-            // File ko app ki cache mein copy karein
             const source = new File(uri);
             const copy = new File(Paths.cache, `receipt-${Date.now()}.pdf`);
             source.copy(copy);
@@ -387,11 +406,11 @@ const Receipt = () => {
             if (await Sharing.isAvailableAsync()) {
                 await Sharing.shareAsync(copy.uri, {
                     mimeType: 'application/pdf',
-                    dialogTitle: 'Receipt',
+                    dialogTitle: 'Share Receipt PDF',
                 });
             }
         } catch (error) {
-            console.error('Print receipt error:', error);
+            console.error('Share PDF error:', error);
         }
     };
 
@@ -571,6 +590,13 @@ const Receipt = () => {
                     title='Share'
                     iconName='share-social-outline'
                     iconType='Ionicons'
+                    onPress={handleShare}
+                />
+
+                <ActionButton
+                    title='Share as PDF'
+                    iconName='file-pdf'
+                    iconType='AntDesign'
                     onPress={handleShare}
                 />
 

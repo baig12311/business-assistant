@@ -1,23 +1,23 @@
 {
   "expo": {
-    "name": "business-assistant",
-    "slug": "business-assistant",
-    "scheme": "businessassistant",
+    "name": "ShopSphere",
+    "slug": "shopsphere",
+    "scheme": "shopsphere",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/appAssets/appIcon.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#DCF2E3",
+        "foregroundImage": "./assets/appAssets/logo.png"
+        
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.baig1212.shopsphere"
     },
     "web": {
       "favicon": "./assets/favicon.png"

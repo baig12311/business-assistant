@@ -1,13 +1,11 @@
 
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Image } from 'expo-image';
+import { View, Text, StyleSheet,Image} from 'react-native';
 import fonts, { fontSize } from '../../constants/typography';
 import Colors from '../../constants/colors';
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
-import Icon from '../common/Icon';
 interface props {
     userName?: string
     business?: string
@@ -34,7 +32,7 @@ const Header: React.FC<props> = ({ userName, business, imageurl }) => {
 
             <Image
                 source={require('../../../assets/appAssets/logo.png')}
-                style={styles.logo}
+                style={styles.appLogo}
             />
 
 
@@ -73,6 +71,11 @@ const styles = StyleSheet.create({
         height: wp(14),
         borderRadius: wp(7)
     },
+    appLogo:{
+        width: wp(10),
+        height: wp(10),
+        borderRadius: wp(7)
+    }
 
 });
 

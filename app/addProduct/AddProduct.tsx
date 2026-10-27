@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { View, Text, KeyboardAvoidingView, ScrollView, Platform, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, KeyboardAvoidingView, ScrollView, Platform, Alert, TouchableOpacity, Image} from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { takePhoto, pickFromLibrary } from '../../src/services/imagePicker';
@@ -16,7 +16,6 @@ import Header from '../../src/components/common/Header';
 import { useAddProduct } from '../../src/hooks/useAddProduct';
 import { useProducts, useProductById } from '../../src/hooks/useProducts';
 import { useUpdateProduct } from '../../src/hooks/useUpdateProduct';
-import { Image } from 'expo-image';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { productSchema } from '../../src/services/schema/productSchema';
 import styles from './AddProductStyle';

@@ -1,5 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { Image } from 'expo-image';
+import { View, Text, StyleSheet, Image} from 'react-native';
 import { onBoardType } from '../../types/onBoardType';
 import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated';
 import fonts, { fontSize } from '../../constants/typography';
@@ -20,7 +19,7 @@ const OnBoard = ({ image, mainText, subText }: onBoardType) => {
             <Image
                 source={image}
                 style={styles.image}
-                contentFit="contain"
+                resizeMode="contain"
             />
 
             <Text style={styles.main}>{mainText}</Text>

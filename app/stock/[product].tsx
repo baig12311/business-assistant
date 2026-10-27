@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from './style';
 import { router } from 'expo-router';
@@ -23,7 +23,6 @@ import Header from '../../src/components/common/Header';
 import StockAlert from '../../src/components/inventory/StockAlert';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { success } from 'zod';
-import { Image } from 'expo-image';
 import { useToast } from '../../src/context/ToastContext';
 import Row from '../../src/components/inventory/Row';
 const ProductDetail = () => {

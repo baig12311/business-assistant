@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import Colors from '../../constants/colors';
-import { Image } from 'expo-image';
 import fonts, { fontSize } from '../../constants/typography';
 import {
     widthPercentageToDP as wp,
@@ -34,7 +33,7 @@ const ProductCard: React.FC<props> = ({ name, stock, price, lowStock, currency,
                     <Image
                         style={styles.image}
                         source={{ uri: imageurl }}
-                        contentFit='cover'
+                        resizeMode='cover'
                     />
                 ) : (
                     <View style={styles.placeholder}>
