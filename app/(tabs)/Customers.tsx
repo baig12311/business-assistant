@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import Colors from '../../src/constants/colors';
+import { useNetworkStatus } from '../../src/hooks/useNetworkStatus';
 import fonts, { fontSize } from '../../src/constants/typography';
 import CustomerSkeleton from '../../src/components/skeleton/CustomerSkeleton';
 import CustomerCard from '../../src/components/customers/CustomerCard';
@@ -17,16 +18,48 @@ import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
+import OfflineScreen from '../../src/components/common/OfflineScreen';
 
 const Customers = () => {
     const [searchText, setSearchText] = useState('')
+    const {isOffline, checkConnection} = useNetworkStatus()
     // const [orderLoading, setOrderLoading] = useState(false)
-    const { data, isLoading: userLoading, error: userError } = useUser()
+    const { data, isLoading: userLoading, error: userError, refetch: userRefetch} = useUser()
     const userId = data?.id
-    const { data: business, isLoading: businessLoading } = useBusiness(userId)
-    const { data: customers, isLoading: customersLoading } = useCustomers(business?.id)
+    const { data: business, isLoading: businessLoading, error: businessError, refetch: businessRefetch} = useBusiness(userId)
+    const { data: customers, isLoading: customersLoading, error: customerError, refetch: customerRefetch} = useCustomers(business?.id)
     const isLoading = userLoading || businessLoading || customersLoading 
-    
+    const isErrorFetching = userError || businessError || customerError
+
+     const handleRetry = async () => {
+    const isConnected = await checkConnection();
+
+    if (!isConnected) return;
+
+    await Promise.all([
+        userRefetch(),
+        businessRefetch(),
+        customerRefetch(),
+    ]);
+};
+
+    // error
+    if (isOffline && !customers) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Header title='Customers' onPress={() => router.back()} />
+                    <Input
+                placeholder='Search customer...'
+                value={searchText}
+                onChangeText={setSearchText}
+                iconName='search-outline'
+                iconType='Ionicons'
+            />
+                <OfflineScreen onPress={handleRetry}/>
+
+            </SafeAreaView>
+        )
+    }
     // search customer
     const filterCustomers = customers?.filter(item =>
         item.name.toLowerCase().
@@ -83,12 +116,13 @@ const Customers = () => {
     };
 
     if(isLoading)
-    {
+        return(
+    
         <SafeAreaView style={styles.container}>
             <Header title='Customers' 
             onPress={() => router.back()} />
             <Input
-                placeholder='Search customers...'
+                placeholder='Search customer...'
                 value={searchText}
                 onChangeText={setSearchText}
                 iconName='search-outline'
@@ -96,12 +130,37 @@ const Customers = () => {
             />
             <CustomerSkeleton/>
         </SafeAreaView>
+        )
+
+    // error
+    if (isErrorFetching) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Header title='Customers' onPress={() => router.back()} />
+                    <Input
+                placeholder='Search customer...'
+                value={searchText}
+                onChangeText={setSearchText}
+                iconName='search-outline'
+                iconType='Ionicons'
+            />
+                <CustomEmptyComponent 
+                isError={true}
+                mainText='Something Went Wrong'
+                subText='Unable to load customers. Please try again.'
+                onPress={handleRetry}
+                />
+
+            </SafeAreaView>
+        )
     }
+
+    
     return (
         <SafeAreaView style={styles.container}>
             <Header title='Customers' onPress={() => router.back()} />
             <Input
-                placeholder='Search customers...'
+                placeholder='Search customer...'
                 value={searchText}
                 onChangeText={setSearchText}
                 iconName='search-outline'
@@ -134,6 +193,7 @@ const Customers = () => {
             }
 
         </SafeAreaView>
+
     );
 };
 

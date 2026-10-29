@@ -16,6 +16,8 @@ import { useCustomers } from '../../src/hooks/useCustomer';
 import RecentOrder from '../../src/components/home/RecentOrder';
 import { currencies } from '../../src/services/data/currencies';
 import Icon from '../../src/components/common/Icon';
+import { useNetworkStatus } from '../../src/hooks/useNetworkStatus';
+import OfflineScreen from '../../src/components/common/OfflineScreen';
 import { formatAmount } from '../../src/utils/formatAmount';
 import { quickActions } from '../../src/services/data/quickActions';
 import { useProducts } from '../../src/hooks/useProducts';
@@ -24,23 +26,57 @@ import ActionCard from '../../src/components/home/ActionCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DashboardSkeleton from '../../src/components/skeleton/HomeSkeleton';
 import DashboardCard from '../../src/components/home/DashboardCard';
+import CustomEmptyComponent from '../../src/components/common/CustomEmptyComponent';
 
 const Home = () => {
+    const {isOffline, checkConnection} = useNetworkStatus()
     const [showSelector, setShowSelector] = useState(false)
     const [salesPeriod, setSalesPeriod] = useState<'Today' | 'Yesterday' | 'Week' | 'Month'>('Today');
-    const { data, error, isLoading: userLoading } = useUser()
+    const { data, error, isLoading: userLoading, error: userError, refetch: userRefetch} = useUser()
 
     const userId = data?.id
-    const { data: business, error: bError, isLoading: bLoading } = useBusiness(userId)
+    const { data: business, error: bError, isLoading: bLoading, refetch:bRefetch} = useBusiness(userId)
 
-    const userName = data?.user_metadata?.name
-    const { data: orders, isLoading: orderLoading } = useOrders(business?.id)
-    const { data: products, isLoading: productLoading } = useProducts(business?.id)
-    const { data: customers, isLoading: customerLoading } = useCustomers(business?.id)
+    const userName = data?.user_metadata?.name || 'User'
+    const { data: orders, isLoading: orderLoading, error: orderError, refetch: orderRefetch} = useOrders(business?.id)
+    const { data: products, isLoading: productLoading, error: productError, refetch: productRefetch} = useProducts(business?.id)
+    const { data: customers, isLoading: customerLoading, error: customerError, refetch: customerRefetch} = useCustomers(business?.id)
 
     const isLoading = userLoading || bLoading || orderLoading
         || productLoading || customerLoading
 
+        const isErrorFetching = userError || bError || orderError || productError || customerError
+
+         const handleRetry = async () => {
+    const isConnected = await checkConnection();
+
+    if (!isConnected) return;
+
+    await Promise.all([
+        userRefetch(),
+        bRefetch(),
+        orderRefetch(),
+        productRefetch(),
+        customerRefetch(),
+    ]);
+};
+
+        // network
+
+         if (isOffline) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Header
+                userName={userName}
+                business={business?.name || ''}
+                imageurl={business?.logo_url}
+            />
+                    
+                <OfflineScreen onPress={handleRetry}/>
+
+            </SafeAreaView>
+        )
+    }
     // Filter out cancelled orders
     const activeOrders = (orders ?? []).filter(
         order =>
@@ -242,6 +278,27 @@ const Home = () => {
             </SafeAreaView>
         )
     }
+
+    if (isErrorFetching) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Header
+                userName={userName}
+                business={business?.name || ''}
+                imageurl={business?.logo_url}
+            />
+                    
+                <CustomEmptyComponent 
+                isError={true}
+                mainText='Something Went Wrong'
+                subText='Unable to load customers. Please try again.'
+                onPress={handleRetry}
+                />
+
+            </SafeAreaView>
+        )
+    }
+
 
     return (
         <SafeAreaView style={styles.container}>

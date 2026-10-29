@@ -15,8 +15,10 @@ interface Props {
     status?: string
     isHelp?:boolean
     onPress?: () => void
+    isDisabled?:boolean
 }
 const CustomSectionRow: React.FC<Props> = ({ paddingHorizontal,
+    isDisabled,
     paddingVertical,
     iconName,
     iconType,
@@ -32,6 +34,7 @@ const CustomSectionRow: React.FC<Props> = ({ paddingHorizontal,
         <TouchableOpacity 
         activeOpacity={0.7}
         onPress={onPress}
+        disabled={isDisabled}
         style={[styles.container, {
             paddingHorizontal: paddingHorizontal,
             paddingVertical: paddingVertical,
@@ -53,6 +56,7 @@ const CustomSectionRow: React.FC<Props> = ({ paddingHorizontal,
              
 
             </View>
+            
             <Icon
                 name='chevron-small-right'
                 type='Entypo'

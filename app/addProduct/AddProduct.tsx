@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { View, Text, KeyboardAvoidingView, ScrollView, Platform, Alert, TouchableOpacity, Image} from 'react-native';
+import { View, Text, KeyboardAvoidingView, ScrollView, Platform, Alert, TouchableOpacity, Image, ActivityIndicator} from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { takePhoto, pickFromLibrary } from '../../src/services/imagePicker';
 import ImageSheet from '../../src/components/uploadImage/ImageSheet';
+import CustomEmptyComponent from '../../src/components/common/CustomEmptyComponent';
 import { router } from 'expo-router';
 import Colors from '../../src/constants/colors';
 import Icon from '../../src/components/common/Icon';
@@ -32,10 +33,10 @@ const AddProduct = () => {
     const [showSheet, setShowSheet] = useState(false)
     const [sheetEdit, setSheetEdit] = useState(false)
     const sheetRef = useRef<BottomSheet>(null)
-    const { data: user } = useUser()
-    const { data: business } = useBusiness(user?.id)
+    const { data: user , isLoading: userLoading, error: userError, refetch: userRefetch} = useUser()
+    const { data: business, isLoading: businessLoading, error: businessError, refetch: businessRefetch} = useBusiness(user?.id)
     const businessId = business.id
-    const { data: selectedProduct, isLoading: loadingProduct, error } = useProductById(productId)
+    const { data: selectedProduct, isLoading: productLoading, error: productError, refetch: productRefetch} = useProductById(productId)
     const {
         mutateAsync: addProductMutation,
         error: addError,
@@ -47,10 +48,8 @@ const AddProduct = () => {
         error: updateError,
     } = useUpdateProduct(businessId);
     const isLoading = isPending || pending
-    const { data: productData } = useProducts(businessId)
-    // const selectedProduct = productData?.find(
-    //     (item: any) => item.id === productId
-    // )
+   const isErrorFetching = userError || businessError || productError
+   const isDataLoadng = userLoading || businessLoading || productLoading
 
     const [product, setProduct] = useState({
         productName: '',
@@ -243,9 +242,45 @@ const AddProduct = () => {
 
         }
     }
+    const handleRetry = ()=>{
+        userRefetch(),
+        businessRefetch(),
+        productRefetch()
+    }
+    if(isDataLoadng)
+        
 
+    {
+        return (
+            <SafeAreaView style={styles.container}>
+            <Header title={productId ? 'Edit Product' : 'Add Product'}
+                    onPress={() => router.back()}
+                />
+                <View style={{flex:1, justifyContent: 'center', alignItems: 'center'}}>
+                    <ActivityIndicator size='large' color={Colors.primary}/>
+                </View>
+        </SafeAreaView>
+        )
+        
+    }
 
+     if (isErrorFetching) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Header title={productId ? 'Edit Product' : 'Add Product'}
+                    onPress={() => router.back()}
+                />
+                    
+                <CustomEmptyComponent 
+                isError={true}
+                mainText='Something Went Wrong'
+                subText='Unable to load product data. Please try again.'
+                onPress={handleRetry}
+                />
 
+            </SafeAreaView>
+        )
+    }
     return (
         <View style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>

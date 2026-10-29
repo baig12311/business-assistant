@@ -27,6 +27,7 @@ import { formatDate } from '../../src/services/formatDate';
 import { useReceiveCustomerPayment } from '../../src/hooks/useReceiveCustmerPayment';
 import { FlatList } from 'react-native-gesture-handler';
 import ActionButton from '../../src/components/customers/ActionButton';
+import CustomEmptyComponent from '../../src/components/common/CustomEmptyComponent';
 const CustomerDetail = () => {
     const {showToast} = useToast()
     const [showMenu, setShowMenu] = useState(false)
@@ -38,15 +39,23 @@ const CustomerDetail = () => {
     const { customerId } = useLocalSearchParams<{ customerId: string }>()
     const [rePaid, setRePaid] = useState('')
     const [showModal, setShowModal] = useState(false)
-    const { data: userData, isLoading: userLoading } = useUser();
-    const { data: businessData, isLoading: businessLoading } = useBusiness(userData?.id)
-    const { data: customer, isLoading: customerLoading } = useCustomerById(customerId)
-    const { data: customerOrder, isLoading: orderLoading } = useCustomerOrders(businessData?.id, customerId)
-    const { data: customerPayment, isLoading: paymentLoading } = useCustomerPayments(businessData?.id, customerId)
+    const { data: userData, isLoading: userLoading, error: userError, refetch: userRefetch} = useUser();
+    const { data: businessData, isLoading: businessLoading, error: businessError, refetch: businessRefetch} = useBusiness(userData?.id)
+    const { data: customer, isLoading: customerLoading, error: customerError, refetch: customerRefetch} = useCustomerById(customerId)
+    const { data: customerOrder, isLoading: orderLoading, error: orderError, refetch: orderRefetch} = useCustomerOrders(businessData?.id, customerId)
+    const { data: customerPayment, isLoading: paymentLoading, error: paymentError, refetch: paymentRefetch} = useCustomerPayments(businessData?.id, customerId)
 
     const { mutateAsync: receivePaymentMutation, isPending, error } = useReceiveCustomerPayment()
     const businessType = businessData?.business_type
-    const isLoading = userLoading || businessLoading || customerLoading || orderLoading
+    const isErrorFetching = userError || businessError || customerError || orderError || paymentError
+    const isLoading = userLoading || businessLoading || customerLoading || orderLoading || paymentLoading
+    const handleRetry = () =>{
+        userRefetch()
+        businessRefetch()
+        customerRefetch()
+        orderRefetch()
+        paymentRefetch()
+    }
     
 const activeCustomerOrders = (customerOrder ?? []).filter(
     (order: any) =>
@@ -211,6 +220,23 @@ const handleWhatsApp = async () => {
                     onPressMenu={() => setShowMenu(!showMenu)}
                     onPress={() => router.back()} />
                 <CustomerDetailSkeleton />
+
+            </SafeAreaView>
+        )
+    }
+    if (isErrorFetching) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Header title='Customer Detail'
+                    isMenu={true}
+                    onPressMenu={() => setShowMenu(!showMenu)}
+                    onPress={() => router.back()} />
+                <CustomEmptyComponent 
+                isError={true}
+                mainText='Something Went Wrong'
+                subText='Unable to load data. Please try again.'
+                onPress={handleRetry}
+                />
 
             </SafeAreaView>
         )
@@ -495,10 +521,16 @@ const handleWhatsApp = async () => {
                             }
 
                         </>
-                    ) : (<View style={styles.new}>
+
+                    ) : (
+                        <View style={styles.new}>
                         <Text style={styles.newHead}>Customer Overview</Text>
                         <Text style={styles.newSub}>Your customer summary will appear here once their first order is created.</Text>
-                    </View>)
+                    </View>
+                    )
+                    
+                    
+                    
                 }
 
 

@@ -585,7 +585,13 @@ const Receipt = () => {
                     iconType='Ionicons'
                     onPress={handlePrint}
                 />
-
+                <ActionButton
+                    title='Share as PDF'
+                    iconName='file-pdf'
+                    iconType='AntDesign'
+                    onPress={handleSharePdf}
+                    isSolid={true}
+                />
                 <ActionButton
                     title='Share'
                     iconName='share-social-outline'
@@ -593,12 +599,7 @@ const Receipt = () => {
                     onPress={handleShare}
                 />
 
-                <ActionButton
-                    title='Share as PDF'
-                    iconName='file-pdf'
-                    iconType='AntDesign'
-                    onPress={handleShare}
-                />
+                
 
             </View>
 

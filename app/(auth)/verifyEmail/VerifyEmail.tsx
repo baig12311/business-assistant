@@ -103,7 +103,7 @@ const handleResendEmail = async () => {
                     <Text
                         style={[
                             styles.message,
-                            { color: isError ? '#D92D20' : Colors.primary },
+                            { color: isError ? Colors.error : Colors.primary },
                         ]}
                     >
                         {message}

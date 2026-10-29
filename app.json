@@ -13,8 +13,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#DCF2E3",
-        "foregroundImage": "./assets/appAssets/logo.png"
-        
+        "foregroundImage": "./assets/appAssets/icon.png"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.baig1212.shopsphere"

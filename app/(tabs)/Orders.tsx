@@ -18,29 +18,63 @@ import {
 import { formatDate } from '../../src/services/formatDate';
 import Colors from '../../src/constants/colors';
 import { orderStatus } from '../../src/services/data/orderStatus';
+import { useNetworkStatus } from '../../src/hooks/useNetworkStatus';
+import OfflineScreen from '../../src/components/common/OfflineScreen';
 import { OrderSource } from '../../src/services/createOrder';
 import Status from '../../src/components/sales/Status';
 import OrderCard from '../../src/components/sales/OrderCard';
 import OrderSourceSelector from '../../src/components/common/OrderSourceSelector';
 const Orders = () => {
-    const { data, isLoading: userLoading, error: userError } = useUser()
+    const {isOffline, checkConnection} = useNetworkStatus()
+    const { data, isLoading: userLoading, error: userError, refetch: userRefetch} = useUser()
     const userId = data?.id
-    const { data: business, isLoading: businessLoading, error: businessError } = useBusiness(userId)
+    const { data: business, isLoading: businessLoading, error: businessError, refetch: businessRefetch} = useBusiness(userId)
     const businessId = business?.id
     const businessType = business?.business_type
-    const { data: orders, isLoading: ordersLoading } = useOrders(businessId)
+    const { data: orders, isLoading: ordersLoading, error: ordersError, refetch: ordersRefetch} = useOrders(businessId)
     const [selectedStatus, setSelectedStatus] = useState('All')
     const isLoading = userLoading || businessLoading || ordersLoading
     const [searchText, setSearchText] = useState('')
     const [selectedSource, setSelectedSource] = useState<
         'all' | 'online' | 'physical'
     >('all');
-
+    const isErrorFetching = userError || businessError || ordersError
     // filter orders
     // const filterOrders = orders?.filter(item =>
     //     item.order_number.toString().
     //         includes(searchText.trim().toLocaleLowerCase())
     // )
+
+    // handleRetry
+
+    const handleRetry = async () => {
+    const isConnected = await checkConnection();
+
+    if (!isConnected) return;
+
+    await Promise.all([
+        userRefetch(),
+        businessRefetch(),
+        ordersRefetch(),
+    ]);
+};
+    if (isOffline && !orders) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Header title='Orders' onPress={() => router.back()} />
+                    <Input
+                placeholder='Search order by number...'
+                value={searchText}
+                onChangeText={setSearchText}
+                iconName='search-outline'
+                iconType='Ionicons'
+            />
+                <OfflineScreen onPress={handleRetry}/>
+
+            </SafeAreaView>
+        )
+    }
+    
 
     const filterOrders = orders?.filter(item => {
         const matchesSearch = item.order_number
@@ -127,6 +161,29 @@ const Orders = () => {
                     keyboard='numeric'
                 />
                 <OrderSkeleton />
+            </SafeAreaView>
+        )
+    }
+
+    // error
+    if (isErrorFetching) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Header title='Orders' onPress={() => router.back()} />
+                    <Input
+                placeholder='Search order by number...'
+                value={searchText}
+                onChangeText={setSearchText}
+                iconName='search-outline'
+                iconType='Ionicons'
+            />
+                <CustomEmptyComponent 
+                isError={true}
+                mainText='Something Went Wrong'
+                subText='Unable to load orders. Please try again.'
+                onPress={handleRetry}
+                />
+
             </SafeAreaView>
         )
     }

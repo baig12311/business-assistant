@@ -21,6 +21,7 @@ import ActionButton from '../../src/components/inventory/ActionButton';
 import Colors from '../../src/constants/colors';
 import Header from '../../src/components/common/Header';
 import StockAlert from '../../src/components/inventory/StockAlert';
+import CustomEmptyComponent from '../../src/components/common/CustomEmptyComponent';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { success } from 'zod';
 import { useToast } from '../../src/context/ToastContext';
@@ -28,10 +29,10 @@ import Row from '../../src/components/inventory/Row';
 const ProductDetail = () => {
     const {showToast} = useToast()
     const { productId } = useLocalSearchParams<{ productId: string }>()
-    const { data: user, isLoading: userLoading } = useUser()
-    const { data: business, isLoading: businessLoading } = useBusiness(user?.id)
-    const { data, isLoading, error } = useProductById(productId)
-    const { data: inventory, isLoading: inventoryLoading } = useInventoryMovements(productId)
+    const { data: user, isLoading: userLoading, error: userError, refetch: userRefetch} = useUser()
+    const { data: business, isLoading: businessLoading, error: businessError, refetch: businessRefetch} = useBusiness(user?.id)
+    const { data, isLoading, error:productError, refetch: productRefetch} = useProductById(productId)
+    const { data: inventory, isLoading: inventoryLoading, error:inventoryError, refetch: inventoryRefetch} = useInventoryMovements(productId)
     const { mutateAsync: addRestockMutation, isPending: addPending } = useRestockProduct()
     const { mutateAsync: addAdjustmentMutation, isPending: adjustPending } = useAdjustStock()
     const [showRestock, setShowRestock] = useState(false)
@@ -61,6 +62,14 @@ const ProductDetail = () => {
     const icon = outStock ? { name: 'close-circle', type: 'Ionicons' } :
         lowStock ? { name: 'alert-circle', type: 'Ionicons' } : { name: 'checkmark-circle', type: 'Ionicons' }
 
+        const isErrorFetching = userError || businessError || productError || inventoryError
+
+        const handleRetry = () =>{
+            userRefetch()
+            businessRefetch()
+            productRefetch()
+            inventoryRefetch()
+        }
     // handle save
 
     const handleRestock = async () => {
@@ -150,7 +159,22 @@ const ProductDetail = () => {
             />
         )
     }
+    // error
+    if (isErrorFetching) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Header title='Product Stock' onPress={() => router.back()} />
+                <CustomEmptyComponent 
+                isError={true}
+                mainText='Something Went Wrong'
+                subText='Unable to load data. Please try again.'
+                onPress={handleRetry}
+                />
 
+            </SafeAreaView>
+        )
+    }
+    // loading
     if (Loading) {
         return (
             <SafeAreaView style={styles.container}>

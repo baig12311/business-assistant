@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { View, Text, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator} from 'react-native';
+import Colors from '../../src/constants/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../../src/components/common/Header';
 import { useCustomers, useCustomerById } from '../../src/hooks/useCustomer';
 import { router, useLocalSearchParams } from 'expo-router';
+import CustomEmptyComponent from '../../src/components/common/CustomEmptyComponent';
 import { countries } from '../../src/services/data/countries';
 import CustomBottomSheet from '../../src/components/common/CustomBottomSheet';
 import { useToast } from '../../src/context/ToastContext';
@@ -36,11 +38,10 @@ const AddCustomer = () => {
     const { customerId } = useLocalSearchParams<{
         customerId: string
     }>()
-    const { data: user } = useUser()
-    const { data: business } = useBusiness(user?.id)
+    const { data: user, isLoading: userLoading,error: userError, refetch: userRefetch} = useUser()
+    const { data: business, isLoading: businessLoading,error: businessError, refetch: businessRefetch} = useBusiness(user?.id)
     const businessId = business?.id
-    const { data: customers } = useCustomers(businessId)
-    const { data: selectedCustomer, isLoading: loadingCustomer, error } = useCustomerById(customerId)
+    const { data: selectedCustomer, isLoading: customerLoading, error: customerError, refetch:customerRefetch } = useCustomerById(customerId)
     const {
         mutateAsync: addCustomerMutation,
         isPending,
@@ -50,6 +51,8 @@ const AddCustomer = () => {
         isPending: pending,
     } = useUpdateCustomer(businessId);
     const isLoading = pending || isPending
+    const isDataLoading = userLoading || businessLoading || customerLoading
+    const isErrorFetching = userError || businessError || customerError
     const [customer, setCustomer] = useState({
         name: '',
         phone: '',
@@ -266,8 +269,38 @@ const AddCustomer = () => {
         )
 
     }
+    const handleRetry=()=>{
+        userRefetch()
+        businessRefetch()
+        customerRefetch()
+    }
+    if(isDataLoading)
+    {
+        return(
+            <SafeAreaView style={styles.container}>
+                <Header title={customerId ? 'Edit Customer' : 'Add Customer'} onPress={() => router.back()} />
+                     <View style={{flex:1, justifyContent: 'center', alignItems: 'center'}}>
+                    <ActivityIndicator size='large' color={Colors.primary}/>
+                </View>
+                    </SafeAreaView>
+        )
+    }
 
+    if (isErrorFetching) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Header title={customerId ? 'Edit Customer' : 'Add Customer'} onPress={() => router.back()} />
+                    
+                <CustomEmptyComponent 
+                isError={true}
+                mainText='Something Went Wrong'
+                subText='Unable to load product data. Please try again.'
+                onPress={handleRetry}
+                />
 
+            </SafeAreaView>
+        )
+    }
     return (
         <View style={{ flex: 1 }}>
 

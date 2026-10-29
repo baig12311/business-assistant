@@ -13,6 +13,7 @@ import {
 import Colors from '../src/constants/colors';
 import fonts, { fontSize } from '../src/constants/typography';
 import AnimatedLoader from '../src/components/common/AnimatedLoader';
+import { logout } from '../src/services/authService';
 import { LinearGradient } from 'expo-linear-gradient';
 
 
@@ -21,73 +22,83 @@ const Index = () => {
         let isActive = true;
 
         const checkUser = async () => {
-            try {
-                const {
-                    data: { session },
-                    error: sessionError,
-                } = await supabase.auth.getSession();
+    try {
+        const {
+            data: { session },
+            error: sessionError,
+        } = await supabase.auth.getSession();
 
-                if (sessionError) {
-                    throw sessionError;
-                }
+        if (!isActive) return;
 
-                if (!session) {
-                    if (isActive) {
-                        router.replace('/OnBoard');
-                    }
-                    return;
-                }
+        if (sessionError || !session) {
+            router.replace('/OnBoard');
+            return;
+        }
 
-                // Verify that the session's user is still valid.
-                const {
-                    data: { user },
-                    error: userError,
-                } = await supabase.auth.getUser();
+        // Verify user with Supabase.
+        const {
+            data: { user },
+            error: userError,
+        } = await supabase.auth.getUser();
 
-                if (userError || !user) {
-                    await supabase.auth.signOut({ scope: 'local' });
+        if (!isActive) return;
 
-                    if (isActive) {
-                        router.replace('/OnBoard');
-                    }
-                    return;
-                }
+        if (userError || !user) {
+            const message = userError?.message?.toLowerCase() ?? '';
 
+            const isNetworkError =
+                message.includes('network') ||
+                message.includes('fetch') ||
+                message.includes('timeout') ||
+                message.includes('failed to connect');
 
-                const { data: business, error: businessError } =
-                    await supabase
-                        .from('businesses')
-                        .select('id')
-                        .eq('owner_id', user.id)
-                        .limit(1)
-                        .maybeSingle();
-
-
-
-                if (businessError) {
-                    console.log(
-                        'Business check error:',
-                        businessError.message
-                    );
-                    return;
-                }
-
-                if (!isActive) return;
-
-                if (!business) {
-                    router.replace('/businessSetup/BusinessSetup');
-                    return;
-                }
-
+            if (isNetworkError) {
+                // Keep the saved session. Do not log the user out.
+                console.log('Offline: keeping saved session');
                 router.replace('/(tabs)/Home');
-            } catch (error) {
-                console.log('Startup auth error:', error);
-
-                if (isActive) {
-                    router.replace('/OnBoard');
-                }
+                return;
             }
-        };
+
+            // Only call your existing logout for an actual auth failure.
+            await logout();
+            return;
+        }
+
+        // Fetch business only when the user is verified online.
+        const {
+            data: business,
+            error: businessError,
+        } = await supabase
+            .from('businesses')
+            .select('id')
+            .eq('owner_id', user.id)
+            .limit(1)
+            .maybeSingle();
+
+        if (!isActive) return;
+
+        if (businessError) {
+            // Network/database failure: do not log out.
+            console.log('Business check error:', businessError.message);
+            router.replace('/(tabs)/Home');
+            return;
+        }
+
+        if (!business) {
+            router.replace('/businessSetup/BusinessSetup');
+            return;
+        }
+
+        router.replace('/(tabs)/Home');
+    } catch (error) {
+        console.log('Startup error:', error);
+
+        // Unexpected/network errors should not force logout.
+        if (isActive) {
+            router.replace('/(tabs)/Home');
+        }
+    }
+};
 
         checkUser();
 

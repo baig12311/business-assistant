@@ -49,7 +49,8 @@ const Signup = () => {
             return;
         }
 
-        const redirectTo = Linking.createURL('callback');
+        try {
+            const redirectTo = Linking.createURL('callback');
         
 
         const { data, error } = await supabase.auth.signUp({
@@ -73,6 +74,17 @@ const Signup = () => {
             setLoading(false)
             return;
         }
+
+        if (data.user && data.user.identities?.length === 0) {
+            showToast(
+                'error',
+                'Already Registered',
+                'This email is already registered. Please try another email address.'
+            );
+            setLoading(false)
+            return;
+        }
+
         if(!data.session)
         {
             router.push({
@@ -89,6 +101,14 @@ const Signup = () => {
         setEmail('')
         setPassword('')
         setConfirmPassword('')
+        } catch (error) {
+            showToast(
+                'error',
+                'Signup Failed',
+                "We couldn't create your account. Please try again."
+            )
+        }
+        
     }
     return (
         <SafeAreaView style={styles.container}>

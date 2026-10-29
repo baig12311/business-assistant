@@ -18,19 +18,20 @@ import {
     heightPercentageToDP as hp
 } from 'react-native-responsive-screen';
 import fonts, { fontSize } from '../../src/constants/typography';
+import { tr } from 'zod/v4/locales';
 const Profile = () => {
     const [showDialog, setShowDialog] = useState(false)
     const [showAccountDialog, setShowAccountDialog] = useState(false)
     const { data, isLoading } = useUser()
     const { data: business, isLoading: businessLoading } = useBusiness(data?.id)
-    const currency = business?.currency
-    const currencyName = currencies.find(item =>
-        item.code === currency)?.name || ''
-    const userName = data?.user_metadata?.name
-    const email = data?.email || 'No Email'
+    const currency = business?.currency || '---'
+    const currencyName =currency ? currencies.find(item =>
+        item.code === currency)?.name || '' : 'Offline'
+    const userName = data?.user_metadata?.name || 'User'
+    const email = data?.email || 'Ofline (No Email)'
     return (
         <SafeAreaView style={styles.container}>
-            <Header title='Profile' onPress={() => router.back}/>
+            <Header title='Profile' onPress={() => router.replace('/Home')}/>
                 {
                     showDialog && (
                         <ConfirmationDialog
@@ -95,6 +96,7 @@ const Profile = () => {
                         iconName='cash-outline'
                         iconType='Ionicons'
                         paddingVertical={hp(1)}
+                        isDisabled={true}
                     />
                 </View>
 

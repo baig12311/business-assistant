@@ -2,15 +2,18 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import fonts, { fontSize } from '../../constants/typography';
 import Colors from '../../constants/colors';
+import OutlineButton from './OutlineButton';
 import Button from './Button';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 interface Props {
   mainText?: string
   subText?: string
   illustration?: any
+  isError?:boolean
+  onPress?:()=>void
 
 }
-const CustomEmptyComponent: React.FC<Props> = ({ mainText, subText, illustration }) => {
+const CustomEmptyComponent: React.FC<Props> = ({ mainText, subText, illustration, isError, onPress}) => {
   return (
 
 
@@ -21,16 +24,22 @@ const CustomEmptyComponent: React.FC<Props> = ({ mainText, subText, illustration
         )
       }
 
-      <Text style={styles.emptyTitle}>{mainText}</Text>
-      <Text style={styles.emptyText}>{subText}</Text>
+      <Text style={[styles.emptyTitle, isError && {color:Colors.error}]}>{mainText}</Text>
+      <Text style={[styles.emptyText, isError && {color:Colors.error}]}>{subText}</Text>
 
-      {/* <View style={{ alignSelf: 'center' }}>
+      {
+        isError && (
+          <View style={{width: wp(30)}}>
         {
-          buttonTitle && (<Button title={buttonTitle} onPress={onPress} />)
+          <Button title='Retry' onPress={onPress} />
         }
         
 
-      </View> */}
+      </View> 
+        )
+      }
+
+      {/* */}
     </View>
   );
 };

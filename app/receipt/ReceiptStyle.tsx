@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     },
     actionRow:{
         flexDirection: 'row',
-        justifyContent: 'space-evenly',
+        justifyContent: 'space-between',
         paddingVertical: hp(2)
     }
 });

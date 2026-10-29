@@ -21,13 +21,7 @@ const AuthCallback = () => {
             email?: string
         }>();
 
-    console.log('AUTH CALLBACK PARAMS:', {
-        code,
-        error,
-        error_description,
-        flow,
-    });
-
+   
     const [message, setMessage] = useState('Verifying your email...');
     const [hasError, setHasError] = useState(false);
 
@@ -72,7 +66,11 @@ const AuthCallback = () => {
             if (sessionError) {
                 if (isActive) {
                     setHasError(true);
-                    setMessage(sessionError.message);
+                    setMessage(
+            flow === 'recovery'
+                ? 'We couldn’t verify your password reset link. It may have expired or already been used. Please request a new link.'
+                : 'We couldn’t verify your email. Your link may have expired or already been used. Please request a new verification email.'
+        );
                 }
                 return;
             }

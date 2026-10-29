@@ -11,11 +11,16 @@ interface props {
     iconName:string
     iconType:string
     onPress?:()=>void
+    isSolid?:boolean
 }
-const ActionButton: React.FC<props> = ({ title, onPress, iconName, iconType}) => {
+const ActionButton: React.FC<props> = ({ title, onPress, iconName, iconType, isSolid}) => {
     return (
         <TouchableOpacity
-        style={styles.container}
+        style={[styles.container, 
+            isSolid && {backgroundColor: Colors.primary},
+            !isSolid && {borderWidth:0.5}
+        
+        ]}
         activeOpacity={0.7}
         onPress={onPress}
         >
@@ -23,9 +28,11 @@ const ActionButton: React.FC<props> = ({ title, onPress, iconName, iconType}) =>
            name={iconName}
            type={iconType}
            size={wp(6)}
-           color={Colors.surface}
+           color={isSolid ? Colors.surface : Colors.text}
            />
-           <Text style={styles.text}>{title}</Text> 
+           <Text style={[styles.text,
+            {color: isSolid ? Colors.surface : Colors.text}
+           ]}>{title}</Text> 
         </TouchableOpacity>
     );
 };
@@ -33,18 +40,19 @@ const ActionButton: React.FC<props> = ({ title, onPress, iconName, iconType}) =>
 const styles = StyleSheet.create({
     container: {
         borderRadius: wp(2),
-        paddingHorizontal: wp(5),
+        paddingHorizontal: wp(4),
         paddingVertical:wp(2),
-        backgroundColor: Colors.primary,
+        borderColor: Colors.textSecondary,
+        // backgroundColor: Colors.primary,
         alignItems: 'center',
-        elevation: 2,
+        //elevation: 2,
         flexDirection: 'row',
         gap:8
     },
     text: {
         fontFamily: fonts.semiBold,
         fontSize: fontSize.text,
-        color: Colors.surface
+        
     }
 });
 
