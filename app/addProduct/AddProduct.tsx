@@ -37,6 +37,7 @@ const AddProduct = () => {
     const { data: business, isLoading: businessLoading, error: businessError, refetch: businessRefetch} = useBusiness(user?.id)
     const businessId = business.id
     const { data: selectedProduct, isLoading: productLoading, error: productError, refetch: productRefetch} = useProductById(productId)
+    const [submitting, setSubmitting] = useState(false)
     const {
         mutateAsync: addProductMutation,
         error: addError,
@@ -47,7 +48,7 @@ const AddProduct = () => {
         isPending: pending,
         error: updateError,
     } = useUpdateProduct(businessId);
-    const isLoading = isPending || pending
+    const isLoading = isPending || pending || submitting
    const isErrorFetching = userError || businessError || productError
    const isDataLoadng = userLoading || businessLoading || productLoading
 
@@ -163,15 +164,20 @@ const AddProduct = () => {
             lowStockThreshold: Number(product.lowStockThreshold),
             imageUrl,
         });
-
+        return true
     }
     // add product
     const AddProduct = async () => {
+        if(submitting) return;
+        setSubmitting(true)
         try {
             if (productId) {
 
-                await updateProducts()
-
+                const ok = await updateProducts()
+                if(!ok)
+                {
+                    return
+                }
                 showToast(
                     'success',
                     'Product Updated',
@@ -381,7 +387,7 @@ const AddProduct = () => {
                         // iconName='person-outline'
                         // iconType='Ionicons'
                         />
-                        <Input
+                        {/* <Input
                             title='Description (optional)'
                             placeholder='This product is ......'
                             value={product.description}
@@ -397,7 +403,7 @@ const AddProduct = () => {
                             }}
                             error={errors.desc}
 
-                        />
+                        /> */}
                         <Input
                             title='Selling Price*'
                             placeholder='123'

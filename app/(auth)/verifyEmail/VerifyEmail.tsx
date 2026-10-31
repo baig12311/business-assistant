@@ -114,6 +114,7 @@ const handleResendEmail = async () => {
                 title={isRecovery ? 'Resend reset email' : 'Resend verification email'}
                 disabled={loading}
                 onPress={handleResendEmail}
+                isLoading={loading}
                 />
                 </View>
                

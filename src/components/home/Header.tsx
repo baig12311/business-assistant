@@ -1,6 +1,7 @@
 
 import { View, Text, StyleSheet,Image} from 'react-native';
 import fonts, { fontSize } from '../../constants/typography';
+import { getGreeting } from '../../utils/getGreeting';
 import Colors from '../../constants/colors';
 import {
     widthPercentageToDP as wp,
@@ -24,7 +25,7 @@ const Header: React.FC<props> = ({ userName, business, imageurl }) => {
             }
 
             <View style={styles.textContainer}>
-                <Text style={styles.text} numberOfLines={1}>Good Afternoon, <Text style={{
+                <Text style={styles.text} numberOfLines={1}>{getGreeting()} 👋, <Text style={{
                     fontFamily: fonts.extraBold, color: Colors.text
                 }}>{userName}</Text></Text>
                 <Text style={[styles.text, { fontFamily: fonts.extraBold, color: Colors.text }]}>{business}</Text>
@@ -67,8 +68,8 @@ const styles = StyleSheet.create({
         color: Colors.textSecondary
     },
     logo: {
-        width: wp(14),
-        height: wp(14),
+        width: wp(12),
+        height: wp(12),
         borderRadius: wp(7)
     },
     appLogo:{

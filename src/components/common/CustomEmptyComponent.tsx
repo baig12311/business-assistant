@@ -20,7 +20,7 @@ const CustomEmptyComponent: React.FC<Props> = ({ mainText, subText, illustration
     <View style={styles.emptyContainer}>
       {
         illustration && (
-          <Image source={illustration} style={styles.illustration} />
+          <Image source={illustration} style={styles.illustration}/>
         )
       }
 
@@ -69,9 +69,9 @@ const styles = StyleSheet.create({
 
   },
   illustration: {
-    width: wp(80),
-    height: hp(30),
-    opacity: 0.5
+    width: wp(60),
+    height: hp(20),
+    opacity: 0.5,
   }
 });
 

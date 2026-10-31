@@ -58,7 +58,7 @@ const Orders = () => {
         ordersRefetch(),
     ]);
 };
-    if (isOffline && !orders) {
+    if (isOffline && orders === undefined) {
         return (
             <SafeAreaView style={styles.container}>
                 <Header title='Orders' onPress={() => router.back()} />
@@ -166,7 +166,7 @@ const Orders = () => {
     }
 
     // error
-    if (isErrorFetching) {
+    if (isErrorFetching && !isOffline && !orders) {
         return (
             <SafeAreaView style={styles.container}>
                 <Header title='Orders' onPress={() => router.back()} />
@@ -236,11 +236,13 @@ const Orders = () => {
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={
         <CustomEmptyComponent
+                illustration={require('../../assets/illustrations/noproduct.png')}
+
             mainText={hasActiveFilter ? 'No orders found' : 'No orders yet'}
             subText={
                 hasActiveFilter
                     ? 'Try a different search or filter'
-                    : 'Your orders will appear here'
+                    : 'Your orders or sales will appear here'
             }
         />
     }

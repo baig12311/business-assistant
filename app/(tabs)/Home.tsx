@@ -63,7 +63,7 @@ const Home = () => {
 
         // network
 
-         if (isOffline) {
+         if (isOffline ) {
         return (
             <SafeAreaView style={styles.container}>
                 <Header
@@ -291,7 +291,7 @@ const Home = () => {
                 <CustomEmptyComponent 
                 isError={true}
                 mainText='Something Went Wrong'
-                subText='Unable to load customers. Please try again.'
+                subText='Unable to load data. Please try again.'
                 onPress={handleRetry}
                 />
 

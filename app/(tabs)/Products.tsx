@@ -68,7 +68,7 @@ const Products = () => {
 };
     // network
 
-     if (isOffline && !products) {
+     if (isOffline && products===undefined) {
         return (
             <SafeAreaView style={styles.container}>
                 <Header title='Products' onPress={() => router.back()} />
@@ -124,7 +124,7 @@ const Products = () => {
     }
 
     // error
-    if (isErrorFetching) {
+    if (isErrorFetching && !isOffline && !products) {
         return (
             <SafeAreaView style={styles.container}>
                 <Header title='Products' onPress={() => router.back()} />

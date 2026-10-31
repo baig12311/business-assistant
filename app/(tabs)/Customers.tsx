@@ -44,7 +44,7 @@ const Customers = () => {
 };
 
     // error
-    if (isOffline && !customers) {
+    if (isOffline && customers === undefined) {
         return (
             <SafeAreaView style={styles.container}>
                 <Header title='Customers' onPress={() => router.back()} />
@@ -133,7 +133,7 @@ const Customers = () => {
         )
 
     // error
-    if (isErrorFetching) {
+    if (isErrorFetching && !isOffline && !customers) {
         return (
             <SafeAreaView style={styles.container}>
                 <Header title='Customers' onPress={() => router.back()} />
